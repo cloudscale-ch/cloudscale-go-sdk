@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 )
 
 const (
 	libraryVersion = "1.0"
-	defaultBaseURL = "https://api.digitalocean.com/"
+	defaultBaseURL = "https://api.cloudscale.ch/"
 	userAgent      = "cloudscale/" + libraryVersion
 	mediaType      = "application/json"
 
@@ -69,4 +70,16 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.UserAgent)
 	return req, nil
+}
+
+type ErrorResponse struct {
+	Message map[string]string
+}
+
+func (r *ErrorResponse) Error() string {
+	err := ""
+	for key, value := range r.Message {
+		err = fmt.Sprintf("%s: %s", key, value)
+	}
+	return err
 }

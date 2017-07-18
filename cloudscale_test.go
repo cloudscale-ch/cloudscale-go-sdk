@@ -50,3 +50,10 @@ func TestNewRequest(t *testing.T) {
 		t.Errorf("NewRequest() User-Agent = %v, expected %v", userAgent, c.UserAgent)
 	}
 }
+
+func TestErrorResponse_Error(t *testing.T) {
+	err := ErrorResponse{Message: map[string]string{"name": "This field may not be blank."}}
+	if err.Error() == "" {
+		t.Errorf("Expected non-empty ErrorResponse.Error()")
+	}
+}
