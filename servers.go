@@ -45,3 +45,11 @@ type Address struct {
 	Gateway      string `json:"gateway"`
 	ReversePtr   string `json:"reverse_prt"`
 }
+
+type ServerRequest struct {
+	Name         string   `json:"name"`
+	Flavor       string   `json:"flavor"`
+	Image        string   `json:"image"`
+	VolumeSizeGB string   `json:"volume_size_gb"`
+	SSHKeys      []string `json:"ssh_keys"`
+}
