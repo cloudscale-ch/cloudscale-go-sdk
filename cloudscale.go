@@ -1,6 +1,9 @@
 package cloudscale
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"net/http"
 	"net/url"
 )
@@ -39,4 +42,31 @@ func NewClient(httpClient *http.Client) *Client {
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
 
 	return c
+}
+
+func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
+	rel, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	u := c.BaseURL.ResolveReference(rel)
+
+	buf := new(bytes.Buffer)
+	if body != nil {
+		err = json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", mediaType)
+	req.Header.Add("Accept", mediaType)
+	req.Header.Add("User-Agent", c.UserAgent)
+	return req, nil
 }
