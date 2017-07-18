@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -14,15 +16,12 @@ const (
 	defaultBaseURL = "https://api.cloudscale.ch/"
 	userAgent      = "cloudscale/" + libraryVersion
 	mediaType      = "application/json"
-
-	headerRateLimit     = "RateLimit-Limit"
-	headerRateRemaining = "RateLimit-Remaining"
-	headerRateReset     = "RateLimit-Reset"
 )
 
-// Client manages communication with DigitalOcean V2 API.
+// Client manages communication with CloudScale API.
 type Client struct {
-	// HTTP client used to communicate with the DO API.
+
+	// HTTP client used to communicate with the CloudScale API.
 	client *http.Client
 
 	// Base URL for API requests.
@@ -70,6 +69,62 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.UserAgent)
 	return req, nil
+}
+
+func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) error {
+
+	req = req.WithContext(ctx)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if rerr := resp.Body.Close(); err == nil {
+			err = rerr
+		}
+	}()
+
+	err = CheckResponse(resp)
+	if err != nil {
+		return err
+	}
+
+	if v != nil {
+		if w, ok := v.(io.Writer); ok {
+			_, err = io.Copy(w, resp.Body)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = json.NewDecoder(resp.Body).Decode(v)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return err
+}
+
+func CheckResponse(r *http.Response) error {
+	if c := r.StatusCode; c >= 200 && c <= 299 {
+		return nil
+	}
+
+	data, err := ioutil.ReadAll(r.Body)
+	res := map[string]string{}
+	if err == nil && len(data) > 0 {
+		err := json.Unmarshal(data, &res)
+		if err != nil {
+			return err
+		}
+	}
+
+	return &ErrorResponse{
+		Message: res,
+	}
 }
 
 type ErrorResponse struct {
