@@ -63,13 +63,13 @@ type ServerRequest struct {
 
 type ServerService interface {
 	Create(ctx context.Context, createRequest *ServerRequest) (*Server, error)
-	Get(ctx context.Context, id string) (*Server, error)
-	Update(ctx context.Context, id string) error
-	Delete(ctx context.Context, id string) error
+	Get(ctx context.Context, serverID string) (*Server, error)
+	Update(ctx context.Context, serverID string) error
+	Delete(ctx context.Context, serverID string) error
 	List(ctx context.Context) ([]Server, error)
-	Reboot(ctx context.Context, id string) error
-	Start(ctx context.Context, id string) error
-	Stop(ctx context.Context, id string) error
+	Reboot(ctx context.Context, serverID string) error
+	Start(ctx context.Context, serverID string) error
+	Stop(ctx context.Context, serverID string) error
 }
 
 type ServerServiceOperations struct {
@@ -94,22 +94,23 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 	return server, nil
 }
 
-func (s ServerServiceOperations) Update(ctx context.Context, id string) error {
+func (s ServerServiceOperations) Update(ctx context.Context, serverID string) error {
 	return nil
 }
-func (s ServerServiceOperations) Get(ctx context.Context, id string) (*Server, error) {
+func (s ServerServiceOperations) Get(ctx context.Context, serverID string) (*Server, error) {
+
 	return nil, nil
 }
-func (s ServerServiceOperations) Delete(ctx context.Context, id string) error {
+func (s ServerServiceOperations) Delete(ctx context.Context, serverID string) error {
 	return nil
 }
-func (s ServerServiceOperations) Reboot(ctx context.Context, id string) error {
+func (s ServerServiceOperations) Reboot(ctx context.Context, serverID string) error {
 	return nil
 }
-func (s ServerServiceOperations) Start(ctx context.Context, id string) error {
+func (s ServerServiceOperations) Start(ctx context.Context, serverID string) error {
 	return nil
 }
-func (s ServerServiceOperations) Stop(ctx context.Context, id string) error {
+func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) error {
 	return nil
 }
 func (s ServerServiceOperations) List(ctx context.Context) ([]Server, error) {
