@@ -1,5 +1,12 @@
 package cloudscale
 
+import (
+	"context"
+	"net/http"
+)
+
+const serverBasePath = "v1/servers"
+
 type Server struct {
 	HREF            string      `json:"href"`
 	UUID            string      `json:"uuid"`
@@ -50,6 +57,61 @@ type ServerRequest struct {
 	Name         string   `json:"name"`
 	Flavor       string   `json:"flavor"`
 	Image        string   `json:"image"`
-	VolumeSizeGB string   `json:"volume_size_gb"`
+	VolumeSizeGB int      `json:"volume_size_gb"`
 	SSHKeys      []string `json:"ssh_keys"`
+}
+
+type ServerService interface {
+	Create(ctx context.Context, createRequest *ServerRequest) (*Server, error)
+	Get(ctx context.Context, id string) (*Server, error)
+	Update(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string) error
+	List(ctx context.Context) ([]Server, error)
+	Reboot(ctx context.Context, id string) error
+	Start(ctx context.Context, id string) error
+	Stop(ctx context.Context, id string) error
+}
+
+type ServerServiceOperations struct {
+	client *Client
+}
+
+func (s ServerServiceOperations) Create(ctx context.Context, createRequest *ServerRequest) (*Server, error) {
+	path := serverBasePath
+
+	req, err := s.client.NewRequest(ctx, http.MethodPost, path, createRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	server := new(Server)
+
+	err = s.client.Do(ctx, req, server)
+	if err != nil {
+		return nil, err
+	}
+
+	return server, nil
+}
+
+func (s ServerServiceOperations) Update(ctx context.Context, id string) error {
+	return nil
+}
+func (s ServerServiceOperations) Get(ctx context.Context, id string) (*Server, error) {
+	return nil, nil
+}
+func (s ServerServiceOperations) Delete(ctx context.Context, id string) error {
+	return nil
+}
+func (s ServerServiceOperations) Reboot(ctx context.Context, id string) error {
+	return nil
+}
+func (s ServerServiceOperations) Start(ctx context.Context, id string) error {
+	return nil
+}
+func (s ServerServiceOperations) Stop(ctx context.Context, id string) error {
+	return nil
+}
+func (s ServerServiceOperations) List(ctx context.Context) ([]Server, error) {
+	return nil, nil
 }
