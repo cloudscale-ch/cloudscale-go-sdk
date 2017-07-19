@@ -29,6 +29,8 @@ type Client struct {
 
 	// User agent for client
 	UserAgent string
+
+	Servers ServerService
 }
 
 // NewClient returns a new DigitalOcean API client.
@@ -40,6 +42,7 @@ func NewClient(httpClient *http.Client) *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
+	c.Servers = ServerServiceOperations{client: c}
 
 	return c
 }
