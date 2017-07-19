@@ -2,6 +2,7 @@ package cloudscale
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -97,9 +98,22 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 func (s ServerServiceOperations) Update(ctx context.Context, serverID string) error {
 	return nil
 }
-func (s ServerServiceOperations) Get(ctx context.Context, serverID string) (*Server, error) {
 
-	return nil, nil
+func (s ServerServiceOperations) Get(ctx context.Context, serverID string) (*Server, error) {
+	path := fmt.Sprintf("%s/%s", serverBasePath, serverID)
+
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	server := new(Server)
+	err = s.client.Do(ctx, req, server)
+	if err != nil {
+		return nil, err
+	}
+
+	return server, nil
 }
 func (s ServerServiceOperations) Delete(ctx context.Context, serverID string) error {
 	return nil
