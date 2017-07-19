@@ -35,6 +35,12 @@ func teardown() {
 	server.Close()
 }
 
+func testHTTPMethod(t *testing.T, r *http.Request, expected string) {
+	if expected != r.Method {
+		t.Errorf("Request method = %v, expected %v", r.Method, expected)
+	}
+}
+
 func TestNewClient(t *testing.T) {
 	c := NewClient(nil)
 
