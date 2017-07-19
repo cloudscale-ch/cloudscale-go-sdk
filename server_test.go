@@ -72,3 +72,17 @@ func TestServers_Get(t *testing.T) {
 		t.Errorf("Servers.Get\n got=%#v\nwant=%#v", server, expected)
 	}
 }
+
+func TestServers_Delete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/servers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodDelete)
+	})
+
+	err := client.Servers.Delete(ctx, "cfde831a-4e87-4a75-960f-89b0148aa2cc")
+	if err != nil {
+		t.Errorf("Serveers.Delete returned error: %v", err)
+	}
+}
