@@ -135,7 +135,12 @@ func (s ServerServiceOperations) Reboot(ctx context.Context, serverID string) er
 }
 
 func (s ServerServiceOperations) Start(ctx context.Context, serverID string) error {
-	return nil
+	path := fmt.Sprintf("%s/%s/start", serverBasePath, serverID)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
+	if err != nil {
+		return err
+	}
+	return s.client.Do(ctx, req, nil)
 }
 func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) error {
 	return nil
