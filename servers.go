@@ -58,7 +58,7 @@ type ServerRequest struct {
 	Name              string   `json:"name"`
 	Flavor            string   `json:"flavor"`
 	Image             string   `json:"image"`
-	VolumeSizeGB      int      `json:"volume_size_gb"`
+	VolumeSizeGB      int      `json:"volume_size_gb,omitempty"`
 	BulkVolumeSizeGB  int      `json:"bulk_volume_size_gb,omitempty"`
 	SSHKeys           []string `json:"ssh_keys"`
 	UsePublicNetwork  bool     `json:"use_public_network,omitempty"`
