@@ -87,7 +87,7 @@ func TestServers_Delete(t *testing.T) {
 	}
 }
 
-func TestServersList(t *testing.T) {
+func TestServers_List(t *testing.T) {
 	setup()
 	defer teardown()
 
