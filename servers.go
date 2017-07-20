@@ -142,9 +142,16 @@ func (s ServerServiceOperations) Start(ctx context.Context, serverID string) err
 	}
 	return s.client.Do(ctx, req, nil)
 }
+
 func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) error {
-	return nil
+	path := fmt.Sprintf("%s/%s/stop", serverBasePath, serverID)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
+	if err != nil {
+		return err
+	}
+	return s.client.Do(ctx, req, nil)
 }
+
 func (s ServerServiceOperations) List(ctx context.Context) ([]Server, error) {
 	path := serverBasePath
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)

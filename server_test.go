@@ -137,3 +137,18 @@ func TestServers_Start(t *testing.T) {
 		t.Errorf("Serveers.Delete returned error: %v", err)
 	}
 }
+
+func TestServers_Stop(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/stop", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodPost)
+	})
+
+	err := client.Servers.Stop(ctx, "47cec963-fcd2-482f-bdb6-24461b2d47b1")
+
+	if err != nil {
+		t.Errorf("Serveers.Delete returned error: %v", err)
+	}
+}
