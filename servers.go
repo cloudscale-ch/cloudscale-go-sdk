@@ -55,11 +55,17 @@ type Address struct {
 }
 
 type ServerRequest struct {
-	Name         string   `json:"name"`
-	Flavor       string   `json:"flavor"`
-	Image        string   `json:"image"`
-	VolumeSizeGB int      `json:"volume_size_gb"`
-	SSHKeys      []string `json:"ssh_keys"`
+	Name              string   `json:"name"`
+	Flavor            string   `json:"flavor"`
+	Image             string   `json:"image"`
+	VolumeSizeGB      int      `json:"volume_size_gb"`
+	BulkVolumeSizeGB  int      `json:"bulk_volume_size_gb,omitempty"`
+	SSHKeys           []string `json:"ssh_keys"`
+	UsePublicNetwork  bool     `json:"use_public_network,omitempty"`
+	UsePrivateNetwork bool     `json:"use_private_network,omitempty"`
+	UseIPV6           bool     `json:"use_ipv6,omitempty"`
+	AntiAffinityWith  []string `json:"anti_affinity_with,omitempty"`
+	UserData          string   `json:"user_data,omitempty"`
 }
 
 type ServerService interface {
