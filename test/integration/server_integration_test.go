@@ -1,4 +1,6 @@
-package cloudscale
+// +build integration
+
+package integration
 
 import "testing"
 
