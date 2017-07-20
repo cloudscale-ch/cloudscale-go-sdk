@@ -135,5 +135,16 @@ func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) erro
 	return nil
 }
 func (s ServerServiceOperations) List(ctx context.Context) ([]Server, error) {
-	return nil, nil
+	path := serverBasePath
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	servers := []Server{}
+	err = s.client.Do(ctx, req, &servers)
+	if err != nil {
+		return nil, err
+	}
+
+	return servers, nil
 }

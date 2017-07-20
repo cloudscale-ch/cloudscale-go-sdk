@@ -86,3 +86,24 @@ func TestServers_Delete(t *testing.T) {
 		t.Errorf("Serveers.Delete returned error: %v", err)
 	}
 }
+
+func TestServersList(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/servers", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodGet)
+		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
+	})
+
+	servers, err := client.Servers.List(ctx)
+	if err != nil {
+		t.Errorf("Droplets.List returned error: %v", err)
+	}
+
+	expected := []Server{{UUID: "47cec963-fcd2-482f-bdb6-24461b2d47b1"}}
+	if !reflect.DeepEqual(servers, expected) {
+		t.Errorf("Servers.List\n got=%#v\nwant=%#v", servers, expected)
+	}
+
+}
