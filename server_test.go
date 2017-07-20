@@ -98,7 +98,7 @@ func TestServers_List(t *testing.T) {
 
 	servers, err := client.Servers.List(ctx)
 	if err != nil {
-		t.Errorf("Droplets.List returned error: %v", err)
+		t.Errorf("Servers.List returned error: %v", err)
 	}
 
 	expected := []Server{{UUID: "47cec963-fcd2-482f-bdb6-24461b2d47b1"}}
