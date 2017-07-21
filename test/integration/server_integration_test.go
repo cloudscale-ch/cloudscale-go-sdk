@@ -4,9 +4,10 @@ package integration
 
 import (
 	"context"
+	"errors"
 	"testing"
-	"time"
 
+	"github.com/cenkalti/backoff"
 	"github.com/cloudscale-ch/cloudscale"
 )
 
@@ -33,7 +34,23 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-	time.Sleep(20 * time.Second)
+
+	// An operation that may fail.
+	operation := func() error {
+		s, err := client.Servers.Get(context.Background(), expected.UUID)
+		if err != nil {
+			return err
+		}
+		if s.Status != "running" {
+			return errors.New("Server is not active")
+		}
+		return nil // or an error
+	}
+
+	err = backoff.Retry(operation, backoff.NewExponentialBackOff())
+	if err != nil {
+		t.Fatalf("Servers.Get returned error %s\n", err)
+	}
 
 	server, err := client.Servers.Get(context.Background(), expected.UUID)
 	if err != nil {
@@ -77,19 +94,57 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-	time.Sleep(20 * time.Second)
+
+	// An operation that may fail.
+	operation := func() error {
+		s, err := client.Servers.Get(context.Background(), server.UUID)
+		if err != nil {
+			return err
+		}
+
+		if s.Status != "running" {
+			return errors.New("Server is not active")
+		}
+		return nil // or an error
+	}
+
+	err = backoff.Retry(operation, backoff.NewExponentialBackOff())
+	if err != nil {
+		t.Fatalf("Servers.Get returned error %s\n", err)
+	}
 
 	err = client.Servers.Stop(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Stop returned error %s\n", err)
 	}
-	time.Sleep(30 * time.Second)
+
+	// An operation that may fail.
+	operationStop := func() error {
+		s, err := client.Servers.Get(context.Background(), server.UUID)
+		if err != nil {
+			return err
+		}
+
+		if s.Status != "stopped" {
+			return errors.New("Server is not active")
+		}
+		return nil // or an error
+	}
+
+	err = backoff.Retry(operationStop, backoff.NewExponentialBackOff())
+	if err != nil {
+		t.Fatalf("Servers.Get returned error %s\n", err)
+	}
 
 	err = client.Servers.Start(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Start returned error %s\n", err)
 	}
-	time.Sleep(20 * time.Second)
+
+	err = backoff.Retry(operation, backoff.NewExponentialBackOff())
+	if err != nil {
+		t.Fatalf("Servers.Get returned error %s\n", err)
+	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
