@@ -5,7 +5,6 @@ package integration
 import (
 	"context"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/cloudscale-ch/cloudscale"
@@ -45,7 +44,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 		t.Errorf("expectedIP.Server.UUID \n got=%s\nwant=%s", uuid, server.UUID)
 	}
 
-	ip := strings.Split(expectedIP.Network, "/")[0]
+	ip := expectedIP.IP()
 	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
 	if err != nil {
 		t.Fatalf("Servers.Get returned error %s\n", err)
@@ -123,7 +122,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		Server: expected.UUID,
 	}
 
-	ip := strings.Split(expectedIP.Network, "/")[0]
+	ip := expectedIP.IP()
 	floatingIP, err := client.FloatingIPs.Update(context.Background(), ip, updateRequest)
 	if err != nil {
 		t.Fatalf("floatingIP.Update returned error %s\n", err)
