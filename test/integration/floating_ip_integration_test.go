@@ -74,3 +74,76 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
 	}
 }
+
+func TestIntegrationFloatingIP_Update(t *testing.T) {
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         "db-master",
+		Flavor:       "flex-2",
+		Image:        "debian-8",
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
+
+	server, err := client.Servers.Create(context.Background(), createServerRequest)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	createServerRequest2 := &cloudscale.ServerRequest{
+		Name:         "db-slave",
+		Flavor:       "flex-2",
+		Image:        "debian-8",
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
+
+	expected, err := client.Servers.Create(context.Background(), createServerRequest2)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	waitUntil("running", server.UUID, t)
+	waitUntil("running", expected.UUID, t)
+
+	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
+		IPVersion: 4,
+		Server:    server.UUID,
+	}
+
+	expectedIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
+	if err != nil {
+		t.Fatalf("floatingIP.Create returned error %s\n", err)
+	}
+
+	updateRequest := &cloudscale.FloatingIPUpdateRequest{
+		Server: expected.UUID,
+	}
+
+	ip := strings.Split(expectedIP.Network, "/")[0]
+	floatingIP, err := client.FloatingIPs.Update(context.Background(), ip, updateRequest)
+	if err != nil {
+		t.Fatalf("floatingIP.Update returned error %s\n", err)
+	}
+
+	if uuid := floatingIP.Server.UUID; uuid != expected.UUID {
+		t.Errorf("Server UUID \n got=%s\nwant=%s", uuid, expected.UUID)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+	err = client.Servers.Delete(context.Background(), expected.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+
+	err = client.FloatingIPs.Delete(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
+	}
+}
