@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 const floatingIPsBasePath = "v1/floating-ips"
@@ -19,6 +20,10 @@ type FloatingIPCreateRequest struct {
 	IPVersion      int    `json:"ip_version"`
 	Server         string `json:"server"`
 	ReversePointer string `json:"reverse_ptr,omitempty"`
+}
+
+func (f FloatingIP) IP() string {
+	return strings.Split(f.Network, "/")[0]
 }
 
 type FloatingIPUpdateRequest struct {

@@ -8,6 +8,18 @@ import (
 	"testing"
 )
 
+func TestFloatingIPs_IP(t *testing.T) {
+	expected := "192.0.2.123"
+
+	floatingIP := FloatingIP{
+		Network: "192.0.2.123/32",
+	}
+	if ip := floatingIP.IP(); ip != expected {
+		t.Errorf("FloatingIP.IP got=%#s\nwant=%#s", ip, expected)
+
+	}
+}
+
 func TestFloatingIPs_Create(t *testing.T) {
 	setup()
 	defer teardown()
