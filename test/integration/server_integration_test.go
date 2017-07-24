@@ -98,7 +98,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
+		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
 }
 
