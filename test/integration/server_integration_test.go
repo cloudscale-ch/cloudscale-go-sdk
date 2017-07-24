@@ -35,22 +35,7 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	// An operation that may fail.
-	operation := func() error {
-		s, err := client.Servers.Get(context.Background(), expected.UUID)
-		if err != nil {
-			return err
-		}
-		if s.Status != "running" {
-			return errors.New("Server is not active")
-		}
-		return nil // or an error
-	}
-
-	err = backoff.Retry(operation, backoff.NewExponentialBackOff())
-	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
-	}
+	waitUntil("running", expected.UUID, t)
 
 	server, err := client.Servers.Get(context.Background(), expected.UUID)
 	if err != nil {
@@ -95,59 +80,47 @@ func TestIntegrationServer_Actions(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	// An operation that may fail.
-	operation := func() error {
-		s, err := client.Servers.Get(context.Background(), server.UUID)
-		if err != nil {
-			return err
-		}
-
-		if s.Status != "running" {
-			return errors.New("Server is not active")
-		}
-		return nil // or an error
-	}
-
-	err = backoff.Retry(operation, backoff.NewExponentialBackOff())
-	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
-	}
+	waitUntil("running", server.UUID, t)
 
 	err = client.Servers.Stop(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Stop returned error %s\n", err)
 	}
 
-	// An operation that may fail.
-	operationStop := func() error {
-		s, err := client.Servers.Get(context.Background(), server.UUID)
-		if err != nil {
-			return err
-		}
-
-		if s.Status != "stopped" {
-			return errors.New("Server is not active")
-		}
-		return nil // or an error
-	}
-
-	err = backoff.Retry(operationStop, backoff.NewExponentialBackOff())
-	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
-	}
+	waitUntil("stopped", server.UUID, t)
 
 	err = client.Servers.Start(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Start returned error %s\n", err)
 	}
 
-	err = backoff.Retry(operation, backoff.NewExponentialBackOff())
-	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
-	}
+	waitUntil("running", server.UUID, t)
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Get returned error %s\n", err)
 	}
+}
+
+func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
+	// An operation that may fail.
+	server := new(cloudscale.Server)
+	operation := func() error {
+		s, err := client.Servers.Get(context.Background(), uuid)
+		if err != nil {
+			return err
+		}
+
+		if s.Status != status {
+			return errors.New("Status not reached")
+		}
+		server = s
+		return nil
+	}
+
+	err := backoff.Retry(operation, backoff.NewExponentialBackOff())
+	if err != nil {
+		t.Fatalf("Error while waiting for status change %s\n", err)
+	}
+	return server
 }
