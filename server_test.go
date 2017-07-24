@@ -1,6 +1,7 @@
 package cloudscale
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -119,7 +120,7 @@ func TestServers_Reboot(t *testing.T) {
 	err := client.Servers.Reboot(ctx, "47cec963-fcd2-482f-bdb6-24461b2d47b1")
 
 	if err != nil {
-		t.Errorf("Serveers.Delete returned error: %v", err)
+		t.Errorf("Serveers.Reboot returned error: %v", err)
 	}
 }
 
@@ -134,7 +135,7 @@ func TestServers_Start(t *testing.T) {
 	err := client.Servers.Start(ctx, "47cec963-fcd2-482f-bdb6-24461b2d47b1")
 
 	if err != nil {
-		t.Errorf("Serveers.Delete returned error: %v", err)
+		t.Errorf("Serveers.Start returned error: %v", err)
 	}
 }
 
@@ -149,6 +150,44 @@ func TestServers_Stop(t *testing.T) {
 	err := client.Servers.Stop(ctx, "47cec963-fcd2-482f-bdb6-24461b2d47b1")
 
 	if err != nil {
-		t.Errorf("Serveers.Delete returned error: %v", err)
+		t.Errorf("Servers.Stop returned error: %v", err)
 	}
+}
+
+func TestServers_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/stop", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodPost)
+	})
+	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/start", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodPost)
+	})
+	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/reboot", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodPost)
+	})
+
+	serverID := "47cec963-fcd2-482f-bdb6-24461b2d47b1"
+
+	err := client.Servers.Update(context.TODO(), serverID, ServerRunning)
+	if err != nil {
+		t.Errorf("Servers.Update returned error: %v", err)
+	}
+
+	err = client.Servers.Update(context.TODO(), serverID, ServerStopped)
+	if err != nil {
+		t.Errorf("Servers.Update returned error: %v", err)
+	}
+
+	err = client.Servers.Update(context.TODO(), serverID, ServerRebooted)
+	if err != nil {
+		t.Errorf("Servers.Update returned error: %v", err)
+	}
+
+	err = client.Servers.Update(context.TODO(), serverID, "Not an actual action")
+	if err == nil {
+		t.Errorf("Servers.Update returned error: %v", err)
+	}
+
 }

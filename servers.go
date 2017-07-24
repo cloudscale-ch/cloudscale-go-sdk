@@ -8,6 +8,10 @@ import (
 
 const serverBasePath = "v1/servers"
 
+const ServerRunning = "running"
+const ServerStopped = "stopped"
+const ServerRebooted = "rebooted"
+
 type Server struct {
 	HREF            string      `json:"href"`
 	UUID            string      `json:"uuid"`
@@ -71,7 +75,7 @@ type ServerRequest struct {
 type ServerService interface {
 	Create(ctx context.Context, createRequest *ServerRequest) (*Server, error)
 	Get(ctx context.Context, serverID string) (*Server, error)
-	Update(ctx context.Context, serverID string) error
+	Update(ctx context.Context, serverID, status string) error
 	Delete(ctx context.Context, serverID string) error
 	List(ctx context.Context) ([]Server, error)
 	Reboot(ctx context.Context, serverID string) error
@@ -101,8 +105,17 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 	return server, nil
 }
 
-func (s ServerServiceOperations) Update(ctx context.Context, serverID string) error {
-	return nil
+func (s ServerServiceOperations) Update(ctx context.Context, serverID, status string) error {
+	switch status {
+	case ServerRunning:
+		return s.Start(context.Background(), serverID)
+	case ServerStopped:
+		return s.Stop(context.Background(), serverID)
+	case ServerRebooted:
+		return s.Reboot(context.Background(), serverID)
+	default:
+		return fmt.Errorf("Status Not Supported %s", status)
+	}
 }
 
 func (s ServerServiceOperations) Get(ctx context.Context, serverID string) (*Server, error) {
