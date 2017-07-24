@@ -18,7 +18,7 @@ type FloatingIP struct {
 type FloatingIPCreateRequest struct {
 	IPVersion      int    `json:"ip_version"`
 	Server         string `json:"server"`
-	ReversePointer string `json:"reverse_ptr"`
+	ReversePointer string `json:"reverse_ptr,omitempty"`
 }
 
 type FloatingIPUpdateRequest struct {

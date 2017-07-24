@@ -19,9 +19,8 @@ func TestFloatingIPs_Create(t *testing.T) {
 
 	mux.HandleFunc("/v1/floating-ips", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
-			"ip_version":  float64(6),
-			"server":      "47cec963-fcd2-482f-bdb6-24461b2d47b1",
-			"reverse_ptr": "",
+			"ip_version": float64(6),
+			"server":     "47cec963-fcd2-482f-bdb6-24461b2d47b1",
 		}
 
 		var v map[string]interface{}
