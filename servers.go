@@ -108,11 +108,11 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 func (s ServerServiceOperations) Update(ctx context.Context, serverID, status string) error {
 	switch status {
 	case ServerRunning:
-		return s.Start(context.Background(), serverID)
+		return s.Start(ctx, serverID)
 	case ServerStopped:
-		return s.Stop(context.Background(), serverID)
+		return s.Stop(ctx, serverID)
 	case ServerRebooted:
-		return s.Reboot(context.Background(), serverID)
+		return s.Reboot(ctx, serverID)
 	default:
 		return fmt.Errorf("Status Not Supported %s", status)
 	}
