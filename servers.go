@@ -41,7 +41,7 @@ type Image struct {
 
 type Volume struct {
 	Type       string `json:"type"`
-	DevicePath string `json:"device"`
+	DevicePath string `json:"device_path"`
 	SizeGB     int    `json:"size_gb"`
 }
 
