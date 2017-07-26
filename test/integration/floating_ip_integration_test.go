@@ -146,3 +146,44 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
 	}
 }
+
+func TestIntegrationFloatingIP_PrefixLenght(t *testing.T) {
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         "db-master",
+		Flavor:       "flex-2",
+		Image:        "debian-8",
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
+
+	server, err := client.Servers.Create(context.Background(), createServerRequest)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	waitUntil("running", server.UUID, t)
+
+	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
+		IPVersion:    6,
+		PrefixLength: 56,
+		Server:       server.UUID,
+	}
+
+	expectedIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
+	if err != nil {
+		t.Fatalf("floatingIP.Create returned error %s\n", err)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+
+	err = client.FloatingIPs.Delete(context.Background(), expectedIP.IP())
+	if err != nil {
+		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
+	}
+
+}
