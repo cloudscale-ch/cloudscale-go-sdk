@@ -55,7 +55,7 @@ type Address struct {
 	Address      string `json:"address"`
 	PrefixLenght string `json:"prefix_lenght"`
 	Gateway      string `json:"gateway"`
-	ReversePtr   string `json:"reverse_prt"`
+	ReversePtr   string `json:"reverse_ptr"`
 }
 
 type ServerRequest struct {
