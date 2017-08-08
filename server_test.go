@@ -27,6 +27,7 @@ func TestServers_Create(t *testing.T) {
 			"flavor":         "flex-4",
 			"image":          "debian-8",
 			"volume_size_gb": float64(50),
+			"use_ipv6":       false,
 			"ssh_keys":       []interface{}{"key"},
 		}
 

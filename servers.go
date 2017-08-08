@@ -67,7 +67,7 @@ type ServerRequest struct {
 	SSHKeys           []string `json:"ssh_keys"`
 	UsePublicNetwork  bool     `json:"use_public_network,omitempty"`
 	UsePrivateNetwork bool     `json:"use_private_network,omitempty"`
-	UseIPV6           bool     `json:"use_ipv6,omitempty"`
+	UseIPV6           bool     `json:"use_ipv6"`
 	AntiAffinityWith  []string `json:"anti_affinity_with,omitempty"`
 	UserData          string   `json:"user_data,omitempty"`
 }
