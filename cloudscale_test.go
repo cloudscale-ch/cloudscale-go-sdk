@@ -59,7 +59,7 @@ func TestNewRequest(t *testing.T) {
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := &ServerRequest{Name: "l"},
-		`{"name":"l","flavor":"","image":"","ssh_keys":null,"use_ipv6":false}`+
+		`{"name":"l","flavor":"","image":"","ssh_keys":null}`+
 			"\n"
 	req, _ := c.NewRequest(ctx, http.MethodGet, inURL, inBody)
 
