@@ -15,7 +15,7 @@ func TestFloatingIPs_IP(t *testing.T) {
 		Network: "192.0.2.123/32",
 	}
 	if ip := floatingIP.IP(); ip != expected {
-		t.Errorf("FloatingIP.IP got=%#s\nwant=%#s", ip, expected)
+		t.Errorf("FloatingIP.IP got=%s\nwant=%s", ip, expected)
 
 	}
 }
