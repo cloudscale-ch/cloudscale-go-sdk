@@ -79,6 +79,25 @@ func TestNewRequest(t *testing.T) {
 	if c.UserAgent != userAgent {
 		t.Errorf("NewRequest() User-Agent = %v, expected %v", userAgent, c.UserAgent)
 	}
+
+	authz := req.Header.Get("Authorization")
+	if len(authz) != 0 {
+		t.Errorf("NewReader() Authorization = %v, expected none", authz)
+	}
+}
+
+func TestNewRequestWithToken(t *testing.T) {
+	c := NewClient(nil)
+	c.AuthToken = "HELPIMTRAPPEDINATOKENGENERATOR"
+
+	inBody := &ServerRequest{Name: "l"}
+	req, _ := c.NewRequest(ctx, http.MethodGet, "/", inBody)
+
+	expected := "Bearer " + c.AuthToken
+	authz := req.Header.Get("Authorization")
+	if authz != expected {
+		t.Errorf("NewReader() Authorization = %v, expected %v", authz, expected)
+	}
 }
 
 func TestErrorResponse_Error(t *testing.T) {

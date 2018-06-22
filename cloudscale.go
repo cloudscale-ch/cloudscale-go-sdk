@@ -27,6 +27,9 @@ type Client struct {
 	// Base URL for API requests.
 	BaseURL *url.URL
 
+	// Authentication token
+	AuthToken string
+
 	// User agent for client
 	UserAgent string
 
@@ -73,6 +76,11 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.Header.Add("Content-Type", mediaType)
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.UserAgent)
+
+	if len(c.AuthToken) != 0 {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.AuthToken))
+	}
+
 	return req, nil
 }
 
