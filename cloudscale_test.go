@@ -120,6 +120,7 @@ func TestCheckResponse(t *testing.T) {
 	}
 
 	expected := &ErrorResponse{
+		StatusCode: http.StatusBadRequest,
 		Message: map[string]string{
 			"name": "This field may not be blank.",
 		},

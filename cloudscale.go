@@ -136,12 +136,14 @@ func CheckResponse(r *http.Response) error {
 	}
 
 	return &ErrorResponse{
-		Message: res,
+		StatusCode: r.StatusCode,
+		Message:    res,
 	}
 }
 
 type ErrorResponse struct {
-	Message map[string]string
+	StatusCode int
+	Message    map[string]string
 }
 
 func (r *ErrorResponse) Error() string {
