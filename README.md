@@ -24,3 +24,8 @@ Run the tests using:
 CLOUDSCALE_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration
 
 ````
+
+If you want to give params to `go test`, you can use something like this:
+```
+TESTARGS='-run FloatingIP' make integration
+```
