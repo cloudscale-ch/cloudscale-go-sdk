@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 const (
@@ -43,7 +44,14 @@ func NewClient(httpClient *http.Client) *Client {
 		httpClient = http.DefaultClient
 	}
 
-	baseURL, _ := url.Parse(defaultBaseURL)
+	// To allow more complicated testing we allow changing the cloudscale.ch
+	// URL.
+	defaultURL := os.Getenv("CLOUDSCALE_URL")
+
+	if defaultURL == "" {
+		defaultURL = defaultBaseURL
+	}
+	baseURL, _ := url.Parse(defaultURL)
 
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
 	c.Servers = ServerServiceOperations{client: c}
