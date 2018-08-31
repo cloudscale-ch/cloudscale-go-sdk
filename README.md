@@ -21,6 +21,6 @@ positives and test failures due to network issues, data changes, etc.
 Run the tests using:
 
 ````
-CLOUDSCALE_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" go test -v -tags=integration  ./integration
+CLOUDSCALE_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration
 
 ````
