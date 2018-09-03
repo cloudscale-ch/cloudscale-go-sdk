@@ -21,7 +21,7 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := &cloudscale.ServerRequest{
-		Name:         "db-master",
+		Name:         "go-sdk-integration-test",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -66,7 +66,7 @@ func TestIntegrationServer_Update(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := &cloudscale.ServerRequest{
-		Name:         "db-master",
+		Name:         "go-sdk-integration-test",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -122,7 +122,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := &cloudscale.ServerRequest{
-		Name:         "db-master",
+		Name:         "go-sdk-integration-test",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,

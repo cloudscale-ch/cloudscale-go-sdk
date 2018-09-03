@@ -14,7 +14,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "db-master",
+		Name:         "go-sdk-integration-test",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -76,7 +76,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 
 func TestIntegrationFloatingIP_Update(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "db-master",
+		Name:         "go-sdk-integration-test",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -91,7 +91,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	}
 
 	createServerRequest2 := &cloudscale.ServerRequest{
-		Name:         "db-slave",
+		Name:         "go-sdk-integration-test-floating",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -149,7 +149,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 
 func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "db-master",
+		Name:         "go-sdk-integration-test",
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
