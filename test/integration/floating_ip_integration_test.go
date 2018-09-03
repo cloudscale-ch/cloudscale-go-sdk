@@ -147,7 +147,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	}
 }
 
-func TestIntegrationFloatingIP_PrefixLenght(t *testing.T) {
+func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         "db-master",
 		Flavor:       "flex-2",
