@@ -10,7 +10,7 @@ const volumeBasePath = "v1/volume"
 
 type Volume struct {
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
-    // will be coming from the API if something is disabled.
+	// will be coming from the API if something is disabled.
 	HREF        string   `json:"href,omitempty"`
 	UUID        string   `json:"uuid,omitempty"`
 	Name        string   `json:"name,omitempty"`
