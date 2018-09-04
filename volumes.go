@@ -6,17 +6,17 @@ import (
 	"net/http"
 )
 
-const volumeBasePath = "v1/volume"
+const volumeBasePath = "v1/volumes"
 
 type Volume struct {
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF        string   `json:"href,omitempty"`
-	UUID        string   `json:"uuid,omitempty"`
-	Name        string   `json:"name,omitempty"`
-	SizeGB      int      `json:"size_gb,omitempty"`
-	Type        string   `json:"type,omitempty"`
-	ServerUUIDs []string `json:"server_uuids,omitempty"`
+	HREF        string    `json:"href,omitempty"`
+	UUID        string    `json:"uuid,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	SizeGB      int       `json:"size_gb,omitempty"`
+	Type        string    `json:"type,omitempty"`
+	ServerUUIDs *[]string `json:"server_uuids,omitempty"`
 }
 
 type VolumeService interface {

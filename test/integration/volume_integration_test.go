@@ -4,27 +4,27 @@ package integration
 
 import (
 	"context"
-	"reflect"
 	"strings"
 	"testing"
+    "time"
 
 	"github.com/cloudscale-ch/cloudscale"
 )
 
 const volumeBaseName = "go-sdk-integration-test-volume"
 
-const createServerRequest = &cloudscale.ServerRequest{
-	Name:         "go-sdk-integration-test-volume",
-	Flavor:       "flex-2",
-	Image:        "debian-8",
-	VolumeSizeGB: 10,
-	SSHKeys: []string{
-		"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
-	},
-}
-
 func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	integrationTest(t)
+
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         "go-sdk-integration-test-volume",
+		Flavor:       "flex-2",
+		Image:        "debian-8",
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
 
 	server, err := client.Servers.Create(context.Background(), createServerRequest)
 	if err != nil {
@@ -33,28 +33,31 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 
 	waitUntil("running", server.UUID, t)
 
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.Volume{
 		Name:        volumeBaseName,
 		SizeGB:      50,
-		ServerUUIDs: []string{server.UUID},
+		ServerUUIDs: &[]string{server.UUID},
 	}
 
-	expectedIP, err := client.Volumes.Create(context.TODO(), createVolumeRequest)
+	volume, err := client.Volumes.Create(context.TODO(), createVolumeRequest)
 	if err != nil {
 		t.Fatalf("Volumes.Create returned error %s\n", err)
 	}
 
-	detachVolumeRequest := &cloudscale.VolumeRequest{
-		ServerUUIDs: []string{},
+    time.Sleep(3 * time.Second)
+	detachVolumeRequest := &cloudscale.Volume{
+		ServerUUIDs: &[]string{},
 	}
-	client.Volumes.Update(context.TODO(), server.UUID, detachVolumeRequest)
+	err = client.Volumes.Update(context.TODO(), volume.UUID, detachVolumeRequest)
 	if err != nil {
 		t.Errorf("Volumes.Update returned error %s\n", err)
 	}
-	attachVolumeRequest := &cloudscale.VolumeRequest{
-		ServerUUIDs: []string{server.UUID},
+	attachVolumeRequest := &cloudscale.Volume{
+		ServerUUIDs: &[]string{server.UUID},
 	}
-	client.Volumes.Update(context.TODO(), server.UUID, attachVolumeRequest)
+
+    time.Sleep(3 * time.Second)
+	err = client.Volumes.Update(context.TODO(), volume.UUID, attachVolumeRequest)
 	if err != nil {
 		t.Errorf("Volumes.Update returned error %s\n", err)
 	}
@@ -66,7 +69,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 }
 
 func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.Volume{
 		Name:   volumeBaseName,
 		SizeGB: 50,
 	}
@@ -81,9 +84,9 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Fatalf("Volumes.List returned error %s\n", err)
 	}
 
-	inList = false
+	inList := false
 	for _, listVolume := range volumes {
-		if listVolume.UUID {
+		if listVolume.UUID == volume.UUID {
 			inList = true
 		}
 	}
@@ -91,34 +94,42 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Errorf("Volume %s not found\n", volume.UUID)
 	}
 
-	multiUpdateVolumeRequest := &cloudscale.VolumeRequest{
+	multiUpdateVolumeRequest := &cloudscale.Volume{
 		SizeGB: 50,
 		Name:   volumeBaseName + "Foo",
 	}
-	client.Volumes.Update(context.TODO(), server.UUID, scaleVolumeRequest)
+	err = client.Volumes.Update(context.TODO(), volume.UUID, multiUpdateVolumeRequest)
 	// This shouldn't work.
 	if err == nil {
 		t.Error("Expected an error when updating multiple volume attributes\n")
 	} else {
-		expected = "foo"
-		if err != expected {
-			t.Error("Expected \"%s\" not \"%s\"\n", expected, err)
+		expected := "To keep changes atomic"
+		err, ok := err.(*cloudscale.ErrorResponse)
+		if !ok {
+			t.Errorf("Couldn't cast %s\n", ok)
+		}
+		if err.StatusCode != 400 {
+			t.Errorf("Expected bad request and not %s\n", err.StatusCode)
+		}
+		if !strings.Contains(err.Error(), expected) {
+			t.Errorf("Expected \"%s\" not \"%s\"\n", expected, err.Error())
 		}
 	}
 
+	const scaleSize = 200
 	// Try to scale.
-	scaleVolumeRequest := &cloudscale.VolumeRequest{SizeGB: 50}
-	client.Volumes.Update(context.TODO(), server.UUID, scaleVolumeRequest)
+	scaleVolumeRequest := &cloudscale.Volume{SizeGB: scaleSize}
+	err = client.Volumes.Update(context.TODO(), volume.UUID, scaleVolumeRequest)
 	getVolume, err := client.Volumes.Get(context.TODO(), volume.UUID)
 	if err == nil {
-		if getVolume.sizeGB != 200 {
-			t.Errorf("Scaling failed, could not scale, is at %s\n", getVolume.sizeGB)
+		if getVolume.SizeGB != scaleSize {
+			t.Errorf("Scaling failed, could not scale, is at %d\n", getVolume.SizeGB)
 		}
 	} else {
 		t.Errorf("Volumes.Get returned error %s\n", err)
 	}
 
-	err = client.Volumes.Delete(context.Background(), ip)
+	err = client.Volumes.Delete(context.Background(), volume.UUID)
 	if err != nil {
 		t.Fatalf("Volumes.Delete returned error %s\n", err)
 	}
