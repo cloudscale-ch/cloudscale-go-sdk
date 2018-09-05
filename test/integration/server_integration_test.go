@@ -5,11 +5,14 @@ package integration
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/cenkalti/backoff"
 	"github.com/cloudscale-ch/cloudscale"
 )
+
+const serverBaseName = "go-sdk-integration-test"
 
 func integrationTest(t *testing.T) {
 	if testing.Short() {
@@ -21,7 +24,7 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test",
+		Name:         serverBaseName,
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -66,7 +69,7 @@ func TestIntegrationServer_Update(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test",
+		Name:         serverBaseName,
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -122,7 +125,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test",
+		Name:         serverBaseName,
 		Flavor:       "flex-2",
 		Image:        "debian-8",
 		VolumeSizeGB: 10,
@@ -171,6 +174,23 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+}
+
+func TestIntegrationServer_DeleteRemainingServer(t *testing.T) {
+	servers, err := client.Servers.List(context.Background())
+	if err != nil {
+		t.Fatalf("Servers.List returned error %s\n", err)
+	}
+
+	for _, server := range servers {
+		if strings.HasPrefix(server.Name, serverBaseName) {
+			t.Errorf("Found not deleted server: %s\n", server.Name)
+			err = client.Servers.Delete(context.Background(), server.UUID)
+			if err != nil {
+				t.Errorf("Servers.Delete returned error %s\n", err)
+			}
+		}
 	}
 }
 

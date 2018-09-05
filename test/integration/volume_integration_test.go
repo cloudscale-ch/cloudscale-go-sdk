@@ -6,7 +6,7 @@ import (
 	"context"
 	"strings"
 	"testing"
-    "time"
+	"time"
 
 	"github.com/cloudscale-ch/cloudscale"
 )
@@ -44,7 +44,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 		t.Fatalf("Volumes.Create returned error %s\n", err)
 	}
 
-    time.Sleep(3 * time.Second)
+	time.Sleep(3 * time.Second)
 	detachVolumeRequest := &cloudscale.Volume{
 		ServerUUIDs: &[]string{},
 	}
@@ -56,7 +56,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 		ServerUUIDs: &[]string{server.UUID},
 	}
 
-    time.Sleep(3 * time.Second)
+	time.Sleep(3 * time.Second)
 	err = client.Volumes.Update(context.TODO(), volume.UUID, attachVolumeRequest)
 	if err != nil {
 		t.Errorf("Volumes.Update returned error %s\n", err)
