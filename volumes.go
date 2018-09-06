@@ -19,10 +19,14 @@ type Volume struct {
 	ServerUUIDs *[]string `json:"server_uuids,omitempty"`
 }
 
+type ListVolumeParams struct {
+	Name string `json:"name,omitempty"`
+}
+
 type VolumeService interface {
 	Create(ctx context.Context, createRequest *Volume) (*Volume, error)
 	Get(ctx context.Context, volumeID string) (*Volume, error)
-	List(ctx context.Context) ([]Volume, error)
+	List(ctx context.Context, params *ListVolumeParams) ([]Volume, error)
 	Update(ctx context.Context, volumeID string, updateRequest *Volume) error
 	Delete(ctx context.Context, volumeID string) error
 }
@@ -91,8 +95,14 @@ func (s VolumeServiceOperations) Delete(ctx context.Context, volumeID string) er
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s VolumeServiceOperations) List(ctx context.Context) ([]Volume, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, volumeBasePath, nil)
+func (s VolumeServiceOperations) List(ctx context.Context, params *ListVolumeParams) ([]Volume, error) {
+	path := volumeBasePath
+	if params != nil {
+		if params.Name != "" {
+			path = fmt.Sprintf("%s?name=%s", path, params.Name)
+		}
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}

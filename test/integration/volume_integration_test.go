@@ -79,7 +79,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Fatalf("Volumes.Create returned error %s\n", err)
 	}
 
-	volumes, err := client.Volumes.List(context.Background())
+	volumes, err := client.Volumes.List(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("Volumes.List returned error %s\n", err)
 	}
@@ -136,7 +136,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 }
 
 func TestIntegrationVolume_DeleteRemainingVolumes(t *testing.T) {
-	volumes, err := client.Volumes.List(context.Background())
+	volumes, err := client.Volumes.List(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("Volumes.List returned error %s\n", err)
 	}
