@@ -18,6 +18,7 @@ var (
 	ctx = context.TODO()
 
 	client *Client
+	metadataClient *MetadataClient
 
 	server *httptest.Server
 )
@@ -29,6 +30,9 @@ func setup() {
 	client = NewClient(nil)
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
+
+	metadataClient = NewMetadataClient(nil)
+	metadataClient.BaseURL = url
 }
 
 func teardown() {
