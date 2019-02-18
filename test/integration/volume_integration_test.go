@@ -106,10 +106,10 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		expected := "To keep changes atomic"
 		err, ok := err.(*cloudscale.ErrorResponse)
 		if !ok {
-			t.Errorf("Couldn't cast %s\n", ok)
+			t.Errorf("Couldn't cast %s\n", err)
 		}
 		if err.StatusCode != 400 {
-			t.Errorf("Expected bad request and not %s\n", err.StatusCode)
+			t.Errorf("Expected bad request and not %d\n", err.StatusCode)
 		}
 		if !strings.Contains(err.Error(), expected) {
 			t.Errorf("Expected \"%s\" not \"%s\"\n", expected, err.Error())
