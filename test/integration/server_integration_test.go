@@ -86,8 +86,12 @@ func TestIntegrationServer_Update(t *testing.T) {
 
 	waitUntil(cloudscale.ServerRunning, server.UUID, t)
 
+	status := cloudscale.ServerStopped
 	// Stop a server
-	err = client.Servers.Update(context.Background(), server.UUID, cloudscale.ServerStopped)
+	req := &cloudscale.ServerUpdateRequest{
+		Status: &status,
+	}
+	err = client.Servers.Update(context.Background(), server.UUID, req)
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
@@ -97,7 +101,8 @@ func TestIntegrationServer_Update(t *testing.T) {
 	}
 
 	// Start a server
-	err = client.Servers.Update(context.Background(), server.UUID, cloudscale.ServerRunning)
+	status = cloudscale.ServerRunning
+	err = client.Servers.Update(context.Background(), server.UUID, req)
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
@@ -107,7 +112,8 @@ func TestIntegrationServer_Update(t *testing.T) {
 	}
 
 	// Reboot a server
-	err = client.Servers.Update(context.Background(), server.UUID, cloudscale.ServerRebooted)
+	status = cloudscale.ServerRebooted
+	err = client.Servers.Update(context.Background(), server.UUID, req)
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}

@@ -167,25 +167,35 @@ func TestServers_Update(t *testing.T) {
 	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/reboot", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
+	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodPatch)
+	})
 
 	serverID := "47cec963-fcd2-482f-bdb6-24461b2d47b1"
 
-	err := client.Servers.Update(context.TODO(), serverID, ServerRunning)
+	status := ServerStopped
+	req := &ServerUpdateRequest{
+		Status: &status,
+	}
+	err := client.Servers.Update(context.TODO(), serverID, req)
 	if err != nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
 
-	err = client.Servers.Update(context.TODO(), serverID, ServerStopped)
+	status = ServerRunning
+	err = client.Servers.Update(context.TODO(), serverID, req)
 	if err != nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
 
-	err = client.Servers.Update(context.TODO(), serverID, ServerRebooted)
+	status = ServerRebooted
+	err = client.Servers.Update(context.TODO(), serverID, req)
 	if err != nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
 
-	err = client.Servers.Update(context.TODO(), serverID, "Not an actual action")
+	status = "Not an actual action"
+	err = client.Servers.Update(context.TODO(), serverID, req)
 	if err == nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
