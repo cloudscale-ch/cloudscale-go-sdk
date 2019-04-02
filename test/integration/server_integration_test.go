@@ -24,22 +24,10 @@ func integrationTest(t *testing.T) {
 func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
-	createRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
-		Flavor:       "flex-2",
-		Image:        DefaultImageSlug,
-		VolumeSizeGB: 10,
-		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
-		},
-	}
-
-	expected, err := client.Servers.Create(context.Background(), createRequest)
+	expected, err := createServer(t)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-
-	waitUntil("running", expected.UUID, t)
 
 	server, err := client.Servers.Get(context.Background(), expected.UUID)
 	if err != nil {
@@ -66,25 +54,13 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 
 }
 
-func TestIntegrationServer_Update(t *testing.T) {
+func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	integrationTest(t)
 
-	createRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
-		Flavor:       "flex-2",
-		Image:        DefaultImageSlug,
-		VolumeSizeGB: 10,
-		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
-		},
-	}
-
-	server, err := client.Servers.Create(context.Background(), createRequest)
+	server, err := createServer(t)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-
-	waitUntil(cloudscale.ServerRunning, server.UUID, t)
 
 	status := cloudscale.ServerStopped
 	// Stop a server
@@ -128,6 +104,24 @@ func TestIntegrationServer_Update(t *testing.T) {
 	}
 }
 
+func createServer(t) {
+	createRequest := &cloudscale.ServerRequest{
+		Name:         serverBaseName,
+		Flavor:       "flex-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
+
+	server, err = client.Servers.Create(context.Background(), createRequest)
+	if err == nil {
+		waitUntil(cloudscale.ServerRunning, server.UUID, t)
+	}
+}
+
+
 func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
 
@@ -145,8 +139,6 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-
-	waitUntil("running", server.UUID, t)
 
 	// Stop a server
 	err = client.Servers.Stop(context.Background(), server.UUID)
