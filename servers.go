@@ -111,15 +111,15 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 }
 
 type ServerUpdateRequest struct {
-	Name            *string   `json:"name,omitempty"`
-	Status          *string   `json:"status,omitempty"`
-	Flavor          *string   `json:"flavor,omitempty"`
+	Name            string   `json:"name,omitempty"`
+	Status          string   `json:"status,omitempty"`
+	Flavor          string   `json:"flavor,omitempty"`
 }
 
 func (s ServerServiceOperations) Update(ctx context.Context, serverID string, updateRequest *ServerUpdateRequest) error {
-	if updateRequest.Status != nil {
+	if updateRequest.Status != "" {
 		err := error(nil)
-		switch *updateRequest.Status {
+		switch updateRequest.Status {
 		case ServerRunning:
 			err = s.Start(ctx, serverID)
 		case ServerStopped:
@@ -127,7 +127,7 @@ func (s ServerServiceOperations) Update(ctx context.Context, serverID string, up
 		case ServerRebooted:
 			err = s.Reboot(ctx, serverID)
 		default:
-			return fmt.Errorf("Status Not Supported %s", *updateRequest.Status)
+			return fmt.Errorf("Status Not Supported %s", updateRequest.Status)
 		}
 		if err != nil {
 			return err
@@ -138,7 +138,7 @@ func (s ServerServiceOperations) Update(ctx context.Context, serverID string, up
 			Flavor: updateRequest.Flavor,
 		}
 	}
-	if updateRequest.Name != nil || updateRequest.Flavor != nil {
+	if updateRequest.Name != "" || updateRequest.Flavor != "" {
 		path := fmt.Sprintf("%s/%s", serverBasePath, serverID)
 
 		req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)

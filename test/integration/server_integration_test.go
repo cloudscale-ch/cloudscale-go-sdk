@@ -62,10 +62,9 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	status := cloudscale.ServerStopped
 	// Stop a server
 	req := &cloudscale.ServerUpdateRequest{
-		Status: &status,
+		Status: cloudscale.ServerStopped,
 	}
 	err = client.Servers.Update(context.Background(), server.UUID, req)
 	if err != nil {
@@ -77,7 +76,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	}
 
 	// Start a server
-	status = cloudscale.ServerRunning
+	req.Status = cloudscale.ServerRunning
 	err = client.Servers.Update(context.Background(), server.UUID, req)
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
@@ -88,7 +87,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	}
 
 	// Reboot a server
-	status = cloudscale.ServerRebooted
+	req.Status = cloudscale.ServerRebooted
 	err = client.Servers.Update(context.Background(), server.UUID, req)
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
@@ -104,7 +103,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	}
 }
 
-func createServer(t) {
+func createServer(t *testing.T) (*cloudscale.Server, error) {
 	createRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
@@ -115,9 +114,69 @@ func createServer(t) {
 		},
 	}
 
-	server, err = client.Servers.Create(context.Background(), createRequest)
+	server, err := client.Servers.Create(context.Background(), createRequest)
 	if err == nil {
 		waitUntil(cloudscale.ServerRunning, server.UUID, t)
+	}
+	return server, err
+}
+
+func TestIntegrationServer_UpdateRest(t *testing.T) {
+	integrationTest(t)
+
+	server, err := createServer(t)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+	// We need to stop the server in order to scale
+	err = client.Servers.Stop(context.Background(), server.UUID)
+	if err != nil {
+		t.Errorf("Servers.Stop returned error %s\n", err)
+	}
+	waitUntil("stopped", server.UUID, t)
+
+	multiUpdateRequest := &cloudscale.ServerUpdateRequest{
+		Flavor: "flex-4",
+		Name:   "bar",
+	}
+	err = client.Servers.Update(context.TODO(), server.UUID, multiUpdateRequest)
+	// This shouldn't work.
+	if err == nil {
+		t.Error("Expected an error when updating multiple volume attributes\n")
+	} else {
+		expected := "To keep changes atomic"
+		err, ok := err.(*cloudscale.ErrorResponse)
+		if !ok {
+			t.Errorf("Couldn't cast %s\n", err)
+		}
+		if err.StatusCode != 400 {
+			t.Errorf("Expected bad request and not %d\n", err.StatusCode)
+		}
+		if !strings.Contains(err.Error(), expected) {
+			t.Errorf("Expected \"%s\" not \"%s\"\n", expected, err.Error())
+		}
+	}
+
+	const scaleFlavor = "flex-4"
+	// Try to scale.
+	scaleRequest := &cloudscale.ServerUpdateRequest{Flavor: scaleFlavor}
+	err = client.Servers.Update(context.TODO(), server.UUID, scaleRequest)
+	if err != nil {
+		t.Errorf("Servers.Update failed %s\n", err)
+	}
+
+	getServer, err := client.Servers.Get(context.TODO(), server.UUID)
+	if err == nil {
+		if getServer.Flavor.Slug != scaleFlavor {
+			t.Errorf("Scaling failed, could not scale, is at %s\n", getServer.Flavor.Slug)
+		}
+	} else {
+		t.Errorf("Servers.Get returned error %s\n", err)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
 }
 
