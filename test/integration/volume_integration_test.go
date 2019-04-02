@@ -19,7 +19,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         "go-sdk-integration-test-volume",
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
