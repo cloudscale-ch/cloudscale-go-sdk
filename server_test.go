@@ -16,7 +16,7 @@ func TestServers_Create(t *testing.T) {
 	serverRequest := &ServerRequest{
 		Name:         "mysql",
 		Flavor:       "flex-4",
-		Image:        "debian-8",
+		Image:        "debian",
 		VolumeSizeGB: 50,
 		SSHKeys:      []string{"key"},
 	}
@@ -25,7 +25,7 @@ func TestServers_Create(t *testing.T) {
 		expected := map[string]interface{}{
 			"name":           "mysql",
 			"flavor":         "flex-4",
-			"image":          "debian-8",
+			"image":          "debian",
 			"volume_size_gb": float64(50),
 			"ssh_keys":       []interface{}{"key"},
 		}
