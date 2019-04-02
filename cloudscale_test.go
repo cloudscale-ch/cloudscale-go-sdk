@@ -17,7 +17,7 @@ var (
 
 	ctx = context.TODO()
 
-	client *Client
+	client         *Client
 	metadataClient *MetadataClient
 
 	server *httptest.Server
