@@ -16,7 +16,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
@@ -78,7 +78,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
@@ -93,7 +93,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	createServerRequest2 := &cloudscale.ServerRequest{
 		Name:         serverBaseName + "-floating",
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
@@ -151,7 +151,7 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",

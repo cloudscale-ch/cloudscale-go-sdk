@@ -13,6 +13,7 @@ import (
 )
 
 const serverBaseName = "go-sdk-integration-test"
+const DefaultImageSlug = "debian-9"
 
 func integrationTest(t *testing.T) {
 	if testing.Short() {
@@ -26,7 +27,7 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 	createRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
@@ -71,7 +72,7 @@ func TestIntegrationServer_Update(t *testing.T) {
 	createRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
@@ -127,7 +128,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	createRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
-		Image:        "debian-8",
+		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
 			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
