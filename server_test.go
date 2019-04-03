@@ -173,28 +173,27 @@ func TestServers_Update(t *testing.T) {
 
 	serverID := "47cec963-fcd2-482f-bdb6-24461b2d47b1"
 
-	status := ServerStopped
 	req := &ServerUpdateRequest{
-		Status: &status,
+		Status: ServerStopped,
 	}
 	err := client.Servers.Update(context.TODO(), serverID, req)
 	if err != nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
 
-	status = ServerRunning
+	req.Status = ServerRunning
 	err = client.Servers.Update(context.TODO(), serverID, req)
 	if err != nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
 
-	status = ServerRebooted
+	req.Status = ServerRebooted
 	err = client.Servers.Update(context.TODO(), serverID, req)
 	if err != nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
 
-	status = "Not an actual action"
+	req.Status = "Not an actual action"
 	err = client.Servers.Update(context.TODO(), serverID, req)
 	if err == nil {
 		t.Errorf("Servers.Update returned error: %v", err)
