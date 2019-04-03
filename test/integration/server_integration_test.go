@@ -184,17 +184,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
 
-	createRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
-		Flavor:       "flex-2",
-		Image:        DefaultImageSlug,
-		VolumeSizeGB: 10,
-		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
-		},
-	}
-
-	server, err := client.Servers.Create(context.Background(), createRequest)
+	server, err := createServer(t)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
