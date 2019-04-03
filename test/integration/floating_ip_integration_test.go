@@ -123,9 +123,14 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	}
 
 	ip := expectedIP.IP()
-	floatingIP, err := client.FloatingIPs.Update(context.Background(), ip, updateRequest)
+	err = client.FloatingIPs.Update(context.Background(), ip, updateRequest)
 	if err != nil {
 		t.Fatalf("floatingIP.Update returned error %s\n", err)
+	}
+
+	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("floatingIP.Get returned error %s\n", err)
 	}
 
 	if uuid := floatingIP.Server.UUID; uuid != expected.UUID {
