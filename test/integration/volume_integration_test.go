@@ -66,6 +66,10 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
+	err = client.Volumes.Delete(context.Background(), volume.UUID)
+	if err != nil {
+		t.Fatalf("Volumes.Delete returned error %s\n", err)
+	}
 }
 
 func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
