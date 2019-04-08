@@ -101,17 +101,11 @@ func TestFloatingIPs_Update(t *testing.T) {
 		if !reflect.DeepEqual(v, expected) {
 			t.Errorf("Request body = %#v, expected %#v", v, expected)
 		}
-
-		fmt.Fprintf(w, `{"network": "192.0.2.123/32"}`)
 	})
 
-	floatingIP, err := client.FloatingIPs.Update(ctx, "192.0.2.123", updateRequest)
+	err := client.FloatingIPs.Update(ctx, "192.0.2.123", updateRequest)
 	if err != nil {
 		t.Errorf("FloatingIps.Update returned error: %v", err)
-	} else {
-		if network := floatingIP.Network; network != "192.0.2.123/32" {
-			t.Errorf("expected network '%s', received '%s'", "192.0.2.123/32", network)
-		}
 	}
 }
 
