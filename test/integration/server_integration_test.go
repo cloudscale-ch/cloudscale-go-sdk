@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/cenkalti/backoff"
-	"github.com/cloudscale-ch/cloudscale"
+	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 const serverBaseName = "go-sdk-integration-test"
