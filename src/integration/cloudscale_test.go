@@ -9,7 +9,7 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk"
+	"cloudscale"
 )
 
 var (

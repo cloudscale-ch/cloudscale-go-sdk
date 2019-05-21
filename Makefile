@@ -6,10 +6,11 @@ test:
 integration:
 	go get github.com/cenkalti/backoff
 	go get golang.org/x/oauth2
-	go test -tags=integration -v $(TEST)/test/integration/... $(TESTARGS) -timeout 120m
+	GOPATH=$(GOPATH):$(PWD) go test -tags=integration -v integration $(TESTARGS) -timeout 120m
 
 fmt:
 	go fmt
 	gofmt -l -w test/integration
 
 .PHONY: test integration
+
