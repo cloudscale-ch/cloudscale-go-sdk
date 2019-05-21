@@ -75,6 +75,7 @@ type ServerRequest struct {
 	UsePrivateNetwork *bool    `json:"use_private_network,omitempty"`
 	UseIPV6           *bool    `json:"use_ipv6,omitempty"`
 	AntiAffinityWith  string   `json:"anti_affinity_with,omitempty"`
+	ServerGroups      []string `json:"server_groups,omitempty"`
 	UserData          string   `json:"user_data,omitempty"`
 }
 
