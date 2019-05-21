@@ -75,6 +75,7 @@ type ServerRequest struct {
 	UsePrivateNetwork *bool    `json:"use_private_network,omitempty"`
 	UseIPV6           *bool    `json:"use_ipv6,omitempty"`
 	AntiAffinityWith  string   `json:"anti_affinity_with,omitempty"`
+	ServerGroups      []string `json:"server_groups,omitempty"`
 	UserData          string   `json:"user_data,omitempty"`
 }
 
@@ -112,9 +113,9 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 }
 
 type ServerUpdateRequest struct {
-	Name            string   `json:"name,omitempty"`
-	Status          string   `json:"status,omitempty"`
-	Flavor          string   `json:"flavor,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Status string `json:"status,omitempty"`
+	Flavor string `json:"flavor,omitempty"`
 }
 
 func (s ServerServiceOperations) Update(ctx context.Context, serverID string, updateRequest *ServerUpdateRequest) error {
@@ -135,7 +136,7 @@ func (s ServerServiceOperations) Update(ctx context.Context, serverID string, up
 		}
 		// Get rid of status
 		updateRequest = &ServerUpdateRequest{
-			Name: updateRequest.Name,
+			Name:   updateRequest.Name,
 			Flavor: updateRequest.Flavor,
 		}
 	}
