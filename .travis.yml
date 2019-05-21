@@ -1,0 +1,7 @@
+language: go
+
+go:
+  - 1.x
+
+script:
+  - CLOUDSCALE_TOKEN=$CLOUDSCALE_TOKEN make integration
