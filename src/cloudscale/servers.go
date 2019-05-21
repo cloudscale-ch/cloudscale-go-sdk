@@ -112,9 +112,9 @@ func (s ServerServiceOperations) Create(ctx context.Context, createRequest *Serv
 }
 
 type ServerUpdateRequest struct {
-	Name            string   `json:"name,omitempty"`
-	Status          string   `json:"status,omitempty"`
-	Flavor          string   `json:"flavor,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Status string `json:"status,omitempty"`
+	Flavor string `json:"flavor,omitempty"`
 }
 
 func (s ServerServiceOperations) Update(ctx context.Context, serverID string, updateRequest *ServerUpdateRequest) error {
@@ -135,7 +135,7 @@ func (s ServerServiceOperations) Update(ctx context.Context, serverID string, up
 		}
 		// Get rid of status
 		updateRequest = &ServerUpdateRequest{
-			Name: updateRequest.Name,
+			Name:   updateRequest.Name,
 			Flavor: updateRequest.Flavor,
 		}
 	}

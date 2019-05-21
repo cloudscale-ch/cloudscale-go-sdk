@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudscale-ch/cloudscale"
+	"cloudscale"
 )
 
 const volumeBaseName = "go-sdk-integration-test-volume"

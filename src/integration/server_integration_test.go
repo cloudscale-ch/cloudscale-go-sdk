@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	"cloudscale"
 	"github.com/cenkalti/backoff"
-	"github.com/cloudscale-ch/cloudscale"
 )
 
 const serverBaseName = "go-sdk-integration-test"
@@ -179,7 +179,6 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
 }
-
 
 func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
