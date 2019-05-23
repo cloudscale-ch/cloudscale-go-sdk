@@ -7,9 +7,8 @@ import (
 	"log"
 	"os"
 
+	cloudscale "github.com/alakae/cloudscale-go-sdk"
 	"golang.org/x/oauth2"
-
-	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 var (
