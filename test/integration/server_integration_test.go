@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
+	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
 	"github.com/cenkalti/backoff"
-	"github.com/cloudscale-ch/cloudscale"
 )
 
 const serverBaseName = "go-sdk-integration-test"
