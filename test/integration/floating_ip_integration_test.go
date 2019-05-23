@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	cloudscale "github.com/alakae/cloudscale-go-sdk"
+	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 func TestIntegrationFloatingIP_CRUD(t *testing.T) {

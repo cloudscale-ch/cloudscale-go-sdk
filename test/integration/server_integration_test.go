@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	cloudscale "github.com/alakae/cloudscale-go-sdk"
+	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
 	"github.com/cenkalti/backoff"
 )
 
