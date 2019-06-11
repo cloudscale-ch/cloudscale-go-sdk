@@ -172,16 +172,11 @@ func (s ServerServiceOperations) Get(ctx context.Context, serverID string) (*Ser
 
 	return server, nil
 }
+
 func (s ServerServiceOperations) Delete(ctx context.Context, serverID string) error {
-	path := fmt.Sprintf("%s/%s", serverBasePath, serverID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
-	if err != nil {
-		return err
-	}
-	return s.client.Do(ctx, req, nil)
-
+	return genericDelete(s.client, ctx, serverBasePath, serverID)
 }
+
 func (s ServerServiceOperations) Reboot(ctx context.Context, serverID string) error {
 	path := fmt.Sprintf("%s/%s/reboot", serverBasePath, serverID)
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
