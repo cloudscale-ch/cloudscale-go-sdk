@@ -5,11 +5,12 @@ package integration
 import (
 	"context"
 	"errors"
+	"reflect"
 	"strings"
 	"testing"
 
-	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
 	"github.com/cenkalti/backoff"
+	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 const serverBaseName = "go-sdk-integration-test"
@@ -21,10 +22,31 @@ func integrationTest(t *testing.T) {
 	}
 }
 
+func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
+	server, err := client.Servers.Create(context.Background(), createRequest)
+	if err == nil {
+		waitUntil(cloudscale.ServerRunning, server.UUID, t)
+	}
+	return server, err
+}
+
+func getDefaultCreateRequest() cloudscale.ServerRequest {
+	return cloudscale.ServerRequest{
+		Name:         serverBaseName,
+		Flavor:       "flex-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
+}
+
 func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
-	expected, err := createServer(t)
+	request := getDefaultCreateRequest()
+	expected, err := createServer(t, &request)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -57,7 +79,8 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	integrationTest(t)
 
-	server, err := createServer(t)
+	request := getDefaultCreateRequest()
+	server, err := createServer(t, &request)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -103,28 +126,11 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	}
 }
 
-func createServer(t *testing.T) (*cloudscale.Server, error) {
-	createRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
-		Flavor:       "flex-2",
-		Image:        DefaultImageSlug,
-		VolumeSizeGB: 10,
-		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
-		},
-	}
-
-	server, err := client.Servers.Create(context.Background(), createRequest)
-	if err == nil {
-		waitUntil(cloudscale.ServerRunning, server.UUID, t)
-	}
-	return server, err
-}
-
 func TestIntegrationServer_UpdateRest(t *testing.T) {
 	integrationTest(t)
 
-	server, err := createServer(t)
+	request := getDefaultCreateRequest()
+	server, err := createServer(t, &request)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -180,11 +186,11 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 	}
 }
 
-
 func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
 
-	server, err := createServer(t)
+	request := getDefaultCreateRequest()
+	server, err := createServer(t, &request)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -222,6 +228,35 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+}
+
+func TestMultipleVolumes(t *testing.T) {
+	integrationTest(t)
+
+	request := getDefaultCreateRequest()
+	request.Volumes = &([]cloudscale.Volume{
+		{SizeGB: 3, Type: "ssd"},
+		{SizeGB: 100, Type: "bulk"},
+	})
+
+	server, err := createServer(t, &request)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	expected := []cloudscale.VolumeStub{
+		cloudscale.VolumeStub{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
+		cloudscale.VolumeStub{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
+		cloudscale.VolumeStub{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
+	}
+	if !reflect.DeepEqual(server.Volumes, expected) {
+		t.Errorf("Volumes response\n got=%#v\nwant=%#v", server.Volumes, expected)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Get returned error %s\n", err)
 	}
 }
 
