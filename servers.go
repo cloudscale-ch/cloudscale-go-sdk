@@ -13,6 +13,7 @@ const ServerStopped = "stopped"
 const ServerRebooted = "rebooted"
 
 type Server struct {
+	ZonalResource
 	HREF            string            `json:"href"`
 	UUID            string            `json:"uuid"`
 	Name            string            `json:"name"`
@@ -72,9 +73,11 @@ type Address struct {
 }
 
 type ServerRequest struct {
+	ZonalResourceRequest
 	Name              string    `json:"name"`
 	Flavor            string    `json:"flavor"`
 	Image             string    `json:"image"`
+	Zone              string   `json:"zone,omitempty"`
 	VolumeSizeGB      int       `json:"volume_size_gb,omitempty"`
 	Volumes           *[]Volume `json:"volumes,omitempty"`
 	BulkVolumeSizeGB  int       `json:"bulk_volume_size_gb,omitempty"`

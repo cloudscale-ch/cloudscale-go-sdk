@@ -9,6 +9,7 @@ import (
 const serverGroupsBasePath = "v1/server-groups"
 
 type ServerGroup struct {
+	ZonalResource
 	HREF    string       `json:"href"`
 	UUID    string       `json:"uuid"`
 	Name    string       `json:"name"`

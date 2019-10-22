@@ -5,10 +5,11 @@ package integration
 import (
 	"context"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
-	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
+	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 const volumeBaseName = "go-sdk-integration-test-volume"
@@ -33,7 +34,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 
 	waitUntil("running", server.UUID, t)
 
-	createVolumeRequest := &cloudscale.Volume{
+	createVolumeRequest := &cloudscale.VolumeRequest{
 		Name:        volumeBaseName,
 		SizeGB:      50,
 		ServerUUIDs: &[]string{server.UUID},
@@ -45,14 +46,14 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	}
 
 	time.Sleep(3 * time.Second)
-	detachVolumeRequest := &cloudscale.Volume{
+	detachVolumeRequest := &cloudscale.VolumeRequest{
 		ServerUUIDs: &[]string{},
 	}
 	err = client.Volumes.Update(context.TODO(), volume.UUID, detachVolumeRequest)
 	if err != nil {
 		t.Errorf("Volumes.Update returned error %s\n", err)
 	}
-	attachVolumeRequest := &cloudscale.Volume{
+	attachVolumeRequest := &cloudscale.VolumeRequest{
 		ServerUUIDs: &[]string{server.UUID},
 	}
 
@@ -73,7 +74,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 }
 
 func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
-	createVolumeRequest := &cloudscale.Volume{
+	createVolumeRequest := &cloudscale.VolumeRequest{
 		Name:   volumeBaseName,
 		SizeGB: 50,
 	}
@@ -98,7 +99,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Errorf("Volume %s not found\n", volume.UUID)
 	}
 
-	multiUpdateVolumeRequest := &cloudscale.Volume{
+	multiUpdateVolumeRequest := &cloudscale.VolumeRequest{
 		SizeGB: 50,
 		Name:   volumeBaseName + "Foo",
 	}
@@ -122,7 +123,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 
 	const scaleSize = 200
 	// Try to scale.
-	scaleVolumeRequest := &cloudscale.Volume{SizeGB: scaleSize}
+	scaleVolumeRequest := &cloudscale.VolumeRequest{SizeGB: scaleSize}
 	err = client.Volumes.Update(context.TODO(), volume.UUID, scaleVolumeRequest)
 	getVolume, err := client.Volumes.Get(context.TODO(), volume.UUID)
 	if err == nil {
@@ -136,6 +137,49 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 	err = client.Volumes.Delete(context.Background(), volume.UUID)
 	if err != nil {
 		t.Fatalf("Volumes.Delete returned error %s\n", err)
+	}
+}
+
+func TestIntegrationVolume_MultiSite(t *testing.T) {
+	integrationTest(t)
+
+	allZones := getAllZones(t)
+	if len(allZones) <= 1 {
+		t.Skip("Skipping MultiSite test.")
+	}
+
+	var wg sync.WaitGroup
+
+	for _, zone := range allZones {
+		wg.Add(1)
+		go createVolumeInZoneAndAssert(t, zone, &wg)
+	}
+
+	wg.Wait()
+}
+
+func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	createVolumeRequest := &cloudscale.VolumeRequest{
+		Name:   volumeBaseName,
+		SizeGB: 50,
+	}
+
+	createVolumeRequest.Zone = zone.Slug
+
+	volume, err := client.Volumes.Create(context.TODO(), createVolumeRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Create returned error %s\n", err)
+	}
+
+	if volume.Zone != zone {
+		t.Errorf("Volume in wrong Zone\n got=%#v\nwant=%#v", volume.Zone, zone)
+	}
+
+	err = client.Volumes.Delete(context.Background(), volume.UUID)
+	if err != nil {
+		t.Errorf("Volumes.Delete returned error %s\n", err)
 	}
 }
 

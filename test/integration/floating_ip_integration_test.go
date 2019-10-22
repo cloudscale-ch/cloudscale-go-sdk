@@ -5,10 +5,13 @@ package integration
 import (
 	"context"
 	"reflect"
+	"sync"
 	"testing"
 
-	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
+	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
+
+const pubKey string = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY="
 
 func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	integrationTest(t)
@@ -19,7 +22,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+			pubKey,
 		},
 	}
 
@@ -81,7 +84,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+			pubKey,
 		},
 	}
 
@@ -96,7 +99,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+			pubKey,
 		},
 	}
 
@@ -152,6 +155,72 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	}
 }
 
+func TestIntegrationFloatingIP_MultiSite(t *testing.T) {
+	integrationTest(t)
+
+	allZones := getAllZones(t)
+	if len(allZones) <= 1 {
+		t.Skip("Skipping MultiSite test.")
+	}
+
+	var wg sync.WaitGroup
+
+	for _, zone := range allZones {
+		wg.Add(1)
+		go createFloatingIPInZoneAndAssert(t, zone, &wg)
+	}
+
+	wg.Wait()
+}
+
+func createFloatingIPInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         serverBaseName,
+		Flavor:       "flex-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			pubKey,
+		},
+	}
+	createServerRequest.Zone = zone.Slug
+
+	server, err := client.Servers.Create(context.Background(), createServerRequest)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	waitUntil("running", server.UUID, t)
+
+	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
+		IPVersion: 6,
+		Server:    server.UUID,
+	}
+
+	createFloatingIPRequest.Zone = zone.Slug
+
+	floatingIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Create returned error %s\n", err)
+	}
+
+	if floatingIP.Zone != zone {
+		t.Errorf("FloatingIP in wrong Zone\n got=%#v\nwant=%#v", floatingIP.Zone, zone)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+
+	err = client.FloatingIPs.Delete(context.Background(), floatingIP.IP())
+	if err != nil {
+		t.Errorf("FloatingIPs.Delete returned error %s\n", err)
+	}
+}
+
 func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
@@ -159,7 +228,7 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+			pubKey,
 		},
 	}
 
