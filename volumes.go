@@ -26,8 +26,6 @@ type ListVolumeParams struct {
 
 type VolumeRequest struct {
 	ZonalResourceRequest
-	HREF        string    `json:"href,omitempty"`
-	UUID        string    `json:"uuid,omitempty"`
 	Name        string    `json:"name,omitempty"`
 	SizeGB      int       `json:"size_gb,omitempty"`
 	Type        string    `json:"type,omitempty"`
