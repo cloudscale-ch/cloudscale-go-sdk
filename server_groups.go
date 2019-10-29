@@ -18,6 +18,7 @@ type ServerGroup struct {
 }
 
 type ServerGroupRequest struct {
+	ZonalResourceRequest
 	Name    string       `json:"name"`
 	Type    string       `json:"type"`
 }
