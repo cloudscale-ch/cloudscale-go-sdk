@@ -9,13 +9,18 @@ import (
 )
 
 func getAllZones(t *testing.T) []cloudscale.Zone {
-	allRegions, err := client.Regions.List(context.Background())
-	if err != nil {
-		t.Fatalf("Regions.List returned error %s\n", err)
-	}
+	allRegions := getAllRegions(t)
 	allZones := []cloudscale.Zone{}
 	for _, region := range allRegions {
 		allZones = append(allZones, region.Zones...)
 	}
 	return allZones
+}
+
+func getAllRegions(t *testing.T) []cloudscale.Region {
+	allRegions, err := client.Regions.List(context.Background())
+	if err != nil {
+		t.Fatalf("Regions.List returned error %s\n", err)
+	}
+	return allRegions
 }

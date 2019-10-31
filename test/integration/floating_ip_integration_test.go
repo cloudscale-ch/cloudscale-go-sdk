@@ -158,22 +158,22 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 func TestIntegrationFloatingIP_MultiSite(t *testing.T) {
 	integrationTest(t)
 
-	allZones := getAllZones(t)
-	if len(allZones) <= 1 {
+	allRegions := getAllRegions(t)
+	if len(allRegions) <= 1 {
 		t.Skip("Skipping MultiSite test.")
 	}
 
 	var wg sync.WaitGroup
 
-	for _, zone := range allZones {
+	for _, region := range allRegions {
 		wg.Add(1)
-		go createFloatingIPInZoneAndAssert(t, zone, &wg)
+		go createFloatingIPInRegionAndAssert(t, region, &wg)
 	}
 
 	wg.Wait()
 }
 
-func createFloatingIPInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	createServerRequest := &cloudscale.ServerRequest{
@@ -185,7 +185,7 @@ func createFloatingIPInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *syn
 			pubKey,
 		},
 	}
-	createServerRequest.Zone = zone.Slug
+	createServerRequest.Zone = region.Zones[0].Slug
 
 	server, err := client.Servers.Create(context.Background(), createServerRequest)
 	if err != nil {
@@ -199,15 +199,15 @@ func createFloatingIPInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *syn
 		Server:    server.UUID,
 	}
 
-	createFloatingIPRequest.Zone = zone.Slug
+	createFloatingIPRequest.Region = region.Slug
 
 	floatingIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
 	if err != nil {
 		t.Fatalf("FloatingIPs.Create returned error %s\n", err)
 	}
 
-	if floatingIP.Zone != zone {
-		t.Errorf("FloatingIP in wrong Zone\n got=%#v\nwant=%#v", floatingIP.Zone, zone)
+	if floatingIP.Region.Slug != region.Slug {
+		t.Errorf("FloatingIP in wrong Region\n got=%#v\nwant=%#v", floatingIP.Region, region)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
