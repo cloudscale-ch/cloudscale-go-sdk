@@ -146,7 +146,7 @@ func TestIntegrationVolume_DeleteRemainingVolumes(t *testing.T) {
 	}
 
 	for _, volume := range volumes {
-		if strings.HasPrefix(volume.Name, volumeBaseName) {
+		if strings.HasPrefix(volume.Name, "go-sdk-integration-test") {
 			t.Errorf("Found not deleted volume: %s\n", volume.Name)
 			err = client.Volumes.Delete(context.Background(), volume.UUID)
 			if err != nil {
