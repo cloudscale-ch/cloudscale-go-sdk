@@ -158,7 +158,11 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 func TestIntegrationFloatingIP_MultiSite(t *testing.T) {
 	integrationTest(t)
 
-	allRegions := getAllRegions(t)
+	allRegions, err := getAllRegions()
+	if err != nil {
+		t.Fatalf("getAllRegions returned error %s\n", err)
+	}
+
 	if len(allRegions) <= 1 {
 		t.Skip("Skipping MultiSite test.")
 	}

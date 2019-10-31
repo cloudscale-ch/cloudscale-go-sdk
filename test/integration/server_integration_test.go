@@ -276,7 +276,11 @@ func TestMultipleVolumes(t *testing.T) {
 func TestIntegrationServer_MultiSite(t *testing.T) {
 	integrationTest(t)
 
-	allZones := getAllZones(t)
+	allZones, err := getAllZones()
+	if err != nil {
+		t.Fatalf("getAllRegions returned error %s\n", err)
+	}
+
 	if len(allZones) <= 1 {
 		t.Skip("Skipping MultiSite test.")
 	}
