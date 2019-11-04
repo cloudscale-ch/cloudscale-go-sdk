@@ -55,7 +55,7 @@ func TestObjectsUser_Create(t *testing.T) {
 		fmt.Fprintf(w, jsonStr)
 	})
 
-	objectsUser, err := client.ObjectsUser.Create(ctx, ObjectsUserRequest)
+	objectsUser, err := client.ObjectsUsers.Create(ctx, ObjectsUserRequest)
 	if err != nil {
 		t.Errorf("ObjectsUser.Create returned error: %v", err)
 		return
@@ -75,14 +75,14 @@ func TestObjectsUser_Get(t *testing.T) {
 		fmt.Fprint(w, `{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}`)
 	})
 
-	server, err := client.ObjectsUser.Get(ctx, "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15")
+	objectUser, err := client.ObjectsUsers.Get(ctx, "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15")
 	if err != nil {
 		t.Errorf("ObjectsUser.Get returned error: %v", err)
 	}
 
 	expected := &ObjectsUser{ID: "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}
-	if !reflect.DeepEqual(server, expected) {
-		t.Errorf("ObjectsUser.Get\n got=%#v\nwant=%#v", server, expected)
+	if !reflect.DeepEqual(objectUser, expected) {
+		t.Errorf("ObjectsUser.Get\n got=%#v\nwant=%#v", objectUser, expected)
 	}
 }
 
@@ -94,7 +94,7 @@ func TestObjectsUser_Delete(t *testing.T) {
 		testHTTPMethod(t, r, http.MethodDelete)
 	})
 
-	err := client.ObjectsUser.Delete(ctx, "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15")
+	err := client.ObjectsUsers.Delete(ctx, "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15")
 	if err != nil {
 		t.Errorf("ObjectsUser.Delete returned error: %v", err)
 	}
@@ -109,14 +109,14 @@ func TestObjectsUser_List(t *testing.T) {
 		fmt.Fprint(w, `[{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}]`)
 	})
 
-	servers, err := client.ObjectsUser.List(ctx)
+	objectUsers, err := client.ObjectsUsers.List(ctx)
 	if err != nil {
 		t.Errorf("ObjectsUser.List returned error: %v", err)
 	}
 
 	expected := []ObjectsUser{{ID: "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}}
-	if !reflect.DeepEqual(servers, expected) {
-		t.Errorf("ObjectsUser.List\n got=%#v\nwant=%#v", servers, expected)
+	if !reflect.DeepEqual(objectUsers, expected) {
+		t.Errorf("ObjectsUser.List\n got=%#v\nwant=%#v", objectUsers, expected)
 	}
 
 }
@@ -134,7 +134,7 @@ func TestObjectsUser_Update(t *testing.T) {
 	req := &ObjectsUserRequest{
 		DisplayName: "new_name",
 	}
-	err := client.ObjectsUser.Update(context.TODO(), userID, req)
+	err := client.ObjectsUsers.Update(context.TODO(), userID, req)
 	if err != nil {
 		t.Errorf("ObjectsUser.Update returned error: %v", err)
 	}
