@@ -8,9 +8,6 @@ import (
 
 const objectsUsersBasePath = "v1/objects-users"
 
-// S3Endpoint is the endpoint to be used by S3 clients
-const S3Endpoint = "https://objects.cloudscale.ch"
-
 // ObjectsUser contains information
 type ObjectsUser struct {
 	HREF        string              `json:"href,omitempty"`
