@@ -38,6 +38,7 @@ type Client struct {
 	Volumes      VolumeService
 	FloatingIPs  FloatingIPsService
 	ServerGroups ServerGroupService
+	ObjectsUsers ObjectsUsersService
 }
 
 // NewClient returns a new CloudScale API client.
@@ -60,6 +61,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.FloatingIPs = FloatingIPsServiceOperations{client: c}
 	c.Volumes = VolumeServiceOperations{client: c}
 	c.ServerGroups = ServerGroupServiceOperations{client: c}
+	c.ObjectsUsers = ObjectsUsersServiceOperations{client: c}
 
 	return c
 }
