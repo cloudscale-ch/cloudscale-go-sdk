@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/cenkalti/backoff"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
@@ -244,7 +245,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	}
 }
 
-func TestMultipleVolumes(t *testing.T) {
+func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 	integrationTest(t)
 
 	request := getDefaultCreateRequest()
@@ -265,6 +266,22 @@ func TestMultipleVolumes(t *testing.T) {
 	}
 	if !reflect.DeepEqual(server.Volumes, expected) {
 		t.Errorf("Volumes response\n got=%#v\nwant=%#v", server.Volumes, expected)
+	}
+
+	// Wait a bit until the volumes are actually allocated and have UUID's see
+	// https://www.cloudscale.ch/en/api/v1#volumes-create
+	time.Sleep(5 * time.Second)
+	server, err = client.Servers.Get(context.TODO(), server.UUID)
+	for _, volume := range server.Volumes[1:] {
+		volumeUUID := volume.UUID
+		if len(volumeUUID) <= 1 {
+			t.Errorf("Volume does not seem to have a valid UUID got=%#v", volumeUUID)
+		}
+
+		err = client.Volumes.Delete(context.Background(), volumeUUID)
+		if err != nil {
+			t.Fatalf("Volumes.Delete returned error %s\n", err)
+		}
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -330,6 +347,8 @@ func TestIntegrationServer_DeleteRemainingServer(t *testing.T) {
 			}
 		}
 	}
+
+	TestIntegrationVolume_DeleteRemainingVolumes(t)
 }
 
 func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {

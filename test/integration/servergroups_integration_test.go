@@ -94,7 +94,7 @@ func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sy
 func TestIntegrationServerGroup_DeleteRemaining(t *testing.T) {
 	serverGroups, err := client.ServerGroups.List(context.Background())
 	if err != nil {
-		t.Fatalf("Servers.List returned error %s\n", err)
+		t.Fatalf("ServerGroups.List returned error %s\n", err)
 	}
 
 	for _, serverGroup := range serverGroups {
