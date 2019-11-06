@@ -5,9 +5,10 @@ package integration
 import (
 	"context"
 	"strings"
+	"sync"
 	"testing"
 
-	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
+	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 func TestIntegrationServerGroup_CRUD(t *testing.T) {
@@ -36,11 +37,58 @@ func TestIntegrationServerGroup_CRUD(t *testing.T) {
 
 func createServerGroup(t *testing.T) (*cloudscale.ServerGroup, error) {
 	createRequest := &cloudscale.ServerGroupRequest{
-		Name:         serverBaseName + "-group",
-		Type:         "anti-affinity",
+		Name: serverBaseName + "-group",
+		Type: "anti-affinity",
 	}
 
 	return client.ServerGroups.Create(context.Background(), createRequest)
+}
+
+func TestIntegrationServerGroup_MultiSite(t *testing.T) {
+	integrationTest(t)
+
+	allZones, err := getAllZones()
+	if err != nil {
+		t.Fatalf("getAllRegions returned error %s\n", err)
+	}
+
+	if len(allZones) <= 1 {
+		t.Skip("Skipping MultiSite test.")
+	}
+
+	var wg sync.WaitGroup
+
+	for _, zone := range allZones {
+		wg.Add(1)
+		go createServerGroupInZoneAndAssert(t, zone, &wg)
+	}
+
+	wg.Wait()
+}
+
+func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	createServerGroupRequest := &cloudscale.ServerGroupRequest{
+		Name: "Yellow Submarine",
+		Type: "anti-affinity",
+	}
+
+	createServerGroupRequest.Zone = zone.Slug
+
+	serverGroup, err := client.ServerGroups.Create(context.TODO(), createServerGroupRequest)
+	if err != nil {
+		t.Fatalf("ServerGroups.Create returned error %s\n", err)
+	}
+
+	if serverGroup.Zone != zone {
+		t.Errorf("ServerGroup in wrong Zone\n got=%#v\nwant=%#v", serverGroup.Zone, zone)
+	}
+
+	err = client.ServerGroups.Delete(context.Background(), serverGroup.UUID)
+	if err != nil {
+		t.Errorf("ServerGroups.Delete returned error %s\n", err)
+	}
 }
 
 func TestIntegrationServerGroup_DeleteRemaining(t *testing.T) {

@@ -7,11 +7,12 @@ import (
 	"errors"
 	"reflect"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
 	"github.com/cenkalti/backoff"
-	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
+	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 const serverBaseName = "go-sdk-integration-test"
@@ -46,8 +47,8 @@ func getDefaultCreateRequest() cloudscale.ServerRequest {
 func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
-	request := getDefaultCreateRequest()
-	expected, err := createServer(t, &request)
+	serverRequest := getDefaultServerRequest()
+	expected, err := createServer(t, &serverRequest)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -80,7 +81,7 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	integrationTest(t)
 
-	request := getDefaultCreateRequest()
+	request := getDefaultServerRequest()
 	server, err := createServer(t, &request)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
@@ -127,11 +128,23 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	}
 }
 
+func getDefaultServerRequest() cloudscale.ServerRequest {
+	return cloudscale.ServerRequest{
+		Name:         serverBaseName,
+		Flavor:       "flex-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+		},
+	}
+}
+
 func TestIntegrationServer_UpdateRest(t *testing.T) {
 	integrationTest(t)
 
-	request := getDefaultCreateRequest()
-	server, err := createServer(t, &request)
+	serverRequest := getDefaultServerRequest()
+	server, err := createServer(t, &serverRequest)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -190,8 +203,8 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 func TestIntegrationServer_Actions(t *testing.T) {
 	integrationTest(t)
 
-	request := getDefaultCreateRequest()
-	server, err := createServer(t, &request)
+	serverRequest := getDefaultServerRequest()
+	server, err := createServer(t, &serverRequest)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
@@ -274,6 +287,48 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Get returned error %s\n", err)
+	}
+}
+
+func TestIntegrationServer_MultiSite(t *testing.T) {
+	integrationTest(t)
+
+	allZones, err := getAllZones()
+	if err != nil {
+		t.Fatalf("getAllRegions returned error %s\n", err)
+	}
+
+	if len(allZones) <= 1 {
+		t.Skip("Skipping MultiSite test.")
+	}
+
+	var wg sync.WaitGroup
+
+	for _, zone := range allZones {
+		wg.Add(1)
+		go createServerInZoneAndAssert(t, zone, &wg)
+	}
+
+	wg.Wait()
+}
+
+func createServerInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	createRequest := getDefaultServerRequest()
+	createRequest.Zone = zone.Slug
+	server, err := createServer(t, &createRequest)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	if server.Zone != zone {
+		t.Errorf("Server in wrong Zone\n got=%#v\nwant=%#v", server.Zone, zone)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Errorf("Servers.Delete returned error %s\n", err)
 	}
 }
 

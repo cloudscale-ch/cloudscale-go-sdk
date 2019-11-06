@@ -34,6 +34,7 @@ type Client struct {
 	// User agent for client
 	UserAgent string
 
+	Regions      RegionService
 	Servers      ServerService
 	Volumes      VolumeService
 	FloatingIPs  FloatingIPsService
@@ -57,6 +58,7 @@ func NewClient(httpClient *http.Client) *Client {
 	baseURL, _ := url.Parse(defaultURL)
 
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
+	c.Regions = RegionServiceOperations{client: c}
 	c.Servers = ServerServiceOperations{client: c}
 	c.FloatingIPs = FloatingIPsServiceOperations{client: c}
 	c.Volumes = VolumeServiceOperations{client: c}
