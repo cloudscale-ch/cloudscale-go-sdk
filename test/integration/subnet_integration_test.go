@@ -48,7 +48,7 @@ func TestIntegrationSubnet_GetAndList(t *testing.T) {
 		t.Fatalf("Subnets.List returned error %s\n", err)
 	}
 
-	if numSubnets := len(subnets); numSubnets < 0 {
+	if numSubnets := len(subnets); numSubnets < 1 {
 		t.Errorf("Subnets.List got=%d\nwant=%d\n", numSubnets, 1)
 	}
 
