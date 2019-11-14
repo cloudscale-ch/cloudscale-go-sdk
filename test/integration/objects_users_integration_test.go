@@ -5,10 +5,9 @@ package integration
 import (
 	"context"
 	"reflect"
-	"strings"
 	"testing"
 
-	cloudscale "github.com/cloudscale-ch/cloudscale-go-sdk"
+	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
 const baseObjectsUserName = "go-sdk-integration-test"
@@ -98,21 +97,4 @@ func createObjectsUser(t *testing.T) (*cloudscale.ObjectsUser, error) {
 	}
 
 	return client.ObjectsUsers.Create(context.Background(), createRequest)
-}
-
-func TestIntegrationObjectsUser_DeleteRemaining(t *testing.T) {
-	objectsUsers, err := client.ObjectsUsers.List(context.Background())
-	if err != nil {
-		t.Fatalf("ObjectsUsers.List returned error %s\n", err)
-	}
-
-	for _, objectsUser := range objectsUsers {
-		if strings.HasPrefix(objectsUser.DisplayName, serverBaseName) {
-			t.Errorf("Found not deleted objectsUser: %s\n", objectsUser.DisplayName)
-			err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
-			if err != nil {
-				t.Errorf("ObjectsUsers.Delete returned error %s\n", err)
-			}
-		}
-	}
 }

@@ -35,6 +35,14 @@ func TestIntegrationSubnet_GetAndList(t *testing.T) {
 		t.Errorf("Subnet.UUID got=%s\nwant=%s", uuid, network.Subnets[0].UUID)
 	}
 
+	if networkUUID := subnet.Network.UUID; networkUUID != network.UUID {
+		t.Errorf("subnet.Network.UUID got=%s\nwant=%s", networkUUID, network.UUID)
+	}
+
+	if networkUUID := subnet.Network.UUID; networkUUID != network.UUID {
+		t.Errorf("subnet.Network.UUID got=%s\nwant=%s", networkUUID, network.UUID)
+	}
+
 	subnets, err := client.Subnets.List(context.Background())
 	if err != nil {
 		t.Fatalf("Subnets.List returned error %s\n", err)

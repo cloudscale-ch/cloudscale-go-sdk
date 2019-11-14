@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"strings"
 	"sync"
 	"testing"
 
@@ -91,19 +90,3 @@ func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sy
 	}
 }
 
-func TestIntegrationServerGroup_DeleteRemaining(t *testing.T) {
-	serverGroups, err := client.ServerGroups.List(context.Background())
-	if err != nil {
-		t.Fatalf("ServerGroups.List returned error %s\n", err)
-	}
-
-	for _, serverGroup := range serverGroups {
-		if strings.HasPrefix(serverGroup.Name, serverBaseName) {
-			t.Errorf("Found not deleted serverGroup: %s\n", serverGroup.Name)
-			err = client.ServerGroups.Delete(context.Background(), serverGroup.UUID)
-			if err != nil {
-				t.Errorf("ServerGroups.Delete returned error %s\n", err)
-			}
-		}
-	}
-}

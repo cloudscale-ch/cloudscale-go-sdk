@@ -186,20 +186,3 @@ func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 		t.Errorf("Volumes.Delete returned error %s\n", err)
 	}
 }
-
-func TestIntegrationVolume_DeleteRemainingVolumes(t *testing.T) {
-	volumes, err := client.Volumes.List(context.Background(), nil)
-	if err != nil {
-		t.Fatalf("Volumes.List returned error %s\n", err)
-	}
-
-	for _, volume := range volumes {
-		if strings.HasPrefix(volume.Name, "go-sdk-integration-test") {
-			t.Errorf("Found not deleted volume: %s\n", volume.Name)
-			err = client.Volumes.Delete(context.Background(), volume.UUID)
-			if err != nil {
-				t.Errorf("Volumes.Delete returned error %s\n", err)
-			}
-		}
-	}
-}

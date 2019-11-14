@@ -5,7 +5,6 @@ package integration
 import (
 	"context"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
-	"strings"
 	"sync"
 	"testing"
 )
@@ -158,22 +157,5 @@ func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.W
 	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
 		t.Errorf("Networks.Delete returned error %s\n", err)
-	}
-}
-
-func TestIntegrationNetwork_DeleteRemainingNetworks(t *testing.T) {
-	networks, err := client.Networks.List(context.Background())
-	if err != nil {
-		t.Fatalf("Networks.List returned error %s\n", err)
-	}
-
-	for _, network := range networks {
-		if strings.HasPrefix(network.Name, "go-sdk-integration-test") {
-			t.Errorf("Found not deleted network: %s\n", network.Name)
-			err = client.Networks.Delete(context.Background(), network.UUID)
-			if err != nil {
-				t.Errorf("Networks.Delete returned error %s\n", err)
-			}
-		}
 	}
 }
