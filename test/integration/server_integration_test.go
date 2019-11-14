@@ -67,7 +67,7 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 		t.Fatalf("Servers.List returned error %s\n", err)
 	}
 
-	if numServers := len(servers); numServers < 0 {
+	if numServers := len(servers); numServers < 1 {
 		t.Errorf("Server.List got=%d\nwant=%d\n", numServers, 1)
 	}
 
