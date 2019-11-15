@@ -20,6 +20,7 @@ type Subnet struct {
 
 type SubnetStub struct {
 	HREF string `json:"href,omitempty"`
+	CIDR string `json:"cidr,omitempty"`
 	UUID string `json:"uuid,omitempty"`
 }
 
