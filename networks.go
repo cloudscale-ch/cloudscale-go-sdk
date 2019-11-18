@@ -21,6 +21,7 @@ type Network struct {
 
 type NetworkStub struct {
 	HREF string `json:"href,omitempty"`
+	Name string `json:"name,omitempty"`
 	UUID string `json:"uuid,omitempty"`
 }
 
