@@ -32,18 +32,6 @@ func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloud
 	return server, err
 }
 
-func getDefaultCreateRequest() cloudscale.ServerRequest {
-	return cloudscale.ServerRequest{
-		Name:         serverBaseName,
-		Flavor:       "flex-2",
-		Image:        DefaultImageSlug,
-		VolumeSizeGB: 10,
-		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
-		},
-	}
-}
-
 func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
@@ -248,7 +236,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 	integrationTest(t)
 
-	request := getDefaultCreateRequest()
+	request := getDefaultServerRequest()
 	request.Volumes = &([]cloudscale.Volume{
 		{SizeGB: 3, Type: "ssd"},
 		{SizeGB: 100, Type: "bulk"},
