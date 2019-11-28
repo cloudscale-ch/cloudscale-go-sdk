@@ -4,32 +4,13 @@ package integration
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"github.com/cenkalti/backoff"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 	"sync"
 	"testing"
+	"time"
 )
 
 const networkBaseName = "go-sdk-integration-test-network"
-
-func DeleteNetworkWithRetry(network *cloudscale.Network) error {
-	operation := func() error {
-		err := client.Networks.Delete(context.Background(), network.UUID)
-		if err != nil {
-			msg := fmt.Sprintf("Networks.Delete returned error %s\n", err)
-			return errors.New(msg)
-		}
-		return nil
-	}
-	err := backoff.Retry(operation, backoff.NewExponentialBackOff())
-	if err != nil {
-		msg := fmt.Sprintf("Retries exeeded: %s\n", err)
-		return errors.New(msg)
-	}
-	return nil
-}
 
 func TestIntegrationNetwork_CRUD(t *testing.T) {
 	integrationTest(t)
@@ -109,9 +90,11 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 		t.Fatalf("Networks.Create returned error %s\n", err)
 	}
 
-	interfaceRequests := []cloudscale.InterfaceRequest{{
-		Network: network.UUID,
-	},}
+	interfaceRequests := []cloudscale.InterfaceRequest{
+		cloudscale.InterfaceRequest{
+			Network: network.UUID,
+		},
+	}
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         "go-sdk-integration-test-network",
 		Flavor:       "flex-2",
@@ -140,19 +123,22 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
-
-	err = DeleteNetworkWithRetry(network)
+	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
+	time.Sleep(5 * time.Second)
+	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
-		t.Fatalf("Could not delete network: %s\n", err)
+		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }
 
 func TestIntegrationNetwork_AttachWithoutIP(t *testing.T) {
 	integrationTest(t)
 
-	interfaceRequests := []cloudscale.InterfaceRequest{{
-		Network: "public",
-	},}
+	interfaceRequests := []cloudscale.InterfaceRequest{
+		cloudscale.InterfaceRequest{
+			Network: "public",
+		},
+	}
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         "go-sdk-integration-test-network",
 		Flavor:       "flex-2",
@@ -216,10 +202,11 @@ func TestIntegrationNetwork_AttachWithoutIP(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
-
-	err = DeleteNetworkWithRetry(network)
+	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
+	time.Sleep(5 * time.Second)
+	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
-		t.Fatalf("Could not delete network: %s\n", err)
+		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }
 
