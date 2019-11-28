@@ -36,6 +36,9 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	serverRequest := getDefaultServerRequest()
+	serverRequest.SSHKeys = []string{}
+	serverRequest.Password = randomNotVerySecurePassword(10)
+
 	expected, err := createServer(t, &serverRequest)
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
