@@ -23,7 +23,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
-			"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY=",
+			pubKey,
 		},
 	}
 
@@ -184,22 +184,5 @@ func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 	err = client.Volumes.Delete(context.Background(), volume.UUID)
 	if err != nil {
 		t.Errorf("Volumes.Delete returned error %s\n", err)
-	}
-}
-
-func TestIntegrationVolume_DeleteRemainingVolumes(t *testing.T) {
-	volumes, err := client.Volumes.List(context.Background(), nil)
-	if err != nil {
-		t.Fatalf("Volumes.List returned error %s\n", err)
-	}
-
-	for _, volume := range volumes {
-		if strings.HasPrefix(volume.Name, "go-sdk-integration-test") {
-			t.Errorf("Found not deleted volume: %s\n", volume.Name)
-			err = client.Volumes.Delete(context.Background(), volume.UUID)
-			if err != nil {
-				t.Errorf("Volumes.Delete returned error %s\n", err)
-			}
-		}
 	}
 }

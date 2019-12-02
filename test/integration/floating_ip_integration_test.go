@@ -62,7 +62,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 		t.Fatalf("FloatingIPs.List returned error %s\n", err)
 	}
 
-	if numFloatingIps := len(floatingIps); numFloatingIps < 0 {
+	if numFloatingIps := len(floatingIps); numFloatingIps < 1 {
 		t.Errorf("FloatingIPs.List \n got=%d\nwant=%d", numFloatingIps, 1)
 	}
 

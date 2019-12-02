@@ -58,13 +58,13 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 		t.Fatalf("Servers.List returned error %s\n", err)
 	}
 
-	if numServers := len(servers); numServers < 0 {
+	if numServers := len(servers); numServers < 1 {
 		t.Errorf("Server.List got=%d\nwant=%d\n", numServers, 1)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
+		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
 
 }
@@ -321,25 +321,6 @@ func createServerInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 	if err != nil {
 		t.Errorf("Servers.Delete returned error %s\n", err)
 	}
-}
-
-func TestIntegrationServer_DeleteRemainingServer(t *testing.T) {
-	servers, err := client.Servers.List(context.Background())
-	if err != nil {
-		t.Fatalf("Servers.List returned error %s\n", err)
-	}
-
-	for _, server := range servers {
-		if strings.HasPrefix(server.Name, serverBaseName) {
-			t.Errorf("Found not deleted server: %s\n", server.Name)
-			err = client.Servers.Delete(context.Background(), server.UUID)
-			if err != nil {
-				t.Errorf("Servers.Delete returned error %s\n", err)
-			}
-		}
-	}
-
-	TestIntegrationVolume_DeleteRemainingVolumes(t)
 }
 
 func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
