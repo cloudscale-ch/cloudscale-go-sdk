@@ -15,6 +15,7 @@ type FloatingIP struct {
 	Network        string     `json:"network"`
 	NextHop        string     `json:"next_hop"`
 	Server         ServerStub `json:"server"`
+	Type           string     `json:"type"`
 	ReversePointer string     `json:"reverse_ptr,omitempty"`
 }
 
@@ -22,6 +23,7 @@ type FloatingIPCreateRequest struct {
 	RegionalResourceRequest
 	IPVersion      int    `json:"ip_version"`
 	Server         string `json:"server"`
+	Type           string `json:"type,omitempty"`
 	PrefixLength   int    `json:"prefix_length,omitempty"`
 	ReversePointer string `json:"reverse_ptr,omitempty"`
 }
