@@ -21,13 +21,14 @@ type ServerGroup struct {
 type ServerGroupRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
-	Name    string       `json:"name"`
-	Type    string       `json:"type"`
+	Name    string       `json:"name,omitempty"`
+	Type    string       `json:"type,omitempty"`
 }
 
 type ServerGroupService interface {
 	Create(ctx context.Context, createRequest *ServerGroupRequest) (*ServerGroup, error)
 	Get(ctx context.Context, serverGroupID string) (*ServerGroup, error)
+	Update(ctx context.Context, networkID string, updateRequest *ServerGroupRequest) error
 	Delete(ctx context.Context, serverGroupID string) error
 	List(ctx context.Context) ([]ServerGroup, error)
 }
@@ -66,6 +67,21 @@ func (s ServerGroupServiceOperations) Get(ctx context.Context, serverGroupID str
 	}
 
 	return serverGroup, nil
+}
+
+func (f ServerGroupServiceOperations) Update(ctx context.Context, serverGroupID string, updateRequest *ServerGroupRequest) error {
+	path := fmt.Sprintf("%s/%s", serverGroupsBasePath, serverGroupID)
+
+	req, err := f.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
+	if err != nil {
+		return err
+	}
+
+	err = f.client.Do(ctx, req, nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s ServerGroupServiceOperations) Delete(ctx context.Context, serverGroupID string) error {
