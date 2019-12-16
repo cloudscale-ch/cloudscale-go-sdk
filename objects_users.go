@@ -10,17 +10,17 @@ const objectsUsersBasePath = "v1/objects-users"
 
 // ObjectsUser contains information
 type ObjectsUser struct {
+	TaggedResource
 	HREF        string              `json:"href,omitempty"`
 	ID          string              `json:"id,omitempty"`
 	DisplayName string              `json:"display_name,omitempty"`
 	Keys        []map[string]string `json:"keys,omitempty"`
-	Tags        map[string]string   `json:"tags,omitempty"`
 }
 
 // ObjectsUserRequest is used to create and update Objects Users
 type ObjectsUserRequest struct {
-	DisplayName string            `json:"display_name,omitempty"`
-	Tags        map[string]string `json:"tags,omitempty"`
+	TaggedResourceRequest
+	DisplayName string `json:"display_name,omitempty"`
 }
 
 // ObjectsUsersService manages users of the S3-compatible objects storage

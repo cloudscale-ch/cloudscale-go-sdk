@@ -10,6 +10,7 @@ const volumeBasePath = "v1/volumes"
 
 type Volume struct {
 	ZonalResource
+	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
 	HREF        string    `json:"href,omitempty"`
@@ -26,6 +27,7 @@ type ListVolumeParams struct {
 
 type VolumeRequest struct {
 	ZonalResourceRequest
+	TaggedResourceRequest
 	Name        string    `json:"name,omitempty"`
 	SizeGB      int       `json:"size_gb,omitempty"`
 	Type        string    `json:"type,omitempty"`

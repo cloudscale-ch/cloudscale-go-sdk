@@ -11,6 +11,7 @@ const floatingIPsBasePath = "v1/floating-ips"
 
 type FloatingIP struct {
 	RegionalResource
+	TaggedResource
 	HREF           string     `json:"href"`
 	Network        string     `json:"network"`
 	NextHop        string     `json:"next_hop"`
@@ -20,6 +21,7 @@ type FloatingIP struct {
 
 type FloatingIPCreateRequest struct {
 	RegionalResourceRequest
+	TaggedResourceRequest
 	IPVersion      int    `json:"ip_version"`
 	Server         string `json:"server"`
 	PrefixLength   int    `json:"prefix_length,omitempty"`
@@ -31,7 +33,8 @@ func (f FloatingIP) IP() string {
 }
 
 type FloatingIPUpdateRequest struct {
-	Server string `json:"server"`
+	TaggedResourceRequest
+	Server string `json:"server,omitempty"`
 }
 
 type FloatingIPsService interface {

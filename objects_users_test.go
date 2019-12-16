@@ -15,9 +15,11 @@ func TestObjectsUser_Create(t *testing.T) {
 
 	ObjectsUserRequest := &ObjectsUserRequest{
 		DisplayName: "TestBucket",
-		Tags: map[string]string{
-			"tag":   "one",
-			"other": "tag",
+		TaggedResourceRequest: TaggedResourceRequest{
+			TagMap{
+				"tag":   "one",
+				"other": "tag",
+			},
 		},
 	}
 

@@ -10,6 +10,7 @@ const serverGroupsBasePath = "v1/server-groups"
 
 type ServerGroup struct {
 	ZonalResource
+	TaggedResource
 	HREF    string       `json:"href"`
 	UUID    string       `json:"uuid"`
 	Name    string       `json:"name"`
@@ -19,6 +20,7 @@ type ServerGroup struct {
 
 type ServerGroupRequest struct {
 	ZonalResourceRequest
+	TaggedResourceRequest
 	Name    string       `json:"name"`
 	Type    string       `json:"type"`
 }

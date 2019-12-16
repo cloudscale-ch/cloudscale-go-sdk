@@ -4,7 +4,6 @@ package integration
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
@@ -62,23 +61,6 @@ func TestIntegrationObjectsUser_UpdateRest(t *testing.T) {
 	if err == nil {
 		if getObjectsUser.DisplayName != renamedName {
 			t.Errorf("Renaming failed, could not rename, is at %s\n", getObjectsUser.DisplayName)
-		}
-	} else {
-		t.Errorf("ObjectsUserRequest.Get returned error %s\n", err)
-	}
-
-	// Try setting a tag.
-	tags := map[string]string{"give_me": "tag"}
-	tagRequest := &cloudscale.ObjectsUserRequest{Tags: tags}
-	err = client.ObjectsUsers.Update(context.TODO(), objectsUser.ID, tagRequest)
-	if err != nil {
-		t.Errorf("ObjectsUsers.Update failed %s\n", err)
-	}
-
-	getObjectsUser, err = client.ObjectsUsers.Get(context.TODO(), objectsUser.ID)
-	if err == nil {
-		if !reflect.DeepEqual(getObjectsUser.Tags, tags) {
-			t.Errorf("Tagging failed, could not tag, is at %s\n", getObjectsUser.Tags)
 		}
 	} else {
 		t.Errorf("ObjectsUserRequest.Get returned error %s\n", err)
