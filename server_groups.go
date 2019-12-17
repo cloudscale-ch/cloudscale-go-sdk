@@ -30,7 +30,7 @@ type ServerGroupService interface {
 	Get(ctx context.Context, serverGroupID string) (*ServerGroup, error)
 	Update(ctx context.Context, networkID string, updateRequest *ServerGroupRequest) error
 	Delete(ctx context.Context, serverGroupID string) error
-	List(ctx context.Context) ([]ServerGroup, error)
+	List(ctx context.Context, modifiers ...ListRequestModifier) ([]ServerGroup, error)
 }
 
 type ServerGroupServiceOperations struct {
@@ -88,11 +88,16 @@ func (s ServerGroupServiceOperations) Delete(ctx context.Context, serverGroupID 
 	return genericDelete(s.client, ctx, serverGroupsBasePath, serverGroupID)
 }
 
-func (s ServerGroupServiceOperations) List(ctx context.Context) ([]ServerGroup, error) {
+func (s ServerGroupServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]ServerGroup, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverGroupsBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, modifier := range modifiers {
+		modifier(req)
+	}
+
 	serverGroups := []ServerGroup{}
 	err = s.client.Do(ctx, req, &serverGroups)
 	if err != nil {

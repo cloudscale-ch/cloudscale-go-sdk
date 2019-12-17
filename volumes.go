@@ -21,10 +21,6 @@ type Volume struct {
 	ServerUUIDs *[]string `json:"server_uuids,omitempty"`
 }
 
-type ListVolumeParams struct {
-	Name string `json:"name,omitempty"`
-}
-
 type VolumeRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
@@ -37,7 +33,7 @@ type VolumeRequest struct {
 type VolumeService interface {
 	Create(ctx context.Context, createRequest *VolumeRequest) (*Volume, error)
 	Get(ctx context.Context, volumeID string) (*Volume, error)
-	List(ctx context.Context, params *ListVolumeParams) ([]Volume, error)
+	List(ctx context.Context, modifiers ...ListRequestModifier) ([]Volume, error)
 	Update(ctx context.Context, volumeID string, updateRequest *VolumeRequest) error
 	Delete(ctx context.Context, volumeID string) error
 }
@@ -106,17 +102,17 @@ func (s VolumeServiceOperations) Delete(ctx context.Context, volumeID string) er
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s VolumeServiceOperations) List(ctx context.Context, params *ListVolumeParams) ([]Volume, error) {
+func (s VolumeServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Volume, error) {
 	path := volumeBasePath
-	if params != nil {
-		if params.Name != "" {
-			path = fmt.Sprintf("%s?name=%s", path, params.Name)
-		}
-	}
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, modifier := range modifiers {
+		modifier(req)
+	}
+
 	volumes := []Volume{}
 	err = s.client.Do(ctx, req, &volumes)
 	if err != nil {
@@ -124,4 +120,13 @@ func (s VolumeServiceOperations) List(ctx context.Context, params *ListVolumePar
 	}
 
 	return volumes, nil
+}
+
+//WithNameFilter uses an undocumented feature of the cloudscale.ch API
+func WithNameFilter(name string) ListRequestModifier {
+	return func(request *http.Request) {
+		query := request.URL.Query()
+		query.Add(fmt.Sprintf("name"), name)
+		request.URL.RawQuery = query.Encode()
+	}
 }

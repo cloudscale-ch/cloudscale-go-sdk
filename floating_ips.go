@@ -42,7 +42,7 @@ type FloatingIPsService interface {
 	Get(ctx context.Context, ip string) (*FloatingIP, error)
 	Update(ctx context.Context, ip string, FloatingIPRequest *FloatingIPUpdateRequest) error
 	Delete(ctx context.Context, ip string) error
-	List(ctx context.Context) ([]FloatingIP, error)
+	List(ctx context.Context, modifiers ...ListRequestModifier) ([]FloatingIP, error)
 }
 
 type FloatingIPsServiceOperations struct {
@@ -99,13 +99,17 @@ func (f FloatingIPsServiceOperations) Delete(ctx context.Context, ip string) err
 	return genericDelete(f.client, ctx, floatingIPsBasePath, ip)
 }
 
-func (f FloatingIPsServiceOperations) List(ctx context.Context) ([]FloatingIP, error) {
+func (f FloatingIPsServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]FloatingIP, error) {
 	path := floatingIPsBasePath
 
 	req, err := f.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
+	for _, modifier := range modifiers {
+		modifier(req)
+	}
+
 	floatingIps := []FloatingIP{}
 	err = f.client.Do(ctx, req, &floatingIps)
 	if err != nil {

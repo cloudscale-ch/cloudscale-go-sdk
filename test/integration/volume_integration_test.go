@@ -84,7 +84,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Fatalf("Volumes.Create returned error %s\n", err)
 	}
 
-	volumes, err := client.Volumes.List(context.Background(), nil)
+	volumes, err := client.Volumes.List(context.Background())
 	if err != nil {
 		t.Fatalf("Volumes.List returned error %s\n", err)
 	}
@@ -139,6 +139,49 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Fatalf("Volumes.Delete returned error %s\n", err)
 	}
 }
+
+func TestIntegrationVolume_ListByName(t *testing.T) {
+	volumeName := volumeBaseName + "-name-test"
+	createVolumeRequest := &cloudscale.VolumeRequest{
+		Name:   volumeName,
+		SizeGB: 5,
+	}
+
+	volume, err := client.Volumes.Create(context.TODO(), createVolumeRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Create returned error %s\n", err)
+	}
+
+	volumes, err := client.Volumes.List(context.Background())
+	if err != nil {
+		t.Fatalf("Volumes.List returned error %s\n", err)
+	}
+	if actual := len(volumes); actual <= 0 {
+		t.Errorf("Expected at lest one volume, got: %#v", actual)
+	}
+
+	volumes, err = client.Volumes.List(context.Background(), cloudscale.WithNameFilter(volumeName))
+	if err != nil {
+		t.Fatalf("Volumes.List returned error %s\n", err)
+	}
+	if actual := len(volumes); actual != 1 {
+		t.Errorf("Expected at exactly one volume, got: %#v", volumes)
+	}
+
+	volumes, err = client.Volumes.List(context.Background(), cloudscale.WithNameFilter("reykjavik"))
+	if err != nil {
+		t.Fatalf("Volumes.List returned error %s\n", err)
+	}
+	if actual := len(volumes); actual != 0 {
+		t.Errorf("Expected no volumes, got: %#v", volumes)
+	}
+
+	err = client.Volumes.Delete(context.Background(), volume.UUID)
+	if err != nil {
+		t.Fatalf("Volumes.Delete returned error %s\n", err)
+	}
+}
+
 
 func TestIntegrationVolume_MultiSite(t *testing.T) {
 	integrationTest(t)

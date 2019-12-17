@@ -106,7 +106,7 @@ type ServerService interface {
 	Get(ctx context.Context, serverID string) (*Server, error)
 	Update(ctx context.Context, serverID string, updateRequest *ServerUpdateRequest) error
 	Delete(ctx context.Context, serverID string) error
-	List(ctx context.Context) ([]Server, error)
+	List(ctx context.Context, modifiers ...ListRequestModifier) ([]Server, error)
 	Reboot(ctx context.Context, serverID string) error
 	Start(ctx context.Context, serverID string) error
 	Stop(ctx context.Context, serverID string) error
@@ -227,13 +227,17 @@ func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) erro
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s ServerServiceOperations) List(ctx context.Context) ([]Server, error) {
+func (s ServerServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Server, error) {
 	path := serverBasePath
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
+	for _, modifier := range modifiers {
+		modifier(req)
+	}
+
 	servers := []Server{}
 	err = s.client.Do(ctx, req, &servers)
 	if err != nil {

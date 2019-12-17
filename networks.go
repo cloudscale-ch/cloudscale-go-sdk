@@ -44,7 +44,7 @@ type NetworkUpdateRequest struct {
 type NetworkService interface {
 	Create(ctx context.Context, createRequest *NetworkCreateRequest) (*Network, error)
 	Get(ctx context.Context, networkID string) (*Network, error)
-	List(ctx context.Context) ([]Network, error)
+	List(ctx context.Context, modifiers ...ListRequestModifier) ([]Network, error)
 	Update(ctx context.Context, networkID string, updateRequest *NetworkUpdateRequest) error
 	Delete(ctx context.Context, networkID string) error
 }
@@ -113,13 +113,18 @@ func (s NetworkServiceOperations) Delete(ctx context.Context, networkID string) 
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s NetworkServiceOperations) List(ctx context.Context) ([]Network, error) {
+func (s NetworkServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Network, error) {
 	path := networkBasePath
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	for _, modifier := range modifiers {
+		modifier(req)
+	}
+
 	networks := []Network{}
 	err = s.client.Do(ctx, req, &networks)
 	if err != nil {

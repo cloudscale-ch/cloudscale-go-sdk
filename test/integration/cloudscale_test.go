@@ -92,7 +92,7 @@ func DeleteRemainingServerGroups() bool {
 func DeleteRemainingVolumes() bool {
 	foundResource := false
 
-	volumes, err := client.Volumes.List(context.Background(), nil)
+	volumes, err := client.Volumes.List(context.Background())
 	if err != nil {
 		log.Fatalf("Volumes.List returned error %s\n", err)
 	}

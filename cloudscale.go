@@ -173,3 +173,6 @@ func (r *ErrorResponse) Error() string {
 	}
 	return err
 }
+
+type ListRequestModifier func(r *http.Request)
+

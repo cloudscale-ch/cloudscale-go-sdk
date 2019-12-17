@@ -13,8 +13,16 @@ var initialTags = cloudscale.TagMap{
 	"yin": "yang",
 }
 
+var initialTagsKeyOnly = cloudscale.TagMap{
+	"yin": "",
+}
+
 var newTags = cloudscale.TagMap{
 	"yab": "yum",
+}
+
+var newTagsKeyOnly = cloudscale.TagMap{
+	"yab": "",
 }
 
 func TestIntegrationTags_Server(t *testing.T) {
@@ -49,6 +57,27 @@ func TestIntegrationTags_Server(t *testing.T) {
 	}
 	if !reflect.DeepEqual(getResult2.Tags, newTags) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.Servers.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Servers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.Servers.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Servers.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -92,6 +121,27 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	}
 	if !reflect.DeepEqual(getResult2.Tags, newTags) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.Volumes.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Volumes.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.Volumes.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Volumes.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
 	}
 
 	err = client.Volumes.Delete(context.Background(), volume.UUID)
@@ -144,6 +194,27 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
 	}
 
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.FloatingIPs.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("FloatingIPs.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.FloatingIPs.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("FloatingIPs.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
 	err = client.FloatingIPs.Delete(context.Background(), floatingIP.IP())
 	if err != nil {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
@@ -191,6 +262,27 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
 	}
 
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.ObjectsUsers.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("ObjectsUsers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.ObjectsUsers.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("ObjectsUsers.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
 	err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
 	if err != nil {
 		t.Fatalf("ObjectsUsers.Delete returned error %s\n", err)
@@ -232,6 +324,27 @@ func TestIntegrationTags_Network(t *testing.T) {
 	}
 	if !reflect.DeepEqual(getResult2.Tags, newTags) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.Networks.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Networks.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.Networks.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Networks.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
 	}
 
 	err = client.Networks.Delete(context.Background(), network.UUID)
@@ -276,6 +389,27 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 	if !reflect.DeepEqual(getResult2.Tags, newTags) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.ServerGroups.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("ServerGroups.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.ServerGroups.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("ServerGroups.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
 	}
 
 	err = client.ServerGroups.Delete(context.Background(), serverGroup.UUID)

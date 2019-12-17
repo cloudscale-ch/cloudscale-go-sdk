@@ -29,7 +29,7 @@ type ObjectsUsersService interface {
 	Get(ctx context.Context, objectsUserID string) (*ObjectsUser, error)
 	Update(ctx context.Context, objectsUserID string, updateRequest *ObjectsUserRequest) error
 	Delete(ctx context.Context, objectsUserID string) error
-	List(ctx context.Context) ([]ObjectsUser, error)
+	List(ctx context.Context, modifiers ...ListRequestModifier) ([]ObjectsUser, error)
 }
 
 // ObjectsUsersServiceOperations contains config for this service
@@ -95,13 +95,17 @@ func (s ObjectsUsersServiceOperations) Delete(ctx context.Context, objectsUserID
 }
 
 // List all objects users
-func (s ObjectsUsersServiceOperations) List(ctx context.Context) ([]ObjectsUser, error) {
+func (s ObjectsUsersServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]ObjectsUser, error) {
 	path := objectsUsersBasePath
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
+	for _, modifier := range modifiers {
+		modifier(req)
+	}
+
 	ObjectsUser := []ObjectsUser{}
 	err = s.client.Do(ctx, req, &ObjectsUser)
 	if err != nil {
