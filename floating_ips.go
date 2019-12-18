@@ -10,7 +10,7 @@ import (
 const floatingIPsBasePath = "v1/floating-ips"
 
 type FloatingIP struct {
-	RegionalResource
+	Region         *Region    `json:"region"` // not using RegionalResource here, as FloatingIP can be regional or global
 	HREF           string     `json:"href"`
 	Network        string     `json:"network"`
 	NextHop        string     `json:"next_hop"`

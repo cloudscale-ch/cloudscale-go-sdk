@@ -321,8 +321,8 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 	if err != nil {
 		t.Fatalf("FloatingIPs.Get returned error %s\n", err)
 	}
-	if actualRegionSlug := actualFloatingIP.Region.Slug; actualRegionSlug != "" {
-		t.Errorf("Region \n got=%#v\nwant=%#v", actualRegionSlug, "")
+	if actualRegion := actualFloatingIP.Region; actualRegion != nil {
+		t.Errorf("Region \n got=%#v\nwant=%#v", actualRegion, nil)
 	}
 
 	for _, server := range append(servers, servers...) {
