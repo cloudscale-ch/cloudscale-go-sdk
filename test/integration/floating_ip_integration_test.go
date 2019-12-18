@@ -226,6 +226,8 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 }
 
 func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
+	integrationTest(t)
+
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         serverBaseName,
 		Flavor:       "flex-2",
@@ -264,4 +266,94 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
 	}
 
+}
+
+func TestIntegrationFloatingIP_Global(t *testing.T) {
+	integrationTest(t)
+
+	allRegions, err := getAllRegions()
+	if err != nil {
+		t.Fatalf("getAllRegions returned error %s\n", err)
+	}
+
+	if len(allRegions) <= 1 {
+		t.Skip("Skipping MultiSite test.")
+	}
+
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         serverBaseName,
+		Flavor:       "flex-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			pubKey,
+		},
+	}
+
+	var servers []*cloudscale.Server
+	for _, region := range allRegions {
+		createServerRequest.Zone = region.Zones[0].Slug
+		server, err := client.Servers.Create(context.Background(), createServerRequest)
+		if err != nil {
+			t.Fatalf("Servers.Create returned error %s\n", err)
+		}
+		servers = append(servers, server)
+	}
+
+	for _, server := range servers {
+		waitUntil("running", server.UUID, t)
+	}
+
+	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
+		IPVersion:    6,
+		PrefixLength: 56,
+		Type:         "global",
+		Server:       servers[0].UUID,
+	}
+
+	floatingIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Create returned error %s\n", err)
+	}
+
+	ip := floatingIP.IP()
+	actualFloatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Get returned error %s\n", err)
+	}
+	if actualRegion := actualFloatingIP.Region; actualRegion != nil {
+		t.Errorf("Region \n got=%#v\nwant=%#v", actualRegion, nil)
+	}
+
+	for _, server := range append(servers, servers...) {
+		expectedServerUUID := server.UUID
+		updateRequest := &cloudscale.FloatingIPUpdateRequest{
+			Server: expectedServerUUID,
+		}
+		err = client.FloatingIPs.Update(context.Background(), ip, updateRequest)
+		if err != nil {
+			t.Fatalf("FloatingIPs.Update returned error %s\n", err)
+		}
+
+		actualFloatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
+		if err != nil {
+			t.Fatalf("FloatingIPs.Get returned error %s\n", err)
+		}
+
+		if uuid := actualFloatingIP.Server.UUID; uuid != expectedServerUUID {
+			t.Errorf("Server UUID \n got=%s\nwant=%s", uuid, expectedServerUUID)
+		}
+	}
+
+	for _, server := range servers {
+		err = client.Servers.Delete(context.Background(), server.UUID)
+		if err != nil {
+			t.Fatalf("Servers.Delete returned error %s\n", err)
+		}
+	}
+
+	err = client.FloatingIPs.Delete(context.Background(), floatingIP.IP())
+	if err != nil {
+		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
+	}
 }
