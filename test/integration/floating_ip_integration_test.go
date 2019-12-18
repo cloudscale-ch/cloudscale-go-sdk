@@ -313,7 +313,16 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 
 	floatingIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
 	if err != nil {
-		t.Fatalf("floatingIP.Create returned error %s\n", err)
+		t.Fatalf("FloatingIPs.Create returned error %s\n", err)
+	}
+
+	ip := floatingIP.IP()
+	actualFloatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Get returned error %s\n", err)
+	}
+	if actualRegionSlug := actualFloatingIP.Region.Slug; actualRegionSlug != "" {
+		t.Errorf("Region \n got=%#v\nwant=%#v", actualRegionSlug, "")
 	}
 
 	for _, server := range append(servers, servers...) {
@@ -321,15 +330,14 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 		updateRequest := &cloudscale.FloatingIPUpdateRequest{
 			Server: expectedServerUUID,
 		}
-		ip := floatingIP.IP()
 		err = client.FloatingIPs.Update(context.Background(), ip, updateRequest)
 		if err != nil {
-			t.Fatalf("floatingIP.Update returned error %s\n", err)
+			t.Fatalf("FloatingIPs.Update returned error %s\n", err)
 		}
 
 		actualFloatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
 		if err != nil {
-			t.Fatalf("floatingIP.Get returned error %s\n", err)
+			t.Fatalf("FloatingIPs.Get returned error %s\n", err)
 		}
 
 		if uuid := actualFloatingIP.Server.UUID; uuid != expectedServerUUID {
