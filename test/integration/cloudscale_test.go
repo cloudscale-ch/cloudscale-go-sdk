@@ -56,7 +56,7 @@ func DeleteRemainingServer() bool {
 	for _, server := range servers {
 		if strings.HasPrefix(server.Name, serverBaseName) {
 			foundResource = true
-			log.Printf("Found not deleted server: %s\n", server.Name)
+			log.Printf("Found not deleted server: %s (%s)\n", server.Name, server.UUID)
 			err = client.Servers.Delete(context.Background(), server.UUID)
 			if err != nil {
 				log.Fatalf("Servers.Delete returned error %s\n", err)
@@ -78,7 +78,7 @@ func DeleteRemainingServerGroups() bool {
 	for _, serverGroup := range serverGroups {
 		if strings.HasPrefix(serverGroup.Name, serverBaseName) {
 			foundResource = true
-			log.Printf("Found not deleted serverGroup: %s\n", serverGroup.Name)
+			log.Printf("Found not deleted serverGroup: %s (%s)\n", serverGroup.Name, serverGroup.UUID)
 			err = client.ServerGroups.Delete(context.Background(), serverGroup.UUID)
 			if err != nil {
 				log.Fatalf("ServerGroups.Delete returned error %s\n", err)
@@ -100,7 +100,7 @@ func DeleteRemainingVolumes() bool {
 	for _, volume := range volumes {
 		if strings.HasPrefix(volume.Name, "go-sdk-integration-test") {
 			foundResource = true
-			log.Printf("Found not deleted volume: %s\n", volume.Name)
+			log.Printf("Found not deleted volume: %s (%s)\n", volume.Name, volume.UUID)
 			err = client.Volumes.Delete(context.Background(), volume.UUID)
 			if err != nil {
 				log.Fatalf("Volumes.Delete returned error %s\n", err)
@@ -122,7 +122,7 @@ func DeleteRemainingNetworks() bool {
 	for _, network := range networks {
 		if strings.HasPrefix(network.Name, "go-sdk-integration-test") {
 			foundResource = true
-			log.Printf("Found not deleted network: %s\n", network.Name)
+			log.Printf("Found not deleted network: %s (%s)\n", network.Name, network.UUID)
 			err = client.Networks.Delete(context.Background(), network.UUID)
 			if err != nil {
 				log.Fatalf("Networks.Delete returned error %s\n", err)
@@ -144,7 +144,7 @@ func DeleteRemainingObjectsUsers() bool {
 	for _, objectsUser := range objectsUsers {
 		if strings.HasPrefix(objectsUser.DisplayName, serverBaseName) {
 			foundResource = true
-			log.Printf("Found not deleted objectsUser: %s\n", objectsUser.DisplayName)
+			log.Printf("Found not deleted objectsUser: %s (%s)\n", objectsUser.DisplayName, objectsUser.ID)
 			err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
 			if err != nil {
 				log.Fatalf("ObjectsUsers.Delete returned error %s\n", err)
