@@ -10,12 +10,13 @@ import (
 const floatingIPsBasePath = "v1/floating-ips"
 
 type FloatingIP struct {
-	RegionalResource
+	Region         *Region    `json:"region"` // not using RegionalResource here, as FloatingIP can be regional or global
 	TaggedResource
 	HREF           string     `json:"href"`
 	Network        string     `json:"network"`
 	NextHop        string     `json:"next_hop"`
 	Server         ServerStub `json:"server"`
+	Type           string     `json:"type"`
 	ReversePointer string     `json:"reverse_ptr,omitempty"`
 }
 
@@ -24,6 +25,7 @@ type FloatingIPCreateRequest struct {
 	TaggedResourceRequest
 	IPVersion      int    `json:"ip_version"`
 	Server         string `json:"server"`
+	Type           string `json:"type,omitempty"`
 	PrefixLength   int    `json:"prefix_length,omitempty"`
 	ReversePointer string `json:"reverse_ptr,omitempty"`
 }
