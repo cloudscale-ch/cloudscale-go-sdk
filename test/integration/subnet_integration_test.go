@@ -57,3 +57,35 @@ func TestIntegrationSubnet_GetAndList(t *testing.T) {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }
+
+func TestIntegrationSubnet_CRUD(t *testing.T) {
+	integrationTest(t)
+
+	autoCreateSubnet := false;
+	createNetworkRequest := &cloudscale.NetworkCreateRequest{
+		Name:                 networkBaseName,
+		AutoCreateIPV4Subnet: &autoCreateSubnet,
+	}
+	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
+	if err != nil {
+		t.Fatalf("Networks.Create returned error %s\n", err)
+	}
+
+	createSubnetRequest := &cloudscale.SubnetCreateRequest{
+		CIDR:    "192.168.192.0/22",
+		Network: network.UUID,
+	}
+	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	err = client.Subnets.Delete(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Delete returned error %s\n", err)
+	}
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
+}

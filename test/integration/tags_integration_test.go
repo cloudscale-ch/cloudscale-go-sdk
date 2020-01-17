@@ -354,6 +354,59 @@ func TestIntegrationTags_Network(t *testing.T) {
 
 }
 
+func TestIntegrationTags_Subnet(t *testing.T) {
+	integrationTest(t)
+
+	createNetworkRequest := cloudscale.NetworkCreateRequest{
+		Name: networkBaseName,
+	}
+	network, err := client.Networks.Create(context.Background(), &createNetworkRequest)
+	if err != nil {
+		t.Fatalf("Networks.Create returned error %s\n", err)
+	}
+
+	createRequest := cloudscale.SubnetCreateRequest{
+		CIDR:    "172.16.0.0/14",
+		Network: network.UUID,
+	}
+	createRequest.Tags = initialTags
+	subnet, err := client.Subnets.Create(context.Background(), &createRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	getResult, err := client.Subnets.Get(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Errorf("Subnets.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Subnets.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.Subnets.Delete(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Delete returned error %s\n", err)
+	}
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
+
+
+}
+
+
 func TestIntegrationTags_ServerGroup(t *testing.T) {
 	integrationTest(t)
 
