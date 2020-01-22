@@ -9,7 +9,6 @@ import (
 const subnetBasePath = "v1/subnets"
 
 type Subnet struct {
-	ZonalResource
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
@@ -26,7 +25,6 @@ type SubnetStub struct {
 }
 
 type SubnetCreateRequest struct {
-	ZonalResourceRequest
 	TaggedResourceRequest
 	CIDR    string `json:"cidr,omitempty"`
 	Network string `json:"network,omitempty"`
