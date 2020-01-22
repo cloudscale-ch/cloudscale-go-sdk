@@ -357,8 +357,10 @@ func TestIntegrationTags_Network(t *testing.T) {
 func TestIntegrationTags_Subnet(t *testing.T) {
 	integrationTest(t)
 
+	autoCreateSubnet := false;
 	createNetworkRequest := cloudscale.NetworkCreateRequest{
 		Name: networkBaseName,
+		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.Background(), &createNetworkRequest)
 	if err != nil {
