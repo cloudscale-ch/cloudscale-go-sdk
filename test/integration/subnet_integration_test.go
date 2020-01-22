@@ -75,12 +75,24 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 		CIDR:    "192.168.192.0/22",
 		Network: network.UUID,
 	}
-	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
+	expected, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
 	if err != nil {
 		t.Fatalf("Subnets.Create returned error %s\n", err)
 	}
 
-	err = client.Subnets.Delete(context.Background(), subnet.UUID)
+	subnet, err := client.Subnets.Get(context.Background(), expected.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Get returned error %s\n", err)
+	}
+
+	if uuid := subnet.UUID; uuid != expected.UUID {
+		t.Errorf("Subnet.UUID got=%s\nwant=%s", uuid, expected.UUID)
+	}
+	if cidr := subnet.CIDR; cidr != createSubnetRequest.CIDR {
+		t.Errorf("Subnet.CIDR got=%s\nwant=%s", cidr, createSubnetRequest.CIDR)
+	}
+
+	err = client.Subnets.Delete(context.Background(), expected.UUID)
 	if err != nil {
 		t.Fatalf("Subnets.Delete returned error %s\n", err)
 	}
