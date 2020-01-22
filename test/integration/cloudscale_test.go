@@ -123,7 +123,7 @@ func DeleteRemainingSubnets() bool {
 	for _, subnet := range subnets {
 		if strings.HasPrefix(subnet.Network.Name, "go-sdk-integration-test") {
 			foundResource = true
-			log.Printf("Found not deleted subnet: %s (%s)\n", subnet.CIDR, subnet.UUID)
+			log.Printf("Found not deleted subnet: %s (%s) on network %s (%s)\n", subnet.CIDR, subnet.UUID, subnet.Network.Name, subnet.Network.UUID)
 			err = client.Subnets.Delete(context.Background(), subnet.UUID)
 			if err != nil {
 				log.Fatalf("Subnets.Delete returned error %s\n", err)
