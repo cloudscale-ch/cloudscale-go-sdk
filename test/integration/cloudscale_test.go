@@ -36,6 +36,7 @@ func TestMain(m *testing.M) {
 	foundResource = foundResource || DeleteRemainingServer()
 	foundResource = foundResource || DeleteRemainingServerGroups()
 	foundResource = foundResource || DeleteRemainingVolumes()
+	foundResource = foundResource || DeleteRemainingSubnets()
 	foundResource = foundResource || DeleteRemainingNetworks()
 	foundResource = foundResource || DeleteRemainingObjectsUsers()
 
@@ -104,6 +105,28 @@ func DeleteRemainingVolumes() bool {
 			err = client.Volumes.Delete(context.Background(), volume.UUID)
 			if err != nil {
 				log.Fatalf("Volumes.Delete returned error %s\n", err)
+			}
+		}
+	}
+
+	return foundResource
+}
+
+func DeleteRemainingSubnets() bool {
+	foundResource := false
+
+	subnets, err := client.Subnets.List(context.Background())
+	if err != nil {
+		log.Fatalf("Subnets.List returned error %s\n", err)
+	}
+
+	for _, subnet := range subnets {
+		if strings.HasPrefix(subnet.Network.Name, "go-sdk-integration-test") {
+			foundResource = true
+			log.Printf("Found not deleted subnet: %s (%s) on network %s (%s)\n", subnet.CIDR, subnet.UUID, subnet.Network.Name, subnet.Network.UUID)
+			err = client.Subnets.Delete(context.Background(), subnet.UUID)
+			if err != nil {
+				log.Fatalf("Subnets.Delete returned error %s\n", err)
 			}
 		}
 	}
