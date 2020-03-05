@@ -12,10 +12,11 @@ type Subnet struct {
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF    string      `json:"href,omitempty"`
-	UUID    string      `json:"uuid,omitempty"`
-	CIDR    string      `json:"cidr,omitempty"`
-	Network NetworkStub `json:"network,omitempty"`
+	HREF           string      `json:"href,omitempty"`
+	UUID           string      `json:"uuid,omitempty"`
+	CIDR           string      `json:"cidr,omitempty"`
+	Network        NetworkStub `json:"network,omitempty"`
+	GatewayAddress string      `json:"gateway_address,omitempty"`
 }
 
 type SubnetStub struct {
@@ -26,8 +27,9 @@ type SubnetStub struct {
 
 type SubnetCreateRequest struct {
 	TaggedResourceRequest
-	CIDR    string `json:"cidr,omitempty"`
-	Network string `json:"network,omitempty"`
+	CIDR           string `json:"cidr,omitempty"`
+	Network        string `json:"network,omitempty"`
+	GatewayAddress string `json:"gateway_address,omitempty"`
 }
 
 type SubnetService interface {

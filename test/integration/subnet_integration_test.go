@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
+	"reflect"
 	"testing"
 )
 
@@ -72,7 +73,8 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 	}
 
 	createSubnetRequest := &cloudscale.SubnetCreateRequest{
-		CIDR:    "192.168.192.0/22",
+		CIDR: "192.168.192.0/22",
+		GatewayAddress: "192.168.192.2",
 		Network: network.UUID,
 	}
 	expected, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
@@ -85,11 +87,8 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 		t.Fatalf("Subnets.Get returned error %s\n", err)
 	}
 
-	if uuid := subnet.UUID; uuid != expected.UUID {
-		t.Errorf("Subnet.UUID got=%s\nwant=%s", uuid, expected.UUID)
-	}
-	if cidr := subnet.CIDR; cidr != createSubnetRequest.CIDR {
-		t.Errorf("Subnet.CIDR got=%s\nwant=%s", cidr, createSubnetRequest.CIDR)
+	if !reflect.DeepEqual(subnet, expected) {
+		t.Errorf("Error = %#v, expected %#v", subnet, expected)
 	}
 
 	err = client.Subnets.Delete(context.Background(), expected.UUID)
