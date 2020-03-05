@@ -75,6 +75,7 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 	createSubnetRequest := &cloudscale.SubnetCreateRequest{
 		CIDR: "192.168.192.0/22",
 		GatewayAddress: "192.168.192.2",
+		DNSServers: []string{"77.109.128.2", "213.144.129.20"},
 		Network: network.UUID,
 	}
 	expected, err := client.Subnets.Create(context.TODO(), createSubnetRequest)

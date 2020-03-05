@@ -17,6 +17,7 @@ type Subnet struct {
 	CIDR           string      `json:"cidr,omitempty"`
 	Network        NetworkStub `json:"network,omitempty"`
 	GatewayAddress string      `json:"gateway_address,omitempty"`
+	DNSServers     []string    `json:"dns_servers,omitempty"`
 }
 
 type SubnetStub struct {
@@ -27,9 +28,10 @@ type SubnetStub struct {
 
 type SubnetCreateRequest struct {
 	TaggedResourceRequest
-	CIDR           string `json:"cidr,omitempty"`
-	Network        string `json:"network,omitempty"`
-	GatewayAddress string `json:"gateway_address,omitempty"`
+	CIDR           string   `json:"cidr,omitempty"`
+	Network        string   `json:"network,omitempty"`
+	GatewayAddress string   `json:"gateway_address,omitempty"`
+	DNSServers     []string `json:"dns_servers,omitempty"`
 }
 
 type SubnetService interface {
