@@ -385,8 +385,33 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
 	}
 
+	updateRequest := cloudscale.SubnetUpdateRequest{}
+	updateRequest.Tags = newTags
+
+	err = client.Subnets.Update(context.Background(), subnet.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("Subnets.Update returned error: %v", err)
+	}
+	getResult2, err := client.Subnets.Get(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Errorf("Subnets.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
 	// test querying with tags
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("Subnets.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("Subnets.List returned error %s\n", err)
