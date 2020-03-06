@@ -92,6 +92,15 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 		t.Errorf("Error = %#v, expected %#v", subnet, expected)
 	}
 
+	subnets, err := client.Subnets.List(context.Background())
+	if err != nil {
+		t.Fatalf("Subnets.List returned error %s\n", err)
+	}
+
+	if numSubnets := len(subnets); numSubnets < 1 {
+		t.Errorf("Subnets.List \n got=%d\nwant=%d", numSubnets, 1)
+	}
+
 	err = client.Subnets.Delete(context.Background(), expected.UUID)
 	if err != nil {
 		t.Fatalf("Subnets.Delete returned error %s\n", err)
