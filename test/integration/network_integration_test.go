@@ -178,6 +178,88 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	}
 }
 
+func TestIntegrationNetwork_Reattach(t *testing.T) {
+	integrationTest(t)
+
+	autoCreateSubnet := false
+	createNetworkRequest := &cloudscale.NetworkCreateRequest{
+		Name:                 networkBaseName,
+		AutoCreateIPV4Subnet: &autoCreateSubnet,
+	}
+	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
+	if err != nil {
+		t.Fatalf("Networks.Create returned error %s\n", err)
+	}
+
+	createSubnetRequest := &cloudscale.SubnetCreateRequest{
+		Network: network.UUID,
+		CIDR:    "192.168.77.0/24",
+	}
+	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	interfaces := []cloudscale.InterfaceRequest{
+		{Network: "public"},
+	}
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         "go-sdk-integration-test-network",
+		Flavor:       "flex-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		Interfaces:   &interfaces,
+		SSHKeys: []string{
+			pubKey,
+		},
+	}
+
+	server, err := client.Servers.Create(context.Background(), createServerRequest)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+	waitUntil("running", server.UUID, t)
+
+	if numNetworks := len(server.Interfaces); numNetworks != 1 {
+		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 1)
+	}
+
+	addresses := []cloudscale.AddressRequest{{
+		Subnet:  subnet.UUID,
+		Address: "192.168.77.77",
+	}}
+	interfaces = append(interfaces, cloudscale.InterfaceRequest{
+		Addresses: &addresses,
+	})
+	updateRequest := cloudscale.ServerUpdateRequest{
+		Interfaces: &interfaces,
+	}
+	err = client.Servers.Update(context.Background(), server.UUID, &updateRequest)
+	if err != nil {
+		t.Fatalf("Servers.Update returned error %s\n", err)
+	}
+
+	updatedServer, err := client.Servers.Get(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Get returned error %s\n", err)
+	}
+	if numNetworks := len(updatedServer.Interfaces); numNetworks != 2 {
+		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 2)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+
+	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
+	time.Sleep(5 * time.Second)
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
+}
+
 func TestIntegrationNetwork_Update(t *testing.T) {
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
