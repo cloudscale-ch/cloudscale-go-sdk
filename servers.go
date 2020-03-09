@@ -97,8 +97,13 @@ type ServerRequest struct {
 }
 
 type InterfaceRequest struct {
-	Network   string   `json:"network,omitempty"`
-	Addresses *[]string `json:"addresses,omitempty"`
+	Network   string            `json:"network,omitempty"`
+	Addresses *[]AddressRequest `json:"addresses,omitempty"`
+}
+
+type AddressRequest struct {
+	Subnet  string `json:"subnet,omitempty"`
+	Address string `json:"address,omitempty"`
 }
 
 type ServerService interface {
