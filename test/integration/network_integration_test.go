@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
+	"regexp"
 	"sync"
 	"testing"
 	"time"
@@ -81,48 +82,94 @@ func TestIntegrationNetwork_CreateWithoutSubnet(t *testing.T) {
 func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	integrationTest(t)
 
+	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name: networkBaseName,
+		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
-
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
 	if err != nil {
 		t.Fatalf("Networks.Create returned error %s\n", err)
 	}
 
-	interfaceRequests := []cloudscale.InterfaceRequest{
-		cloudscale.InterfaceRequest{
-			Network: network.UUID,
-		},
+	createSubnetRequest := &cloudscale.SubnetCreateRequest{
+		Network: network.UUID,
+		CIDR: "192.168.42.0/24",
 	}
-	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test-network",
-		Flavor:       "flex-2",
-		Image:        DefaultImageSlug,
-		VolumeSizeGB: 10,
-		Interfaces:   &interfaceRequests,
-		SSHKeys: []string{
-			pubKey,
-		},
-	}
-
-	server, err := client.Servers.Create(context.Background(), createServerRequest)
+	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
 	if err != nil {
-		t.Fatalf("Servers.Create returned error %s\n", err)
-	}
-	waitUntil("running", server.UUID, t)
-
-	if numNetworks := len(server.Interfaces); numNetworks != 1 {
-		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 1)
-	}
-	if singleInterface := server.Interfaces[0]; singleInterface.Network.UUID != network.UUID {
-		t.Errorf("Attatched to wrong Network\ngot=%#v\nwant=%#v", singleInterface.Network.UUID, network.UUID)
+		t.Fatalf("Subnets.Create returned error %s\n", err)
 	}
 
-	err = client.Servers.Delete(context.Background(), server.UUID)
-	if err != nil {
-		t.Fatalf("Servers.Delete returned error %s\n", err)
+	cases := []struct {
+		name       string
+		in         *[]cloudscale.InterfaceRequest
+		expectedIP string
+	}{
+		{"Attach by network UUID", &[]cloudscale.InterfaceRequest{
+			{
+				Network: network.UUID,
+			},
+		}, `192\.168\.42\.[0-9]*`},
+		{"Attach by subnet UUID", &[]cloudscale.InterfaceRequest{
+			{
+				Addresses: &[]cloudscale.AddressRequest{
+					{
+						Subnet: subnet.UUID,
+					},
+				},
+			},
+		}, `192\.168\.42\.[0-9]*`},
+		{"Attach by subnet UUID with predefined IP", &[]cloudscale.InterfaceRequest{
+			{
+				Addresses: &[]cloudscale.AddressRequest{
+					{
+						Subnet:  subnet.UUID,
+						Address: "192.168.42.242",
+					},
+				},
+			},
+		}, `192\.168\.42\.242`},
 	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			createServerRequest := &cloudscale.ServerRequest{
+				Name:         "go-sdk-integration-test-network",
+				Flavor:       "flex-2",
+				Image:        DefaultImageSlug,
+				VolumeSizeGB: 10,
+				Interfaces:   tt.in,
+				SSHKeys: []string{
+					pubKey,
+				},
+			}
+
+			server, err := client.Servers.Create(context.Background(), createServerRequest)
+			if err != nil {
+				t.Fatalf("Servers.Create returned error %s\n", err)
+			}
+			waitUntil("running", server.UUID, t)
+
+			if numNetworks := len(server.Interfaces); numNetworks != 1 {
+				t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 1)
+			}
+			singleInterface := server.Interfaces[0];
+			if singleInterface.Network.UUID != network.UUID {
+				t.Errorf("Attatched to wrong Network\ngot=%#v\nwant=%#v", singleInterface.Network.UUID, network.UUID)
+			}
+			re := regexp.MustCompile(tt.expectedIP)
+			if !re.Match([]byte(singleInterface.Addresses[0].Address)) {
+				t.Errorf("Expected IP regex does not match\ngot=%#v\nwant=%#v", singleInterface.Addresses[0].Address, tt.expectedIP)
+			}
+
+			err = client.Servers.Delete(context.Background(), server.UUID)
+			if err != nil {
+				t.Fatalf("Servers.Delete returned error %s\n", err)
+			}
+		})
+	}
+
 	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
 	time.Sleep(5 * time.Second)
 	err = client.Networks.Delete(context.Background(), network.UUID)
@@ -131,20 +178,37 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	}
 }
 
-func TestIntegrationNetwork_AttachWithoutIP(t *testing.T) {
+func TestIntegrationNetwork_Reattach(t *testing.T) {
 	integrationTest(t)
 
-	interfaceRequests := []cloudscale.InterfaceRequest{
-		cloudscale.InterfaceRequest{
-			Network: "public",
-		},
+	autoCreateSubnet := false
+	createNetworkRequest := &cloudscale.NetworkCreateRequest{
+		Name:                 networkBaseName,
+		AutoCreateIPV4Subnet: &autoCreateSubnet,
+	}
+	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
+	if err != nil {
+		t.Fatalf("Networks.Create returned error %s\n", err)
+	}
+
+	createSubnetRequest := &cloudscale.SubnetCreateRequest{
+		Network: network.UUID,
+		CIDR:    "192.168.77.0/24",
+	}
+	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	interfaces := []cloudscale.InterfaceRequest{
+		{Network: "public"},
 	}
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         "go-sdk-integration-test-network",
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
-		Interfaces:   &interfaceRequests,
+		Interfaces:   &interfaces,
 		SSHKeys: []string{
 			pubKey,
 		},
@@ -160,48 +224,34 @@ func TestIntegrationNetwork_AttachWithoutIP(t *testing.T) {
 		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 1)
 	}
 
-	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
-	}
-
-	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
-	if err != nil {
-		t.Fatalf("Networks.Create returned error %s\n", err)
-	}
-
-	interfaceRequests = append(interfaceRequests, cloudscale.InterfaceRequest{
-		Network:   network.UUID,
-		Addresses: &[]string{},
+	addresses := []cloudscale.AddressRequest{{
+		Subnet:  subnet.UUID,
+		Address: "192.168.77.77",
+	}}
+	interfaces = append(interfaces, cloudscale.InterfaceRequest{
+		Addresses: &addresses,
 	})
-	updateServerRequest := &cloudscale.ServerUpdateRequest{
-		Interfaces: &interfaceRequests,
+	updateRequest := cloudscale.ServerUpdateRequest{
+		Interfaces: &interfaces,
+	}
+	err = client.Servers.Update(context.Background(), server.UUID, &updateRequest)
+	if err != nil {
+		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
 
-	err = client.Servers.Update(context.TODO(), server.UUID, updateServerRequest)
+	updatedServer, err := client.Servers.Get(context.Background(), server.UUID)
 	if err != nil {
-		t.Errorf("Servers.Update returned error: %v", err)
+		t.Fatalf("Servers.Get returned error %s\n", err)
 	}
-
-	server, err = client.Servers.Get(context.Background(), server.UUID)
-	if err != nil {
-		t.Errorf("Server.Get returned error: %v", err)
-	}
-	if numNetworks := len(server.Interfaces); numNetworks != 2 {
+	if numNetworks := len(updatedServer.Interfaces); numNetworks != 2 {
 		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 2)
-	}
-	second := server.Interfaces[1]
-	if second.Network.UUID != network.UUID {
-		t.Errorf("Attatched to wrong Network\ngot=%#v\nwant=%#v", second.Network.UUID, network.UUID)
-	}
-
-	if addressCount := len(second.Addresses); addressCount > 0 {
-		t.Errorf("Expected no addresses\ngot=%#v", addressCount)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
+
 	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
 	time.Sleep(5 * time.Second)
 	err = client.Networks.Delete(context.Background(), network.UUID)
