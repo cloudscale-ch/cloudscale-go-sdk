@@ -102,15 +102,16 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	}
 
 	cases := []struct {
-		name       string
-		in         *[]cloudscale.InterfaceRequest
-		expectedIP string
+		name                string
+		in                  *[]cloudscale.InterfaceRequest
+		expectedNumNetworks int
+		expectedIP          string
 	}{
 		{"Attach by network UUID", &[]cloudscale.InterfaceRequest{
 			{
 				Network: network.UUID,
 			},
-		}, `192\.168\.42\.[0-9]*`},
+		}, 1, `192\.168\.42\.[0-9]*`},
 		{"Attach by subnet UUID", &[]cloudscale.InterfaceRequest{
 			{
 				Addresses: &[]cloudscale.AddressRequest{
@@ -119,7 +120,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 					},
 				},
 			},
-		}, `192\.168\.42\.[0-9]*`},
+		}, 1, `192\.168\.42\.[0-9]*`},
 		{"Attach by subnet UUID with predefined IP", &[]cloudscale.InterfaceRequest{
 			{
 				Addresses: &[]cloudscale.AddressRequest{
@@ -129,7 +130,16 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 					},
 				},
 			},
-		}, `192\.168\.42\.242`},
+		}, 1, `192\.168\.42\.242`},
+		{"Attach by network UUID without IP (Layer 2)", &[]cloudscale.InterfaceRequest{
+			{
+				Network: "public",
+			},
+			{
+				Network:   network.UUID,
+				Addresses: &[]cloudscale.AddressRequest{},
+			},
+		}, 2, ""},
 	}
 
 	for _, tt := range cases {
@@ -151,18 +161,23 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 			}
 			waitUntil("running", server.UUID, t)
 
-			if numNetworks := len(server.Interfaces); numNetworks != 1 {
-				t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 1)
+			if numNetworks := len(server.Interfaces); numNetworks != tt.expectedNumNetworks {
+				t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, tt.expectedNumNetworks)
 			}
-			singleInterface := server.Interfaces[0];
-			if singleInterface.Network.UUID != network.UUID {
-				t.Errorf("Attatched to wrong Network\ngot=%#v\nwant=%#v", singleInterface.Network.UUID, network.UUID)
+			lastNetworkInterface := server.Interfaces[len(server.Interfaces)-1];
+			if lastNetworkInterface.Network.UUID != network.UUID {
+				t.Errorf("Attatched to wrong Network\ngot=%#v\nwant=%#v", lastNetworkInterface.Network.UUID, network.UUID)
 			}
-			re := regexp.MustCompile(tt.expectedIP)
-			if !re.Match([]byte(singleInterface.Addresses[0].Address)) {
-				t.Errorf("Expected IP regex does not match\ngot=%#v\nwant=%#v", singleInterface.Addresses[0].Address, tt.expectedIP)
+			if tt.expectedIP != "" {
+				re := regexp.MustCompile(tt.expectedIP)
+				if !re.Match([]byte(lastNetworkInterface.Addresses[0].Address)) {
+					t.Errorf("Expected IP regex does not match\ngot=%#v\nwant=%#v", lastNetworkInterface.Addresses[0].Address, tt.expectedIP)
+				}
+			} else {
+				if len(lastNetworkInterface.Addresses) != 0 {
+					t.Errorf("Expected no IP addresses\ngot=%#v", len(lastNetworkInterface.Addresses))
+				}
 			}
-
 			err = client.Servers.Delete(context.Background(), server.UUID)
 			if err != nil {
 				t.Fatalf("Servers.Delete returned error %s\n", err)
