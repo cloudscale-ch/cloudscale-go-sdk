@@ -178,6 +178,9 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 					t.Errorf("Expected no IP addresses\ngot=%#v", len(lastNetworkInterface.Addresses))
 				}
 			}
+
+			// this is required especially for the 'without IP' case.
+			time.Sleep(20 * time.Second)
 			err = client.Servers.Delete(context.Background(), server.UUID)
 			if err != nil {
 				t.Fatalf("Servers.Delete returned error %s\n", err)
@@ -186,7 +189,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	}
 
 	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
