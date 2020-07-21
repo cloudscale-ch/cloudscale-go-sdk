@@ -50,7 +50,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	ip := expectedIP.IP()
 	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
 	if err != nil {
-		t.Fatalf("Servers.Get returned error %s\n", err)
+		t.Fatalf("FloatingIPs.Get returned error %s\n", err)
 	}
 
 	if !reflect.DeepEqual(floatingIP, expectedIP) {
@@ -357,3 +357,46 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
 	}
 }
+
+func TestIntegrationFloatingIP_WithoutServer(t *testing.T) {
+	integrationTest(t)
+
+	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
+		IPVersion: 4,
+	}
+
+	expectedIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
+	if err != nil {
+		t.Fatalf("floatingIP.Create returned error %s\n", err)
+	}
+
+	if server := expectedIP.Server; server != nil {
+		t.Errorf("expectedIP.Server \n got=%#v\nwant=%#v", server, nil)
+	}
+
+	ip := expectedIP.IP()
+	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Get returned error %s\n", err)
+	}
+
+	if !reflect.DeepEqual(floatingIP, expectedIP) {
+		t.Errorf("Error = %#v, expected %#v", floatingIP, expectedIP)
+	}
+
+	floatingIps, err := client.FloatingIPs.List(context.Background())
+	if err != nil {
+		t.Fatalf("FloatingIPs.List returned error %s\n", err)
+	}
+
+	if numFloatingIps := len(floatingIps); numFloatingIps < 1 {
+		t.Errorf("FloatingIPs.List \n got=%d\nwant=%d", numFloatingIps, 1)
+	}
+
+
+	err = client.FloatingIPs.Delete(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
+	}
+}
+
