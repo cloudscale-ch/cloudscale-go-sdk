@@ -1,0 +1,41 @@
+name: Tests
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+
+      - name: Set up Go
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: '1.15'
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2.3.3
+
+      - name: Get dependencies
+        run: |
+          go mod download
+
+      - name: unit tests
+        timeout-minutes: 5
+        run: |
+          make test
+
+#      - name: integration tests
+#        timeout-minutes: 60
+#        env:
+#
+#          CLOUDSCALE_TOKEN: ${{ secrets.CLOUDSCALE_TOKEN }}
+#        if: env.CLOUDSCALE_TOKEN != null
+#
+#        run: |
+#          make integration
