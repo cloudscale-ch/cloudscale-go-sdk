@@ -3,6 +3,8 @@ on:
   push:
     paths-ignore:
       - 'README.md'
+  schedule:
+    - cron: '44 16 * * 4'
 
 jobs:
   test:
