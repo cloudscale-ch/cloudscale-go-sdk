@@ -30,12 +30,12 @@ jobs:
         run: |
           make test
 
-#      - name: integration tests
-#        timeout-minutes: 60
-#        env:
-#
-#          CLOUDSCALE_TOKEN: ${{ secrets.CLOUDSCALE_TOKEN }}
-#        if: env.CLOUDSCALE_TOKEN != null
-#
-#        run: |
-#          make integration
+      - name: integration tests
+        timeout-minutes: 60
+        env:
+
+          CLOUDSCALE_TOKEN: ${{ secrets.CLOUDSCALE_TOKEN }}
+        if: env.CLOUDSCALE_TOKEN != null
+
+        run: |
+          make integration
