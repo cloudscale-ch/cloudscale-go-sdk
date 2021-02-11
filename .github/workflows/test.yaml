@@ -26,12 +26,12 @@ jobs:
         run: |
           go mod download
 
-      - name: unit tests
+      - name: Run unit tests
         timeout-minutes: 5
         run: |
           make test
 
-      - name: integration tests
+      - name: Run integration tests
         timeout-minutes: 60
         env:
           CLOUDSCALE_TOKEN: ${{ secrets.CLOUDSCALE_TOKEN }}
