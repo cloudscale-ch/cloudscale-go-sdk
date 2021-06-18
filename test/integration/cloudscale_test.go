@@ -39,6 +39,7 @@ func TestMain(m *testing.M) {
 	foundResource = foundResource || DeleteRemainingSubnets()
 	foundResource = foundResource || DeleteRemainingNetworks()
 	foundResource = foundResource || DeleteRemainingObjectsUsers()
+	foundResource = foundResource || DeleteRemainingCustomImages()
 
 	if (foundResource) {
 		log.Fatal("Failing due to remaining resource\n")
@@ -171,6 +172,28 @@ func DeleteRemainingObjectsUsers() bool {
 			err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
 			if err != nil {
 				log.Fatalf("ObjectsUsers.Delete returned error %s\n", err)
+			}
+		}
+	}
+
+	return foundResource
+}
+
+func DeleteRemainingCustomImages() bool {
+	foundResource := false
+
+	customImages, err := client.CustomImages.List(context.Background())
+	if err != nil {
+		log.Fatalf("CustomImages.List returned error %s\n", err)
+	}
+
+	for _, customImage := range customImages {
+		if strings.HasPrefix(customImage.Name, customImageBaseName) {
+			foundResource = true
+			log.Printf("Found not deleted customImage: %s (%s)\n", customImage.Name, customImage.UUID)
+			err = client.CustomImages.Delete(context.Background(), customImage.UUID)
+			if err != nil {
+				log.Fatalf("CustomImages.Delete returned error %s\n", err)
 			}
 		}
 	}
