@@ -4,12 +4,11 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
-
-const baseObjectsUserName = "go-sdk-integration-test"
 
 func TestIntegrationObjectsUser_CRUD(t *testing.T) {
 	integrationTest(t)
@@ -50,7 +49,7 @@ func TestIntegrationObjectsUser_UpdateRest(t *testing.T) {
 	}
 
 	// Try to rename.
-	renamedName := baseObjectsUserName + "-renamed"
+	renamedName := fmt.Sprintf("%s-renamed", testRunPrefix)
 	renameRequest := &cloudscale.ObjectsUserRequest{DisplayName: renamedName}
 	err = client.ObjectsUsers.Update(context.TODO(), objectsUser.ID, renameRequest)
 	if err != nil {
@@ -75,7 +74,7 @@ func TestIntegrationObjectsUser_UpdateRest(t *testing.T) {
 
 func createObjectsUser(t *testing.T) (*cloudscale.ObjectsUser, error) {
 	createRequest := &cloudscale.ObjectsUserRequest{
-		DisplayName: baseObjectsUserName,
+		DisplayName: testRunPrefix,
 	}
 
 	return client.ObjectsUsers.Create(context.Background(), createRequest)

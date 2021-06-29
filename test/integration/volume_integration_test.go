@@ -12,13 +12,11 @@ import (
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
-const volumeBaseName = "go-sdk-integration-test-volume"
-
 func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	integrationTest(t)
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test-volume",
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -35,7 +33,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	waitUntil("running", server.UUID, t)
 
 	createVolumeRequest := &cloudscale.VolumeRequest{
-		Name:        volumeBaseName,
+		Name:        testRunPrefix,
 		SizeGB:      50,
 		ServerUUIDs: &[]string{server.UUID},
 	}
@@ -75,7 +73,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 
 func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 	createVolumeRequest := &cloudscale.VolumeRequest{
-		Name:   volumeBaseName,
+		Name:   testRunPrefix,
 		SizeGB: 50,
 	}
 
@@ -101,7 +99,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 
 	multiUpdateVolumeRequest := &cloudscale.VolumeRequest{
 		SizeGB: 50,
-		Name:   volumeBaseName + "Foo",
+		Name:   testRunPrefix + "Foo",
 	}
 	err = client.Volumes.Update(context.TODO(), volume.UUID, multiUpdateVolumeRequest)
 	// This shouldn't work.
@@ -141,7 +139,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 }
 
 func TestIntegrationVolume_ListByName(t *testing.T) {
-	volumeName := volumeBaseName + "-name-test"
+	volumeName := testRunPrefix + "-name-test"
 	createVolumeRequest := &cloudscale.VolumeRequest{
 		Name:   volumeName,
 		SizeGB: 5,
@@ -209,7 +207,7 @@ func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 	defer wg.Done()
 
 	createVolumeRequest := &cloudscale.VolumeRequest{
-		Name:   volumeBaseName,
+		Name:   testRunPrefix,
 		SizeGB: 50,
 	}
 

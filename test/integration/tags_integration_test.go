@@ -90,7 +90,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.VolumeRequest{
-		Name:   volumeBaseName,
+		Name:   testRunPrefix,
 		SizeGB: 3,
 	}
 	createRequest.Tags = initialTags
@@ -230,7 +230,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.ObjectsUserRequest{
-		DisplayName: baseObjectsUserName,
+		DisplayName: testRunPrefix,
 	}
 	createRequest.Tags = initialTags
 
@@ -294,7 +294,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 	}
 	createRequest.Tags = initialTags
 
@@ -359,7 +359,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 
 	autoCreateSubnet := false;
 	createNetworkRequest := cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.Background(), &createNetworkRequest)
@@ -433,12 +433,11 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 
 }
 
-
 func TestIntegrationTags_ServerGroup(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.ServerGroupRequest{
-		Name: serverBaseName + "-group",
+		Name: testRunPrefix + "-group",
 		Type: "anti-affinity",
 	}
 	createRequest.Tags = initialTags
@@ -497,4 +496,73 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 		t.Fatalf("ServerGroups.Delete returned error %s\n", err)
 	}
 
+}
+
+func TestIntegrationTags_CustomImage(t *testing.T) {
+	integrationTest(t)
+
+	createRequest := cloudscale.CustomImageImportRequest{
+		Name:             testRunPrefix,
+		URL:              "https://at-images.objects.lpg.cloudscale.ch/alpine",
+		UserDataHandling: "extend-cloud-config",
+		Zones:            []string{"lpg1"},
+		SourceFormat:     "raw",
+	}
+	createRequest.Tags = initialTags
+
+	customImageImport, err := client.CustomImageImports.Create(context.Background(), &createRequest)
+	if err != nil {
+		t.Fatalf("CustomImages.Create returned error %s\n", err)
+	}
+	waitForImport("success", customImageImport.UUID, t)
+
+	imageID := customImageImport.CustomImage.UUID
+	getResult, err := client.CustomImages.Get(context.Background(), imageID)
+	if err != nil {
+		t.Errorf("CustomImages.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.CustomImageRequest{}
+	updateRequest.Tags = newTags
+
+	err = client.CustomImages.Update(context.Background(), imageID, &updateRequest)
+	if err != nil {
+		t.Errorf("CustomImages.Update returned error: %v", err)
+	}
+	getResult2, err := client.CustomImages.Get(context.Background(), imageID)
+	if err != nil {
+		t.Errorf("CustomImages.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.CustomImages.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("CustomImages.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.CustomImages.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("CustomImages.List returned error %s\n", err)
+		}
+		if len(res) < 1 {
+			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.CustomImages.Delete(context.Background(), imageID)
+	if err != nil {
+		t.Fatalf("CustomImages.Delete returned error %s\n", err)
+	}
 }

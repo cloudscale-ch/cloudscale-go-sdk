@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2.1.3
         with:
-          go-version: '1.15'
+          go-version: '1.16'
         id: go
 
       - name: Check out code into the Go module directory
@@ -33,6 +33,10 @@ jobs:
         timeout-minutes: 5
         run: |
           make test
+
+      - name: Sleep random seconds to ensure test call are not executed at exactly the same time (push and pr runs)
+        run: sleep $(( ( RANDOM % 30 )  + 1 ))
+        shell: bash
 
       - name: Run integration tests
         timeout-minutes: 60

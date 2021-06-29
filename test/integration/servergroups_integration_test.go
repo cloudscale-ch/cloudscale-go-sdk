@@ -36,7 +36,7 @@ func TestIntegrationServerGroup_CRUD(t *testing.T) {
 
 func createServerGroup(t *testing.T) (*cloudscale.ServerGroup, error) {
 	createRequest := &cloudscale.ServerGroupRequest{
-		Name: serverBaseName + "-group",
+		Name: testRunPrefix + "-group",
 		Type: "anti-affinity",
 	}
 
