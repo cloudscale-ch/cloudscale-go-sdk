@@ -15,7 +15,6 @@ import (
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
 
-const serverBaseName = "go-sdk-integration-test"
 const DefaultImageSlug = "debian-9"
 
 func integrationTest(t *testing.T) {
@@ -121,7 +120,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 
 func getDefaultServerRequest() cloudscale.ServerRequest {
 	return cloudscale.ServerRequest{
-		Name:         serverBaseName,
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,

@@ -90,7 +90,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.VolumeRequest{
-		Name:   volumeBaseName,
+		Name:   testRunPrefix,
 		SizeGB: 3,
 	}
 	createRequest.Tags = initialTags
@@ -230,7 +230,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.ObjectsUserRequest{
-		DisplayName: baseObjectsUserName,
+		DisplayName: testRunPrefix,
 	}
 	createRequest.Tags = initialTags
 
@@ -294,7 +294,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 	}
 	createRequest.Tags = initialTags
 
@@ -359,7 +359,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 
 	autoCreateSubnet := false;
 	createNetworkRequest := cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.Background(), &createNetworkRequest)
@@ -437,7 +437,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.ServerGroupRequest{
-		Name: serverBaseName + "-group",
+		Name: testRunPrefix + "-group",
 		Type: "anti-affinity",
 	}
 	createRequest.Tags = initialTags
@@ -502,7 +502,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.CustomImageImportRequest{
-		Name:             customImageBaseName,
+		Name:             testRunPrefix,
 		URL:              "https://at-images.objects.lpg.cloudscale.ch/alpine",
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1"},

@@ -4,6 +4,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 	"regexp"
 	"sync"
@@ -11,13 +12,11 @@ import (
 	"time"
 )
 
-const networkBaseName = "go-sdk-integration-test-network"
-
 func TestIntegrationNetwork_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 	}
 
 	expected, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -59,7 +58,7 @@ func TestIntegrationNetwork_CreateWithoutSubnet(t *testing.T) {
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name:                 networkBaseName,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 
@@ -84,7 +83,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -145,7 +144,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
 			createServerRequest := &cloudscale.ServerRequest{
-				Name:         "go-sdk-integration-test-network",
+				Name:         testRunPrefix,
 				Flavor:       "flex-2",
 				Image:        DefaultImageSlug,
 				VolumeSizeGB: 10,
@@ -201,7 +200,7 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name:                 networkBaseName,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -222,7 +221,7 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 		{Network: "public"},
 	}
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test-network",
+		Name:         fmt.Sprintf("%s-network", testRunPrefix),
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -283,7 +282,7 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name:                 networkBaseName,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -305,7 +304,7 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 		{Network: network.UUID},
 	}
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test-network",
+		Name:         fmt.Sprintf("%s-network", testRunPrefix),
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -370,7 +369,7 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 func TestIntegrationNetwork_Update(t *testing.T) {
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 		MTU:  1500,
 	}
 
@@ -430,7 +429,7 @@ func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.W
 	defer wg.Done()
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 	}
 
 	createNetworkRequest.Zone = zone.Slug

@@ -17,7 +17,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -79,7 +79,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 
 func TestIntegrationFloatingIP_Update(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -94,7 +94,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	}
 
 	createServerRequest2 := &cloudscale.ServerRequest{
-		Name:         serverBaseName + "-floating",
+		Name:         testRunPrefix + "-floating",
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -181,7 +181,7 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 	defer wg.Done()
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -229,7 +229,7 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	integrationTest(t)
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -281,7 +281,7 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 	}
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         serverBaseName,
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,

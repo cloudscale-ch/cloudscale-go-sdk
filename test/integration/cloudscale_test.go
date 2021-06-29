@@ -4,10 +4,13 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 	"golang.org/x/oauth2"
@@ -15,10 +18,14 @@ import (
 
 var (
 	client *cloudscale.Client
+	testRunPrefix string
 )
 
 func TestMain(m *testing.M) {
 	// setup tests
+	rand.Seed(time.Now().UnixNano())
+	testRunPrefix = fmt.Sprintf("go-sdk-%d", rand.Intn(100000))
+
 	token := os.Getenv("CLOUDSCALE_TOKEN")
 	if token == "" {
 		log.Fatal("Missing CLOUDSCALE_TOKEN, tests won't run!\n")
@@ -56,7 +63,7 @@ func DeleteRemainingServer() bool {
 	}
 
 	for _, server := range servers {
-		if strings.HasPrefix(server.Name, serverBaseName) {
+		if strings.HasPrefix(server.Name, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted server: %s (%s)\n", server.Name, server.UUID)
 			err = client.Servers.Delete(context.Background(), server.UUID)
@@ -78,7 +85,7 @@ func DeleteRemainingServerGroups() bool {
 	}
 
 	for _, serverGroup := range serverGroups {
-		if strings.HasPrefix(serverGroup.Name, serverBaseName) {
+		if strings.HasPrefix(serverGroup.Name, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted serverGroup: %s (%s)\n", serverGroup.Name, serverGroup.UUID)
 			err = client.ServerGroups.Delete(context.Background(), serverGroup.UUID)
@@ -100,7 +107,7 @@ func DeleteRemainingVolumes() bool {
 	}
 
 	for _, volume := range volumes {
-		if strings.HasPrefix(volume.Name, "go-sdk-integration-test") {
+		if strings.HasPrefix(volume.Name, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted volume: %s (%s)\n", volume.Name, volume.UUID)
 			err = client.Volumes.Delete(context.Background(), volume.UUID)
@@ -122,7 +129,7 @@ func DeleteRemainingSubnets() bool {
 	}
 
 	for _, subnet := range subnets {
-		if strings.HasPrefix(subnet.Network.Name, "go-sdk-integration-test") {
+		if strings.HasPrefix(subnet.Network.Name, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted subnet: %s (%s) on network %s (%s)\n", subnet.CIDR, subnet.UUID, subnet.Network.Name, subnet.Network.UUID)
 			err = client.Subnets.Delete(context.Background(), subnet.UUID)
@@ -144,7 +151,7 @@ func DeleteRemainingNetworks() bool {
 	}
 
 	for _, network := range networks {
-		if strings.HasPrefix(network.Name, "go-sdk-integration-test") {
+		if strings.HasPrefix(network.Name, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted network: %s (%s)\n", network.Name, network.UUID)
 			err = client.Networks.Delete(context.Background(), network.UUID)
@@ -166,7 +173,7 @@ func DeleteRemainingObjectsUsers() bool {
 	}
 
 	for _, objectsUser := range objectsUsers {
-		if strings.HasPrefix(objectsUser.DisplayName, serverBaseName) {
+		if strings.HasPrefix(objectsUser.DisplayName, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted objectsUser: %s (%s)\n", objectsUser.DisplayName, objectsUser.ID)
 			err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
@@ -188,7 +195,7 @@ func DeleteRemainingCustomImages() bool {
 	}
 
 	for _, customImage := range customImages {
-		if strings.HasPrefix(customImage.Name, customImageBaseName) {
+		if strings.HasPrefix(customImage.Name, testRunPrefix) {
 			foundResource = true
 			log.Printf("Found not deleted customImage: %s (%s)\n", customImage.Name, customImage.UUID)
 			err = client.CustomImages.Delete(context.Background(), customImage.UUID)

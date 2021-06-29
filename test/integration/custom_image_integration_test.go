@@ -14,13 +14,12 @@ import (
 )
 
 const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/alpine"
-const customImageBaseName = "go-sdk-integration-test-custom-image"
 
 func TestIntegrationCustomImage_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
-		Name:             customImageBaseName,
+		Name:             testRunPrefix,
 		URL:              "https://at-images.objects.lpg.cloudscale.ch/alpine",
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1", "rma1"},
@@ -105,7 +104,7 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 	integrationTest(t)
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
-		Name:             customImageBaseName,
+		Name:             testRunPrefix,
 		URL:              "http://www.cloudscale.ch/this-does-and-will-never-exist",
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"rma1"},
@@ -128,7 +127,7 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 func TestIntegrationCustomImage_Update(t *testing.T) {
 
 	createCustomImageImportRequest := &cloudscale.CustomImageImportRequest{
-		Name:             customImageBaseName,
+		Name:             testRunPrefix,
 		URL:              testImageURL,
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1", "rma1"},
@@ -142,7 +141,7 @@ func TestIntegrationCustomImage_Update(t *testing.T) {
 
 	customImageImport = waitForImport("success", customImageImport.UUID, t)
 
-	expectedNewName := fmt.Sprintf("%s-renamed", customImageBaseName)
+	expectedNewName := fmt.Sprintf("%s-renamed", testRunPrefix)
 	updateRequest := &cloudscale.CustomImageRequest{
 		Name: expectedNewName,
 	}
@@ -170,7 +169,7 @@ func TestIntegrationCustomImage_Update(t *testing.T) {
 func TestIntegrationCustomImage_Boot(t *testing.T) {
 
 	createCustomImageImportRequest := &cloudscale.CustomImageImportRequest{
-		Name:             customImageBaseName,
+		Name:             testRunPrefix,
 		URL:              testImageURL,
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1", "rma1"},
@@ -185,7 +184,7 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 	customImageImport = waitForImport("success", customImageImport.UUID, t)
 
 	createServerRequest := &cloudscale.ServerRequest{
-		Name:         "go-sdk-integration-test-custom-image",
+		Name:         testRunPrefix,
 		Flavor:       "flex-2",
 		Image:        customImageImport.CustomImage.UUID,
 		VolumeSizeGB: 10,

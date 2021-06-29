@@ -14,7 +14,7 @@ func TestIntegrationSubnet_GetAndList(t *testing.T) {
 	integrationTest(t)
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: networkBaseName,
+		Name: testRunPrefix,
 	}
 
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -64,7 +64,7 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 
 	autoCreateSubnet := false;
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name:                 networkBaseName,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -116,7 +116,7 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 
 	autoCreateSubnet := false;
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name:                 networkBaseName,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
