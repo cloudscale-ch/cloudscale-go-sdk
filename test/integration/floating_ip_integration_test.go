@@ -374,6 +374,13 @@ func TestIntegrationFloatingIP_WithoutServer(t *testing.T) {
 		t.Errorf("expectedIP.Server \n got=%#v\nwant=%#v", server, nil)
 	}
 
+	if expectedIP.PrefixLength() != 32 {
+		t.Fatalf("Expect prefix length %d, found %d\n", 32, expectedIP.PrefixLength())
+	}
+	if expectedIP.IPVersion != 4 {
+		t.Fatalf("Expect prefix length %d, found %d\n", 4, expectedIP.IPVersion)
+	}
+
 	ip := expectedIP.IP()
 	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
 	if err != nil {
