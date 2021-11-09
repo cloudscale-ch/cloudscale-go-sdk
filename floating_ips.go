@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 const floatingIPsBasePath = "v1/floating-ips"
@@ -14,6 +15,7 @@ type FloatingIP struct {
 	TaggedResource
 	HREF           string      `json:"href"`
 	Network        string      `json:"network"`
+	IPVersion      int         `json:"ip_version"`
 	NextHop        string      `json:"next_hop"`
 	Server         *ServerStub `json:"server"`
 	Type           string      `json:"type"`
@@ -34,9 +36,15 @@ func (f FloatingIP) IP() string {
 	return strings.Split(f.Network, "/")[0]
 }
 
+func (f FloatingIP) PrefixLength() int {
+	result, _ := strconv.Atoi(strings.Split(f.Network, "/")[1])
+	return result
+}
+
 type FloatingIPUpdateRequest struct {
 	TaggedResourceRequest
-	Server string `json:"server,omitempty"`
+	Server         string `json:"server,omitempty"`
+	ReversePointer string `json:"reverse_ptr,omitempty"`
 }
 
 type FloatingIPsService interface {
