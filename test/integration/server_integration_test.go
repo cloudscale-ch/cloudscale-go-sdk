@@ -250,9 +250,9 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 	}
 
 	expected := []cloudscale.VolumeStub{
-		cloudscale.VolumeStub{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
-		cloudscale.VolumeStub{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
-		cloudscale.VolumeStub{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
+		{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
+		{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
+		{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
 	}
 	if !reflect.DeepEqual(server.Volumes, expected) {
 		t.Errorf("Volumes response\n got=%#v\nwant=%#v", server.Volumes, expected)
