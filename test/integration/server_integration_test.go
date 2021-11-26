@@ -250,9 +250,9 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 	}
 
 	expected := []cloudscale.VolumeStub{
-		cloudscale.VolumeStub{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
-		cloudscale.VolumeStub{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
-		cloudscale.VolumeStub{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
+		{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
+		{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
+		{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
 	}
 	if !reflect.DeepEqual(server.Volumes, expected) {
 		t.Errorf("Volumes response\n got=%#v\nwant=%#v", server.Volumes, expected)
@@ -343,4 +343,24 @@ func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
 		t.Fatalf("Error while waiting for status change %s\n", err)
 	}
 	return server
+}
+
+func waitUntilListed(t *testing.T, server *cloudscale.Server) {
+	operation := func() error {
+		servers, err := client.Servers.List(context.Background())
+		if err != nil {
+			return err
+		}
+		for _, s := range servers {
+			if s.UUID == server.UUID {
+				return nil
+			}
+		}
+		return errors.New("not contained in server listing")
+	}
+
+	err := backoff.Retry(operation, backoff.NewExponentialBackOff())
+	if err != nil {
+		t.Fatalf("Error while waiting for server to be listed %s\n", err)
+	}
 }

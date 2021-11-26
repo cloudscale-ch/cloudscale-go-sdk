@@ -4,31 +4,41 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 	"reflect"
 	"testing"
 )
 
-var initialTags = cloudscale.TagMap{
-	"yin": "yang",
+func getInitialTags() cloudscale.TagMap {
+	return cloudscale.TagMap{
+		fmt.Sprintf("yin-%s", testRunPrefix): "yang",
+	}
 }
 
-var initialTagsKeyOnly = cloudscale.TagMap{
-	"yin": "",
+func getInitialTagsKeyOnly() cloudscale.TagMap {
+	return cloudscale.TagMap{
+		fmt.Sprintf("yin-%s", testRunPrefix): "",
+	}
 }
 
-var newTags = cloudscale.TagMap{
-	"yab": "yum",
+func getNewTags() cloudscale.TagMap {
+	return cloudscale.TagMap{
+		fmt.Sprintf("yab-%s", testRunPrefix): "yum",
+	}
 }
 
-var newTagsKeyOnly = cloudscale.TagMap{
-	"yab": "",
+func getNewTagsKeyOnly() cloudscale.TagMap {
+	return cloudscale.TagMap{
+		fmt.Sprintf("yab-%s", testRunPrefix): "",
+	}
 }
 
 func TestIntegrationTags_Server(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := getDefaultServerRequest()
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	server, err := createServer(t, &createRequest)
@@ -45,6 +55,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.ServerUpdateRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.Servers.Update(context.Background(), server.UUID, &updateRequest)
@@ -60,6 +71,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Servers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -70,13 +82,14 @@ func TestIntegrationTags_Server(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Servers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("Servers.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -93,6 +106,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 		Name:   testRunPrefix,
 		SizeGB: 3,
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	volume, err := client.Volumes.Create(context.Background(), &createRequest)
@@ -109,6 +123,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.VolumeRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.Volumes.Update(context.Background(), volume.UUID, &updateRequest)
@@ -124,6 +139,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Volumes.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -134,13 +150,14 @@ func TestIntegrationTags_Volume(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Volumes.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("Volumes.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -164,6 +181,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 		IPVersion: 6,
 		Server:    server.UUID,
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	floatingIP, err := client.FloatingIPs.Create(context.Background(), &createRequest)
@@ -180,6 +198,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.FloatingIPUpdateRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.FloatingIPs.Update(context.Background(), floatingIP.IP(), &updateRequest)
@@ -195,6 +214,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.FloatingIPs.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -205,13 +225,14 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.FloatingIPs.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("FloatingIPs.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -232,6 +253,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	createRequest := cloudscale.ObjectsUserRequest{
 		DisplayName: testRunPrefix,
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	objectsUser, err := client.ObjectsUsers.Create(context.Background(), &createRequest)
@@ -248,6 +270,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.ObjectsUserRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.ObjectsUsers.Update(context.Background(), objectsUser.ID, &updateRequest)
@@ -263,6 +286,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.ObjectsUsers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -273,13 +297,14 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.ObjectsUsers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("ObjectsUsers.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -296,6 +321,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	createRequest := cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	network, err := client.Networks.Create(context.Background(), &createRequest)
@@ -312,6 +338,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.NetworkUpdateRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.Networks.Update(context.Background(), network.UUID, &updateRequest)
@@ -327,6 +354,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Networks.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -337,13 +365,14 @@ func TestIntegrationTags_Network(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Networks.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("Networks.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -371,6 +400,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 		CIDR:    "172.16.0.0/14",
 		Network: network.UUID,
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 	subnet, err := client.Subnets.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -386,6 +416,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.SubnetUpdateRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.Subnets.Update(context.Background(), subnet.UUID, &updateRequest)
@@ -401,6 +432,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -411,13 +443,14 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("Subnets.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -440,6 +473,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 		Name: testRunPrefix + "-group",
 		Type: "anti-affinity",
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	serverGroup, err := client.ServerGroups.Create(context.Background(), &createRequest)
@@ -456,6 +490,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.ServerGroupRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.ServerGroups.Update(context.Background(), serverGroup.UUID, &updateRequest)
@@ -471,6 +506,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.ServerGroups.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -481,13 +517,14 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.ServerGroups.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("ServerGroups.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
@@ -508,6 +545,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 		Zones:            []string{"lpg1"},
 		SourceFormat:     "raw",
 	}
+	initialTags := getInitialTags()
 	createRequest.Tags = initialTags
 
 	customImageImport, err := client.CustomImageImports.Create(context.Background(), &createRequest)
@@ -526,6 +564,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.CustomImageRequest{}
+	newTags := getNewTags()
 	updateRequest.Tags = newTags
 
 	err = client.CustomImages.Update(context.Background(), imageID, &updateRequest)
@@ -541,6 +580,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	}
 
 	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.CustomImages.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -551,13 +591,14 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 		}
 	}
 
+	newTagsKeyOnly := getNewTagsKeyOnly()
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.CustomImages.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
 			t.Errorf("CustomImages.List returned error %s\n", err)
 		}
-		if len(res) < 1 {
-			t.Errorf("Expected at least one result when filter with %#v, got: %#v", tags, len(res))
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
 		}
 	}
 
