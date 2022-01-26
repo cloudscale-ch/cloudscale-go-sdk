@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestNetworks_Create(t *testing.T) {
@@ -51,7 +52,7 @@ func TestNetworks_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/networks/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc"}`)
+		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
 
 	network, err := client.Networks.Get(ctx, "cfde831a-4e87-4a75-960f-89b0148aa2cc")
@@ -59,7 +60,7 @@ func TestNetworks_Get(t *testing.T) {
 		t.Errorf("Networks.Get returned error: %v", err)
 	}
 
-	expected := &Network{UUID: "cfde831a-4e87-4a75-960f-89b0148aa2cc"}
+	expected := &Network{UUID: "cfde831a-4e87-4a75-960f-89b0148aa2cc", CreatedAt: time.Date(2019, time.Month(5), 27, 16, 45, 32, 241824000, time.UTC)}
 	if !reflect.DeepEqual(network, expected) {
 		t.Errorf("Networks.Get\n got=%#v\nwant=%#v", network, expected)
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestFloatingIPs_IP(t *testing.T) {
@@ -65,7 +66,7 @@ func TestFloatingIPs_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"network": "192.0.2.123/32"}`)
+		fmt.Fprint(w, `{"network": "192.0.2.123/32", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
 
 	floatingIP, err := client.FloatingIPs.Get(ctx, "192.0.2.123")
@@ -73,7 +74,7 @@ func TestFloatingIPs_Get(t *testing.T) {
 		t.Errorf("FloatingIPs.Get returned error: %v", err)
 	}
 
-	expected := &FloatingIP{Network: "192.0.2.123/32"}
+	expected := &FloatingIP{Network: "192.0.2.123/32", CreatedAt: time.Date(2019, time.Month(5), 27, 16, 45, 32, 241824000, time.UTC)}
 	if !reflect.DeepEqual(floatingIP, expected) {
 		t.Errorf("FloatingIPs.Get\n got=%#v\nwant=%#v", floatingIP, expected)
 	}
