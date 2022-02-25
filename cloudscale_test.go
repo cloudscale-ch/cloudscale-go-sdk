@@ -200,10 +200,10 @@ func TestDo_redirectLoop(t *testing.T) {
 }
 
 // TODO: Maybe add an argument with a description for the assertion.
-func assertEqual(t *testing.T, actual interface{}, expected interface{}) {
+func assertEqual(t *testing.T, expected interface{}, actual interface{}) {
 	t.Helper()
 
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Assertion failed:\nexpected: %#v\n  actual: %#v", actual, expected)
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("Assertion failed:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
 }
