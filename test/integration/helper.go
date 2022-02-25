@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -6,6 +7,8 @@ import (
 	"context"
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 	"math/rand"
+	"reflect"
+	"testing"
 	"time"
 )
 
@@ -39,4 +42,13 @@ func randomNotVerySecurePassword(length int) string {
 
 func randInt(min int, max int) int {
 	return min + rand.Intn(max-min)
+}
+
+// TODO: Maybe add an argument with a description for the assertion.
+func assertEqual(t *testing.T, expected interface{}, actual interface{}) {
+	t.Helper()
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("Assertion failed:\nexpected: %#v\n  actual: %#v", expected, actual)
+	}
 }

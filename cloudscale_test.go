@@ -198,3 +198,12 @@ func TestDo_redirectLoop(t *testing.T) {
 		t.Errorf("Expected a URL error; got %#v.", err)
 	}
 }
+
+// TODO: Maybe add an argument with a description for the assertion.
+func assertEqual(t *testing.T, actual interface{}, expected interface{}) {
+	t.Helper()
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Assertion failed:\nexpected: %#v\n  actual: %#v", actual, expected)
+	}
+}
