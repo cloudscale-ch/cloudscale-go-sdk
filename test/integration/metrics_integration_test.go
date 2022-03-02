@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func TestIntegrationMetrics_GetBuckets(t *testing.T) {
+func TestIntegrationMetrics_GetBucketMetrics(t *testing.T) {
 	integrationTest(t)
 
 	request := &cloudscale.BucketMetricsRequest{
@@ -20,9 +20,9 @@ func TestIntegrationMetrics_GetBuckets(t *testing.T) {
 		ObjectsUserIDs: []string{},
 	}
 
-	response, err := client.Metrics.GetBuckets(context.Background(), request)
+	response, err := client.Metrics.GetBucketMetrics(context.Background(), request)
 	if err != nil {
-		t.Fatalf("Metrics.GetBuckets returned error %s\n", err)
+		t.Fatalf("Metrics.GetBucketMetrics returned error %s\n", err)
 	}
 
 	// We can't get any metrics data without creating a bucket using the S3

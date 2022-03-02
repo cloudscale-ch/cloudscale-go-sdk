@@ -53,7 +53,7 @@ type BucketMetricsData struct {
 }
 
 type MetricsService interface {
-	GetBuckets(ctx context.Context, request *BucketMetricsRequest) (*BucketMetrics, error)
+	GetBucketMetrics(ctx context.Context, request *BucketMetricsRequest) (*BucketMetrics, error)
 }
 
 type MetricsServiceOperations struct {
@@ -86,7 +86,7 @@ func encodeGetBucketParameters(request *BucketMetricsRequest) string {
 	return builder.String()
 }
 
-func (s MetricsServiceOperations) GetBuckets(ctx context.Context, request *BucketMetricsRequest) (*BucketMetrics, error) {
+func (s MetricsServiceOperations) GetBucketMetrics(ctx context.Context, request *BucketMetricsRequest) (*BucketMetrics, error) {
 	path := fmt.Sprintf("%s/buckets%s", metricsBasePath, encodeGetBucketParameters(request))
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func TestMetrics_GetBuckets(t *testing.T) {
+func TestMetrics_GetBucketMetrics(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -57,10 +57,10 @@ func TestMetrics_GetBuckets(t *testing.T) {
 		fmt.Fprintf(w, jsonStr)
 	})
 
-	metrics, err := client.Metrics.GetBuckets(ctx, metricsRequest)
+	metrics, err := client.Metrics.GetBucketMetrics(ctx, metricsRequest)
 
 	if err != nil {
-		t.Errorf("Metrics.GetBuckets returned error: %v", err)
+		t.Errorf("Metrics.GetBucketMetrics returned error: %v", err)
 		return
 	}
 
@@ -95,7 +95,7 @@ func TestMetrics_GetBuckets(t *testing.T) {
 	}
 }
 
-func TestMetrics_GetBucketsAdditionalArgs(t *testing.T) {
+func TestMetrics_GetBucketMetricsAdditionalArgs(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -120,10 +120,10 @@ func TestMetrics_GetBucketsAdditionalArgs(t *testing.T) {
 		fmt.Fprintf(w, "{}")
 	})
 
-	_, err := client.Metrics.GetBuckets(ctx, metricsRequest)
+	_, err := client.Metrics.GetBucketMetrics(ctx, metricsRequest)
 
 	if err != nil {
-		t.Errorf("Metrics.GetBuckets returned error: %v", err)
+		t.Errorf("Metrics.GetBucketMetrics returned error: %v", err)
 		return
 	}
 }
