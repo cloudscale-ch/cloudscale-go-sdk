@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -31,6 +32,10 @@ func TestIntegrationNetwork_CRUD(t *testing.T) {
 
 	if uuid := network.UUID; uuid != expected.UUID {
 		t.Errorf("Network.UUID got=%s\nwant=%s", uuid, expected.UUID)
+	}
+
+	if h := time.Since(network.CreatedAt).Hours(); !(-1 < h && h < 1) {
+		t.Errorf("network.CreatedAt ourside of expected range. got=%v", network.CreatedAt)
 	}
 
 	expectedNumberOfSubnets := 1
@@ -83,7 +88,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
-		Name: testRunPrefix,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
@@ -93,7 +98,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 
 	createSubnetRequest := &cloudscale.SubnetCreateRequest{
 		Network: network.UUID,
-		CIDR: "192.168.42.0/24",
+		CIDR:    "192.168.42.0/24",
 	}
 	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
 	if err != nil {
@@ -163,7 +168,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 			if numNetworks := len(server.Interfaces); numNetworks != tt.expectedNumNetworks {
 				t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, tt.expectedNumNetworks)
 			}
-			lastNetworkInterface := server.Interfaces[len(server.Interfaces)-1];
+			lastNetworkInterface := server.Interfaces[len(server.Interfaces)-1]
 			if lastNetworkInterface.Network.UUID != network.UUID {
 				t.Errorf("Attatched to wrong Network\ngot=%#v\nwant=%#v", lastNetworkInterface.Network.UUID, network.UUID)
 			}
@@ -364,7 +369,6 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }
-
 
 func TestIntegrationNetwork_Update(t *testing.T) {
 

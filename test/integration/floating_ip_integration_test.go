@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -7,6 +8,7 @@ import (
 	"reflect"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk"
 )
@@ -41,6 +43,10 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	expectedIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
 	if err != nil {
 		t.Fatalf("floatingIP.Create returned error %s\n", err)
+	}
+
+	if h := time.Since(expectedIP.CreatedAt).Hours(); !(-1 < h && h < 1) {
+		t.Errorf("expectedIP.CreatedAt ourside of expected range. got=%v", expectedIP.CreatedAt)
 	}
 
 	if uuid := expectedIP.Server.UUID; uuid != server.UUID {
@@ -400,10 +406,8 @@ func TestIntegrationFloatingIP_WithoutServer(t *testing.T) {
 		t.Errorf("FloatingIPs.List \n got=%d\nwant=%d", numFloatingIps, 1)
 	}
 
-
 	err = client.FloatingIPs.Delete(context.Background(), ip)
 	if err != nil {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
 	}
 }
-

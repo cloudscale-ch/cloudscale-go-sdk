@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -42,6 +43,10 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	volume, err := client.Volumes.Create(context.TODO(), createVolumeRequest)
 	if err != nil {
 		t.Fatalf("Volumes.Create returned error %s\n", err)
+	}
+
+	if h := time.Since(volume.CreatedAt).Hours(); !(-1 < h && h < 1) {
+		t.Errorf("volume.CreatedAt ourside of expected range. got=%v", volume.CreatedAt)
 	}
 
 	time.Sleep(3 * time.Second)
@@ -180,7 +185,6 @@ func TestIntegrationVolume_ListByName(t *testing.T) {
 		t.Fatalf("Volumes.Delete returned error %s\n", err)
 	}
 }
-
 
 func TestIntegrationVolume_MultiSite(t *testing.T) {
 	integrationTest(t)

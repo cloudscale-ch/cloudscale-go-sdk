@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -11,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 )
 
 const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/alpine"
@@ -59,6 +61,10 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 		t.Errorf("CustomImage.List got=%d\nwant=%d\n", numCustomImages, 1)
 	}
 
+	if h := time.Since(customImages[0].CreatedAt).Hours(); !(-1 < h && h < 1) {
+		t.Errorf("customImages[0].CreatedAt ourside of expected range. got=%v", customImages[0].CreatedAt)
+	}
+
 	customImageImports, err := client.CustomImageImports.List(context.Background())
 	if err != nil {
 		t.Fatalf("CustomImageImports.List returned error %s\n", err)
@@ -69,6 +75,7 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 	}
 
 	customImage, err := client.CustomImages.Get(context.Background(), customImageImport.CustomImage.UUID)
+
 	if err != nil {
 		t.Fatalf("CustomImages.Get returned error %s\n", err)
 	}
