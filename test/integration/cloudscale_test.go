@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -17,7 +18,7 @@ import (
 )
 
 var (
-	client *cloudscale.Client
+	client        *cloudscale.Client
 	testRunPrefix string
 )
 
@@ -38,7 +39,7 @@ func TestMain(m *testing.M) {
 	// run the tests
 	runResult := m.Run()
 
-	log.Printf("Checking for reamaining resources..\n")
+	log.Printf("Checking for leftover resources..\n")
 	foundResource := false
 	foundResource = foundResource || DeleteRemainingServer()
 	foundResource = foundResource || DeleteRemainingServerGroups()
@@ -48,8 +49,8 @@ func TestMain(m *testing.M) {
 	foundResource = foundResource || DeleteRemainingObjectsUsers()
 	foundResource = foundResource || DeleteRemainingCustomImages()
 
-	if (foundResource) {
-		log.Fatal("Failing due to remaining resource\n")
+	if foundResource {
+		log.Fatal("Failing due to leftover resource\n")
 	}
 	os.Exit(runResult)
 }

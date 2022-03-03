@@ -44,6 +44,7 @@ type Client struct {
 	ObjectsUsers       ObjectsUsersService
 	CustomImages       CustomImageService
 	CustomImageImports CustomImageImportsService
+	Metrics            MetricsService
 }
 
 // NewClient returns a new CloudScale API client.
@@ -72,6 +73,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.ObjectsUsers = ObjectsUsersServiceOperations{client: c}
 	c.CustomImages = CustomImageServiceOperations{client: c}
 	c.CustomImageImports = CustomImageImportsServiceOperations{client: c}
+	c.Metrics = MetricsServiceOperations{client: c}
 
 	return c
 }
@@ -179,4 +181,3 @@ func (r *ErrorResponse) Error() string {
 }
 
 type ListRequestModifier func(r *http.Request)
-
