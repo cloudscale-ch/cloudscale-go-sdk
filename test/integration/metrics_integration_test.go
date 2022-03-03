@@ -13,11 +13,16 @@ import (
 func TestIntegrationMetrics_GetBucketMetrics(t *testing.T) {
 	integrationTest(t)
 
+	objectsUser, err := createObjectsUser(t)
+	if err != nil {
+		t.Fatalf("ObjectsUsers.Create returned error %s\n", err)
+	}
+
 	request := &cloudscale.BucketMetricsRequest{
 		Start:          time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
 		End:            time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
 		BucketNames:    []string{},
-		ObjectsUserIDs: []string{},
+		ObjectsUserIDs: []string{objectsUser.ID},
 	}
 
 	response, err := client.Metrics.GetBucketMetrics(context.Background(), request)
@@ -29,4 +34,9 @@ func TestIntegrationMetrics_GetBucketMetrics(t *testing.T) {
 	// API.
 	assertEqual(t, time.Date(2019, 12, 31, 23, 0, 0, 0, time.UTC), response.Start)
 	assertEqual(t, time.Date(2020, 1, 1, 23, 0, 0, 0, time.UTC), response.End)
+
+	err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
+	if err != nil {
+		t.Fatalf("ObjectsUsers.Get returned error %s\n", err)
+	}
 }
