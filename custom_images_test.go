@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestCustomImage_Get(t *testing.T) {
@@ -14,7 +15,7 @@ func TestCustomImage_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/custom-images/11111111-1864-4608-853a-0771b6885a3a", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"uuid": "11111111-1864-4608-853a-0771b6885a3a"}`)
+		fmt.Fprint(w, `{"uuid": "11111111-1864-4608-853a-0771b6885a3a", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
 
 	objectUser, err := client.CustomImages.Get(ctx, "11111111-1864-4608-853a-0771b6885a3a")
@@ -22,7 +23,7 @@ func TestCustomImage_Get(t *testing.T) {
 		t.Errorf("CustomImage.Get returned error: %v", err)
 	}
 
-	expected := &CustomImage{UUID: "11111111-1864-4608-853a-0771b6885a3a"}
+	expected := &CustomImage{UUID: "11111111-1864-4608-853a-0771b6885a3a", CreatedAt: time.Date(2019, time.Month(5), 27, 16, 45, 32, 241824000, time.UTC) }
 	if !reflect.DeepEqual(objectUser, expected) {
 		t.Errorf("CustomImage.Get\n got=%#v\nwant=%#v", objectUser, expected)
 	}

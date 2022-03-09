@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -50,6 +51,10 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 
 	if uuid := server.UUID; uuid != expected.UUID {
 		t.Errorf("Server.UUID got=%s\nwant=%s", uuid, expected.UUID)
+	}
+
+	if h := time.Since(server.CreatedAt).Hours(); !(-1 < h && h < 1) {
+		t.Errorf("server.CreatedAt ourside of expected range. got=%v", server.CreatedAt)
 	}
 
 	servers, err := client.Servers.List(context.Background())
