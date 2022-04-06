@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const volumeBasePath = "v1/volumes"
+const volumeBasePath = "/volumes"
 
 type Volume struct {
 	ZonalResource

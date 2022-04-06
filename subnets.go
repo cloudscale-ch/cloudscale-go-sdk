@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const subnetBasePath = "v1/subnets"
+const subnetBasePath = "/subnets"
 
 type Subnet struct {
 	TaggedResource

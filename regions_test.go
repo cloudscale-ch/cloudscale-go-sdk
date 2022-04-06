@@ -26,7 +26,7 @@ func TestRegions_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/regions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/regions", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, regionsResponse)
 	})

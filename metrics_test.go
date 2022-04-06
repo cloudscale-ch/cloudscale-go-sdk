@@ -20,7 +20,7 @@ func TestMetrics_GetBucketMetrics(t *testing.T) {
 		ObjectsUserIDs: []string{},
 	}
 
-	mux.HandleFunc("/v1/metrics/buckets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/metrics/buckets", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string][]string{
 			"start": {"2020-01-01"},
 			"end":   {"2020-01-01"},
@@ -106,7 +106,7 @@ func TestMetrics_GetBucketMetricsAdditionalArgs(t *testing.T) {
 		ObjectsUserIDs: []string{"hallo", "tschüss"},
 	}
 
-	mux.HandleFunc("/v1/metrics/buckets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/metrics/buckets", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string][]string{
 			"start":           {"2020-01-01"},
 			"end":             {"2020-01-02"},

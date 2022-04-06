@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const metricsBasePath = "v1/metrics"
+const metricsBasePath = "/metrics"
 
 type BucketMetricsRequest struct {
 	// Interpreted as midnight in the Europe/Zurich time zone at the start of

@@ -6,7 +6,7 @@ If you want to manage your cloudscale.ch server resources with Go, you are at
 the right place.
 
 There's a possibility to specify the `CLOUDSCALE_API_URL` environment variable to
-change the default url of https://api.cloudscale.ch, but you can almost certainly
+change the default url of https://api.cloudscale.ch/v1, but you can almost certainly
 use the default.
 
 ## Download from Github

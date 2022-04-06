@@ -14,7 +14,7 @@ import (
 
 const (
 	libraryVersion = "v1.10.0"
-	defaultBaseURL = "https://api.cloudscale.ch/"
+	defaultBaseURL = "https://api.cloudscale.ch/v1"
 	userAgent      = "cloudscale/" + libraryVersion
 	mediaType      = "application/json"
 )
@@ -78,23 +78,18 @@ func NewClient(httpClient *http.Client) *Client {
 	return c
 }
 
-func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
-	rel, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
-
-	u := c.BaseURL.ResolveReference(rel)
+func (c *Client) NewRequest(_ context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
+	requestUrl := c.BaseURL.String() + urlStr
 
 	buf := new(bytes.Buffer)
 	if body != nil {
-		err = json.NewEncoder(buf).Encode(body)
+		err := json.NewEncoder(buf).Encode(body)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	req, err := http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequest(method, requestUrl, buf)
 	if err != nil {
 		return nil, err
 	}

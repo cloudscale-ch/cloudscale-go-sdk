@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const customImagesBasePath = "v1/custom-images"
+const customImagesBasePath = "/custom-images"
 
 const UserDataHandlingPassThrough = "pass-through"
 const UserDataHandlingExtendCloudConfig = "extend-cloud-config"

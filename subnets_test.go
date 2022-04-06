@@ -11,7 +11,7 @@ func TestSubnets_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/subnets/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/subnets/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc"}`)
 	})
@@ -31,7 +31,7 @@ func TestSubnets_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/subnets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/subnets", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
 	})

@@ -22,7 +22,7 @@ func TestServers_Create(t *testing.T) {
 		SSHKeys:      []string{"key"},
 	}
 
-	mux.HandleFunc("/v1/servers", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"name":           "mysql",
 			"flavor":         "flex-4",
@@ -59,7 +59,7 @@ func TestServers_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
@@ -79,7 +79,7 @@ func TestServers_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodDelete)
 	})
 
@@ -93,7 +93,7 @@ func TestServers_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
 	})
@@ -114,7 +114,7 @@ func TestServers_Reboot(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/reboot", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/reboot", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
 
@@ -129,7 +129,7 @@ func TestServers_Start(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/start", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/start", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
 
@@ -144,7 +144,7 @@ func TestServers_Stop(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/stop", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/stop", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
 
@@ -159,16 +159,16 @@ func TestServers_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/stop", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/stop", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/start", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/start", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/reboot", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1/reboot", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPost)
 	})
-	mux.HandleFunc("/v1/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/servers/47cec963-fcd2-482f-bdb6-24461b2d47b1", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPatch)
 	})
 

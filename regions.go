@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-const regionsBasePath = "v1/regions"
+const regionsBasePath = "/regions"
 
 type Zone struct {
 	Slug string `json:"slug"`
