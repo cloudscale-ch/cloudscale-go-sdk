@@ -32,7 +32,7 @@ positives and test failures due to network issues, data changes, etc.
 Run the tests using:
 
 ````
-CLOUDSCALE_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration
+CLOUDSCALE_API_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration
 
 ````
 
