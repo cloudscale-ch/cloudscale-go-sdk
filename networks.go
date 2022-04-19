@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const networkBasePath = "/networks"
+const networkBasePath = "v1/networks"
 
 type Network struct {
 	ZonalResource

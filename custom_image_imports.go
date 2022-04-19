@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const customImageImportsBasePath = "/custom-images/import"
+const customImageImportsBasePath = "v1/custom-images/import"
 
 type CustomImageStub struct {
 	HREF string `json:"href,omitempty"`

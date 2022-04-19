@@ -17,7 +17,7 @@ func TestServersGroups_Create(t *testing.T) {
 		Type:       "anti-affinity",
 	}
 
-	mux.HandleFunc("/server-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/server-groups", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"name":           "db-servers",
 			"type":           "anti-affinity",
@@ -51,7 +51,7 @@ func TestServerGroups_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/server-groups/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/server-groups/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc"}`)
 	})
@@ -71,7 +71,7 @@ func TestServerGroups_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/server-groups/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/server-groups/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodDelete)
 	})
 
@@ -85,7 +85,7 @@ func TestServerGroups_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/server-groups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/server-groups", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
 	})

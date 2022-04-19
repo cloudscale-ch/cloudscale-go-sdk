@@ -61,7 +61,7 @@ func TestNewClient(t *testing.T) {
 func TestNewRequest(t *testing.T) {
 	c := NewClient(nil)
 
-	inURL, outURL := "/foo", defaultBaseURL+"/foo"
+	inURL, outURL := "/foo", defaultBaseURL+"foo"
 	inBody, outBody := &ServerRequest{Name: "l"},
 		`{"name":"l","flavor":"","image":"","ssh_keys":null}`+
 			"\n"

@@ -22,7 +22,7 @@ func TestCustomImageImport_Create(t *testing.T) {
 		},
 	}
 
-	mux.HandleFunc("/custom-images/import", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/custom-images/import", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"name": "Test Image",
 			"tags": map[string]interface{}{
@@ -72,7 +72,7 @@ func TestCustomImageImport_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/custom-images/import/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/custom-images/import/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 			"href": "https://api.cloudscale.ch/v1/custom-images/import/11111111-1864-4608-853a-0771b6885a3a",
@@ -117,7 +117,7 @@ func TestCustomImageImport_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/custom-images/import", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/custom-images/import", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{
 			"href": "https://api.cloudscale.ch/v1/custom-images/import/11111111-1864-4608-853a-0771b6885a3a",

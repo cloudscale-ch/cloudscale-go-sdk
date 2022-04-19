@@ -17,7 +17,7 @@ func TestNetworks_Create(t *testing.T) {
 		Name:       "netzli",
 	}
 
-	mux.HandleFunc("/networks", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/networks", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"name":           "netzli",
 		}
@@ -50,7 +50,7 @@ func TestNetworks_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/networks/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/networks/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
@@ -70,7 +70,7 @@ func TestNetworks_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/networks/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/networks/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodDelete)
 	})
 
@@ -84,7 +84,7 @@ func TestNetworks_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/networks", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/networks", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
 	})

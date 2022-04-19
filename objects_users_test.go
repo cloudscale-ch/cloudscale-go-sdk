@@ -23,7 +23,7 @@ func TestObjectsUser_Create(t *testing.T) {
 		},
 	}
 
-	mux.HandleFunc("/objects-users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/objects-users", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"display_name": "TestBucket",
 			"tags": map[string]interface{}{
@@ -72,7 +72,7 @@ func TestObjectsUser_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}`)
 	})
@@ -92,7 +92,7 @@ func TestObjectsUser_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodDelete)
 	})
 
@@ -106,7 +106,7 @@ func TestObjectsUser_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/objects-users", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/objects-users", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}]`)
 	})
@@ -127,7 +127,7 @@ func TestObjectsUser_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodPatch)
 	})
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const serverGroupsBasePath = "/server-groups"
+const serverGroupsBasePath = "v1/server-groups"
 
 type ServerGroup struct {
 	ZonalResource

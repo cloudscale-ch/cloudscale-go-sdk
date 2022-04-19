@@ -30,7 +30,7 @@ func TestFloatingIPs_Create(t *testing.T) {
 		Server:    "47cec963-fcd2-482f-bdb6-24461b2d47b1",
 	}
 
-	mux.HandleFunc("/floating-ips", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/floating-ips", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"ip_version": float64(6),
 			"server":     "47cec963-fcd2-482f-bdb6-24461b2d47b1",
@@ -64,7 +64,7 @@ func TestFloatingIPs_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{"network": "192.0.2.123/32", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
@@ -88,7 +88,7 @@ func TestFloatingIPs_Update(t *testing.T) {
 		Server: "47777777-fcd2-482f-bdb6-24461b2d47b1",
 	}
 
-	mux.HandleFunc("/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"server": "47777777-fcd2-482f-bdb6-24461b2d47b1",
 		}
@@ -114,7 +114,7 @@ func TestFloatingIPs_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodDelete)
 	})
 
@@ -128,7 +128,7 @@ func TestFloatingIPs_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/floating-ips", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/floating-ips", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `[{"network": "192.0.2.123/32"}]`)
 	})

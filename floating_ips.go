@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const floatingIPsBasePath = "/floating-ips"
+const floatingIPsBasePath = "v1/floating-ips"
 
 type FloatingIP struct {
 	Region         *Region     `json:"region"` // not using RegionalResource here, as FloatingIP can be regional or global

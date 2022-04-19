@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const objectsUsersBasePath = "/objects-users"
+const objectsUsersBasePath = "v1/objects-users"
 
 // ObjectsUser contains information
 type ObjectsUser struct {

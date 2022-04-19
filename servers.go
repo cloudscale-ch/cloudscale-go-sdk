@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const serverBasePath = "/servers"
+const serverBasePath = "v1/servers"
 
 const ServerRunning = "running"
 const ServerStopped = "stopped"
