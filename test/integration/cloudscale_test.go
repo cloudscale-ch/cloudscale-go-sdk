@@ -27,9 +27,9 @@ func TestMain(m *testing.M) {
 	rand.Seed(time.Now().UnixNano())
 	testRunPrefix = fmt.Sprintf("go-sdk-%d", rand.Intn(100000))
 
-	token := os.Getenv("CLOUDSCALE_TOKEN")
+	token := os.Getenv("CLOUDSCALE_API_TOKEN")
 	if token == "" {
-		log.Fatal("Missing CLOUDSCALE_TOKEN, tests won't run!\n")
+		log.Fatal("Missing CLOUDSCALE_API_TOKEN, tests won't run!\n")
 	}
 	tc := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},

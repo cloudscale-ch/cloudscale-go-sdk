@@ -55,7 +55,7 @@ func NewClient(httpClient *http.Client) *Client {
 
 	// To allow more complicated testing we allow changing the cloudscale.ch
 	// URL.
-	defaultURL := os.Getenv("CLOUDSCALE_URL")
+	defaultURL := os.Getenv("CLOUDSCALE_API_URL")
 
 	if defaultURL == "" {
 		defaultURL = defaultBaseURL
