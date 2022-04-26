@@ -15,7 +15,7 @@ func TestCustomImageImport_Create(t *testing.T) {
 	CustomImageImportRequest := &CustomImageImportRequest{
 		Name: "Test Image",
 		TaggedResourceRequest: TaggedResourceRequest{
-			TagMap{
+			&TagMap{
 				"tag":   "one",
 				"other": "tag",
 			},
