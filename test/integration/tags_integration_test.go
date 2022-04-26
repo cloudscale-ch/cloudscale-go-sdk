@@ -43,7 +43,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 
 	createRequest := getDefaultServerRequest()
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	server, err := createServer(t, &createRequest)
 	if err != nil {
@@ -60,7 +60,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 
 	updateRequest := cloudscale.ServerUpdateRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.Servers.Update(context.Background(), server.UUID, &updateRequest)
 	if err != nil {
@@ -111,7 +111,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 		SizeGB: 3,
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	volume, err := client.Volumes.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -128,7 +128,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 
 	updateRequest := cloudscale.VolumeRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.Volumes.Update(context.Background(), volume.UUID, &updateRequest)
 	if err != nil {
@@ -186,7 +186,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 		Server:    server.UUID,
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	floatingIP, err := client.FloatingIPs.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -203,7 +203,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 
 	updateRequest := cloudscale.FloatingIPUpdateRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.FloatingIPs.Update(context.Background(), floatingIP.IP(), &updateRequest)
 	if err != nil {
@@ -258,7 +258,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 		DisplayName: testRunPrefix,
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	objectsUser, err := client.ObjectsUsers.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -275,7 +275,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 
 	updateRequest := cloudscale.ObjectsUserRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.ObjectsUsers.Update(context.Background(), objectsUser.ID, &updateRequest)
 	if err != nil {
@@ -326,7 +326,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 		Name: testRunPrefix,
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	network, err := client.Networks.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -343,7 +343,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 
 	updateRequest := cloudscale.NetworkUpdateRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.Networks.Update(context.Background(), network.UUID, &updateRequest)
 	if err != nil {
@@ -405,7 +405,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 		Network: network.UUID,
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 	subnet, err := client.Subnets.Create(context.Background(), &createRequest)
 	if err != nil {
 		t.Fatalf("Subnets.Create returned error %s\n", err)
@@ -421,7 +421,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 
 	updateRequest := cloudscale.SubnetUpdateRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.Subnets.Update(context.Background(), subnet.UUID, &updateRequest)
 	if err != nil {
@@ -478,7 +478,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 		Type: "anti-affinity",
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	serverGroup, err := client.ServerGroups.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -494,9 +494,9 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.ServerGroupRequest{}
-	newTags := getNewTags()
-	updateRequest.Tags = newTags
-
+	// Test update with empty tags
+	emptyTags := getEmptyTags()
+	updateRequest.Tags = &emptyTags
 	err = client.ServerGroups.Update(context.Background(), serverGroup.UUID, &updateRequest)
 	if err != nil {
 		t.Errorf("ServerGroups.Update returned error: %v", err)
@@ -505,12 +505,14 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	if err != nil {
 		t.Errorf("ServerGroups.Get returned error %s\n", err)
 	}
-	if !reflect.DeepEqual(getResult2.Tags, newTags) {
-		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	if !reflect.DeepEqual(getResult2.Tags, emptyTags) {
+		t.Errorf("Tagging failed, could not untag, is at %s\n", getResult.Tags)
 	}
 
-	// Test empty tags
-	updateRequest.Tags = getEmptyTags()
+	// Test update with some tags again
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
 	err = client.ServerGroups.Update(context.Background(), serverGroup.UUID, &updateRequest)
 	if err != nil {
 		t.Errorf("ServerGroups.Update returned error: %v", err)
@@ -519,8 +521,8 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	if err != nil {
 		t.Errorf("ServerGroups.Get returned error %s\n", err)
 	}
-	if !reflect.DeepEqual(getResult2.Tags, getEmptyTags()) {
-		t.Errorf("Tagging failed, could not untag, is at %s\n", getResult.Tags)
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
 	}
 
 	// test querying with tags
@@ -564,7 +566,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 		SourceFormat:     "raw",
 	}
 	initialTags := getInitialTags()
-	createRequest.Tags = initialTags
+	createRequest.Tags = &initialTags
 
 	customImageImport, err := client.CustomImageImports.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -583,7 +585,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 
 	updateRequest := cloudscale.CustomImageRequest{}
 	newTags := getNewTags()
-	updateRequest.Tags = newTags
+	updateRequest.Tags = &newTags
 
 	err = client.CustomImages.Update(context.Background(), imageID, &updateRequest)
 	if err != nil {
