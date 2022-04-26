@@ -28,6 +28,10 @@ func getNewTags() cloudscale.TagMap {
 	}
 }
 
+func getEmptyTags() cloudscale.TagMap {
+	return cloudscale.TagMap{}
+}
+
 func getNewTagsKeyOnly() cloudscale.TagMap {
 	return cloudscale.TagMap{
 		fmt.Sprintf("yab-%s", testRunPrefix): "",
@@ -503,6 +507,20 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 	if !reflect.DeepEqual(getResult2.Tags, newTags) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// Test empty tags
+	updateRequest.Tags = getEmptyTags()
+	err = client.ServerGroups.Update(context.Background(), serverGroup.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("ServerGroups.Update returned error: %v", err)
+	}
+	getResult2, err = client.ServerGroups.Get(context.Background(), serverGroup.UUID)
+	if err != nil {
+		t.Errorf("ServerGroups.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, getEmptyTags()) {
+		t.Errorf("Tagging failed, could not untag, is at %s\n", getResult.Tags)
 	}
 
 	// test querying with tags
