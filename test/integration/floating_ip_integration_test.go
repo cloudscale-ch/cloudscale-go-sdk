@@ -20,7 +20,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
@@ -86,7 +86,7 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 func TestIntegrationFloatingIP_Update(t *testing.T) {
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
@@ -101,7 +101,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 
 	createServerRequest2 := &cloudscale.ServerRequest{
 		Name:         testRunPrefix + "-floating",
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
@@ -188,7 +188,7 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
@@ -236,7 +236,7 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
@@ -288,7 +288,7 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
