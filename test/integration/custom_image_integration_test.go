@@ -192,7 +192,7 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        customImageImport.CustomImage.UUID,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{

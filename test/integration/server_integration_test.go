@@ -126,7 +126,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 func getDefaultServerRequest() cloudscale.ServerRequest {
 	return cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
@@ -151,7 +151,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 	waitUntil("stopped", server.UUID, t)
 
 	multiUpdateRequest := &cloudscale.ServerUpdateRequest{
-		Flavor: "flex-4",
+		Flavor: "flex-4-4",
 		Name:   "bar",
 	}
 	err = client.Servers.Update(context.TODO(), server.UUID, multiUpdateRequest)
@@ -172,7 +172,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		}
 	}
 
-	const scaleFlavor = "flex-4"
+	const scaleFlavor = "flex-4-4"
 	// Try to scale.
 	scaleRequest := &cloudscale.ServerUpdateRequest{Flavor: scaleFlavor}
 	err = client.Servers.Update(context.TODO(), server.UUID, scaleRequest)

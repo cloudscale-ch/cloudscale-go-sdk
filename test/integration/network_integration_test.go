@@ -150,7 +150,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			createServerRequest := &cloudscale.ServerRequest{
 				Name:         testRunPrefix,
-				Flavor:       "flex-2",
+				Flavor:       "flex-4-2",
 				Image:        DefaultImageSlug,
 				VolumeSizeGB: 10,
 				Interfaces:   tt.in,
@@ -227,7 +227,7 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 	}
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         fmt.Sprintf("%s-network", testRunPrefix),
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		Interfaces:   &interfaces,
@@ -310,7 +310,7 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 	}
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         fmt.Sprintf("%s-network", testRunPrefix),
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		Interfaces:   &interfaces,

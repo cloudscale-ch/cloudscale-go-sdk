@@ -18,7 +18,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
-		Flavor:       "flex-2",
+		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
 		SSHKeys: []string{
