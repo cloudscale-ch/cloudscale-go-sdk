@@ -32,7 +32,6 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	}
 
 	waitUntil("running", server.UUID, t)
-	waitUntilListed(t, server)
 
 	createVolumeRequest := &cloudscale.VolumeRequest{
 		Name:        testRunPrefix,

@@ -349,23 +349,3 @@ func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
 	}
 	return server
 }
-
-func waitUntilListed(t *testing.T, server *cloudscale.Server) {
-	operation := func() error {
-		servers, err := client.Servers.List(context.Background())
-		if err != nil {
-			return err
-		}
-		for _, s := range servers {
-			if s.UUID == server.UUID {
-				return nil
-			}
-		}
-		return errors.New("not contained in server listing")
-	}
-
-	err := backoff.Retry(operation, backoff.NewExponentialBackOff())
-	if err != nil {
-		t.Fatalf("Error while waiting for server to be listed %s\n", err)
-	}
-}
