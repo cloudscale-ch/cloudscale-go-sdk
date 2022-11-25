@@ -143,6 +143,53 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 	}
 }
 
+func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
+	createVolumeRequest := &cloudscale.VolumeRequest{
+		Name:   testRunPrefix,
+		SizeGB: 50,
+	}
+
+	volume, err := client.Volumes.Create(context.TODO(), createVolumeRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Create returned error %s\n", err)
+	}
+
+	createServerRequest := &cloudscale.ServerRequest{
+		Name:         testRunPrefix,
+		Flavor:       "flex-4-2",
+		Image:        DefaultImageSlug,
+		VolumeSizeGB: 10,
+		SSHKeys: []string{
+			pubKey,
+		},
+	}
+
+	server, err := client.Servers.Create(context.Background(), createServerRequest)
+	if err != nil {
+		t.Fatalf("Servers.Create returned error %s\n", err)
+	}
+
+	waitUntil("running", server.UUID, t)
+
+	volumeAttachRequest := &cloudscale.VolumeRequest{
+		ServerUUIDs: &[]string{server.UUID},
+	}
+
+	err = client.Volumes.Update(context.Background(), volume.UUID, volumeAttachRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Update returned error %s\n", err)
+	}
+
+	err = client.Servers.Delete(context.Background(), server.UUID)
+	if err != nil {
+		t.Fatalf("Servers.Delete returned error %s\n", err)
+	}
+	err = client.Volumes.Delete(context.Background(), volume.UUID)
+	if err != nil {
+		t.Fatalf("Volumes.Delete returned error %s\n", err)
+	}
+}
+
 func TestIntegrationVolume_ListByName(t *testing.T) {
 	volumeName := testRunPrefix + "-name-test"
 	createVolumeRequest := &cloudscale.VolumeRequest{
