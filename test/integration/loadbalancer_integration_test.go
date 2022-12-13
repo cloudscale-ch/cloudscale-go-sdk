@@ -8,11 +8,12 @@ import (
 	"errors"
 	"github.com/cenkalti/backoff"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v2"
+	"reflect"
 	"testing"
 	"time"
 )
 
-func TestIntegrationLoadBalancer_Create(t *testing.T) {
+func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
@@ -21,16 +22,34 @@ func TestIntegrationLoadBalancer_Create(t *testing.T) {
 	}
 	createLoadBalancerRequest.Zone = "rma1"
 
-	loadBalancer, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
+	expected, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
 	if err != nil {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
+
+	loadBalancer, err := client.LoadBalancers.Get(context.Background(), expected.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Get returned error %s\n", err)
+	}
+
+	waitUntilLB("running", expected.UUID, t)
 
 	if h := time.Since(loadBalancer.CreatedAt).Hours(); !(-1 < h && h < 1) {
 		t.Errorf("loadBalancer.CreatedAt ourside of expected range. got=%v", loadBalancer.CreatedAt)
 	}
 
-	waitUntilLB("running", loadBalancer.UUID, t)
+	if !reflect.DeepEqual(loadBalancer, expected) {
+		t.Errorf("Error = %#v, expected %#v", loadBalancer, expected)
+	}
+
+	loadBalancers, err := client.LoadBalancers.List(context.Background())
+	if err != nil {
+		t.Fatalf("LoadBalancers.List returned error %s\n", err)
+	}
+
+	if numLoadBalancers := len(loadBalancers); numLoadBalancers < 1 {
+		t.Errorf("LoadBalancers.List \n got=%d\nwant=%d", numLoadBalancers, 1)
+	}
 
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
