@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -390,9 +391,9 @@ func TestIntegrationTags_Network(t *testing.T) {
 func TestIntegrationTags_Subnet(t *testing.T) {
 	integrationTest(t)
 
-	autoCreateSubnet := false;
+	autoCreateSubnet := false
 	createNetworkRequest := cloudscale.NetworkCreateRequest{
-		Name: testRunPrefix,
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	}
 	network, err := client.Networks.Create(context.Background(), &createNetworkRequest)
@@ -466,7 +467,6 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
-
 
 }
 
@@ -626,4 +626,74 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CustomImages.Delete returned error %s\n", err)
 	}
+}
+
+func TestIntegrationTags_LoadBalancer(t *testing.T) {
+	integrationTest(t)
+
+	createRequest := cloudscale.LoadBalancerRequest{
+		Name:   testRunPrefix,
+		Flavor: "lb-flex-4-2",
+	}
+	createRequest.Zone = "rma1"
+	initialTags := getInitialTags()
+	createRequest.Tags = &initialTags
+
+	loadBalancer, err := client.LoadBalancers.Create(context.Background(), &createRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
+	}
+
+	getResult, err := client.LoadBalancers.Get(context.Background(), loadBalancer.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.LoadBalancerRequest{}
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
+	err = client.LoadBalancers.Update(context.Background(), loadBalancer.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("LoadBalancers.Update returned error: %v", err)
+	}
+	getResult2, err := client.LoadBalancers.Get(context.Background(), loadBalancer.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.LoadBalancers.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	newTagsKeyOnly := getNewTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.LoadBalancers.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+
 }
