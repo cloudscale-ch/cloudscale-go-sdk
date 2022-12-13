@@ -48,6 +48,7 @@ func TestMain(m *testing.M) {
 	foundResource = foundResource || DeleteRemainingNetworks()
 	foundResource = foundResource || DeleteRemainingObjectsUsers()
 	foundResource = foundResource || DeleteRemainingCustomImages()
+	foundResource = foundResource || DeleteRemainingLoadBalancers()
 
 	if foundResource {
 		log.Fatal("Failing due to leftover resource\n")
@@ -202,6 +203,28 @@ func DeleteRemainingCustomImages() bool {
 			err = client.CustomImages.Delete(context.Background(), customImage.UUID)
 			if err != nil {
 				log.Fatalf("CustomImages.Delete returned error %s\n", err)
+			}
+		}
+	}
+
+	return foundResource
+}
+
+func DeleteRemainingLoadBalancers() bool {
+	foundResource := false
+
+	loadBalancers, err := client.LoadBalancers.List(context.Background())
+	if err != nil {
+		log.Fatalf("LoadBalancers.List returned error %s\n", err)
+	}
+
+	for _, loadBalancer := range loadBalancers {
+		if strings.HasPrefix(loadBalancer.Name, testRunPrefix) {
+			foundResource = true
+			log.Printf("Found not deleted loadBalancer: %s (%s)\n", loadBalancer.Name, loadBalancer.UUID)
+			err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
+			if err != nil {
+				log.Fatalf("LoadBalancers.Delete returned error %s\n", err)
 			}
 		}
 	}
