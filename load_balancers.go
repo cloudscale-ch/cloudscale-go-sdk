@@ -25,19 +25,34 @@ type LoadBalancerRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
 	Name   string `json:"name,omitempty"`
-	Flavor string `json:"flavor"`
+	Flavor string `json:"flavor,omitempty"`
 }
 
 type LoadBalancerService interface {
 	Create(ctx context.Context, createRequest *LoadBalancerRequest) (*LoadBalancer, error)
 	Get(ctx context.Context, loadBalancerID string) (*LoadBalancer, error)
 	List(ctx context.Context, modifiers ...ListRequestModifier) ([]LoadBalancer, error)
-	//Update(ctx context.Context, loadBalancerID string, updateRequest *LoadBalancerRequest) error
+	Update(ctx context.Context, loadBalancerID string, updateRequest *LoadBalancerRequest) error
 	Delete(ctx context.Context, loadBalancerID string) error
 }
 
 type LoadBalancerServiceOperations struct {
 	client *Client
+}
+
+func (s LoadBalancerServiceOperations) Update(ctx context.Context, loadBalancerID string, updateRequest *LoadBalancerRequest) error {
+	path := fmt.Sprintf("%s/%s", loadBalancerBasePath, loadBalancerID)
+
+	req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
+	if err != nil {
+		return err
+	}
+
+	err = s.client.Do(ctx, req, nil)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s LoadBalancerServiceOperations) Create(ctx context.Context, createRequest *LoadBalancerRequest) (*LoadBalancer, error) {

@@ -57,6 +57,48 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 	}
 }
 
+func TestIntegrationLoadBalancer_Update(t *testing.T) {
+	integrationTest(t)
+
+	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
+		Name:   testRunPrefix,
+		Flavor: "lb-flex-4-2",
+	}
+	createLoadBalancerRequest.Zone = "rma1"
+
+	lb, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
+	if err != nil {
+		t.Fatalf("loadBalancer.Create returned error %s\n", err)
+	}
+
+	waitUntilLB("running", lb.UUID, t)
+
+	newName := testRunPrefix + "-renamed"
+	updateRequest := &cloudscale.LoadBalancerRequest{
+		Name: newName,
+	}
+
+	uuid := lb.UUID
+	err = client.LoadBalancers.Update(context.Background(), uuid, updateRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Update returned error %s\n", err)
+	}
+
+	loadBalancer, err := client.LoadBalancers.Get(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Get returned error %s\n", err)
+	}
+
+	if name := loadBalancer.Name; name != newName {
+		t.Errorf("loadbalancer.Name \n got=%s\nwant=%s", name, newName)
+	}
+
+	err = client.LoadBalancers.Delete(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+}
+
 func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalancer {
 	// An operation that may fail.
 	loadBalancer := new(cloudscale.LoadBalancer)
