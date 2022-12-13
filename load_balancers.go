@@ -14,11 +14,18 @@ type LoadBalancer struct {
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF      string    `json:"href,omitempty"`
-	UUID      string    `json:"uuid,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	Status    string    `json:"status,omitempty"`
-	CreatedAt time.Time `json:"created_at"`
+	HREF         string       `json:"href"`
+	UUID         string       `json:"uuid"`
+	Name         string       `json:"name"`
+	Status       string       `json:"status"`
+	VIPAddresses []VIPAddress `json:"vip_addresses"`
+	CreatedAt    time.Time    `json:"created_at"`
+}
+
+type VIPAddress struct {
+	Version int        `json:"version"`
+	Address string     `json:"address"`
+	Subnet  SubnetStub `json:"subnet"`
 }
 
 type LoadBalancerRequest struct {
