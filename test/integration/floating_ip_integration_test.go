@@ -84,6 +84,8 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 }
 
 func TestIntegrationFloatingIP_Update(t *testing.T) {
+	integrationTest(t)
+
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
 		Flavor:       "flex-4-2",
