@@ -45,6 +45,7 @@ type Client struct {
 	CustomImages       CustomImageService
 	CustomImageImports CustomImageImportsService
 	LoadBalancers      LoadBalancerService
+	LoadBalancerPools  LoadBalancerPoolService
 	Metrics            MetricsService
 }
 
@@ -75,6 +76,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.CustomImages = CustomImageServiceOperations{client: c}
 	c.CustomImageImports = CustomImageImportsServiceOperations{client: c}
 	c.LoadBalancers = LoadBalancerServiceOperations{client: c}
+	c.LoadBalancerPools = LoadBalancerPoolServiceOperations{client: c}
 	c.Metrics = MetricsServiceOperations{client: c}
 
 	return c

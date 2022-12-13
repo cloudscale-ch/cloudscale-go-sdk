@@ -119,7 +119,7 @@ func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalan
 		return nil
 	}
 
-	err := backoff.Retry(operation, backoff.NewExponentialBackOff())
+	err := backoff.Retry(operation, backoff.NewConstantBackOff(2000000000))
 	if err != nil {
 		t.Fatalf("Error while waiting for status change %s\n", err)
 	}
