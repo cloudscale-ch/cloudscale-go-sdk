@@ -6,12 +6,6 @@ import (
 
 const loadBalancerPoolBasePath = "v1/load-balancers/pools"
 
-type LoadBalancerStub struct {
-	HREF string `json:"href,omitempty"`
-	UUID string `json:"uuid,omitempty"`
-	Name string `json:"name,omitempty"`
-}
-
 type LoadBalancerPool struct {
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors

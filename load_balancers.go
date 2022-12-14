@@ -6,6 +6,12 @@ import (
 
 const loadBalancerBasePath = "v1/load-balancers"
 
+type LoadBalancerStub struct {
+	HREF string `json:"href,omitempty"`
+	UUID string `json:"uuid,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
 type LoadBalancer struct {
 	ZonalResource
 	TaggedResource
