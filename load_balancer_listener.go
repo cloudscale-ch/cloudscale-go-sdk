@@ -32,3 +32,11 @@ type LoadBalancerListenerRequest struct {
 	Protocol     string `json:"protocol,omitempty"`
 	ProtocolPort int    `json:"protocol_port,omitempty"`
 }
+
+type LoadBalancerListenerService interface {
+	GenericCreateService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
+	GenericGetService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
+	GenericListService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
+	GenericUpdateService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
+	GenericDeleteService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
+}

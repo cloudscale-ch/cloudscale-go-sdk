@@ -34,20 +34,21 @@ type Client struct {
 	// User agent for client
 	UserAgent string
 
-	Regions               RegionService
-	Servers               ServerService
-	Volumes               VolumeService
-	Networks              NetworkService
-	Subnets               SubnetService
-	FloatingIPs           FloatingIPsService
-	ServerGroups          ServerGroupService
-	ObjectsUsers          ObjectsUsersService
-	CustomImages          CustomImageService
-	CustomImageImports    CustomImageImportsService
-	LoadBalancers         GenericService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
-	LoadBalancerPools     GenericService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
-	LoadBalancerListeners GenericService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
-	Metrics               MetricsService
+	Regions                 RegionService
+	Servers                 ServerService
+	Volumes                 VolumeService
+	Networks                NetworkService
+	Subnets                 SubnetService
+	FloatingIPs             FloatingIPsService
+	ServerGroups            ServerGroupService
+	ObjectsUsers            ObjectsUsersService
+	CustomImages            CustomImageService
+	CustomImageImports      CustomImageImportsService
+	LoadBalancers           LoadBalancerService
+	LoadBalancerPools       LoadBalancerPoolService
+	LoadBalancerPoolMembers LoadBalancerPoolMemberService
+	LoadBalancerListeners   LoadBalancerListenerService
+	Metrics                 MetricsService
 }
 
 // NewClient returns a new CloudScale API client.
@@ -83,6 +84,9 @@ func NewClient(httpClient *http.Client) *Client {
 	c.LoadBalancerPools = GenericServiceOperations[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]{
 		client: c,
 		path:   loadBalancerPoolBasePath,
+	}
+	c.LoadBalancerPoolMembers = LoadBalancerPoolMemberServiceOperations{
+		client: c,
 	}
 	c.LoadBalancerListeners = GenericServiceOperations[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]{
 		client: c,

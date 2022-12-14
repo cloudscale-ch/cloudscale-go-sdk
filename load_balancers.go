@@ -37,3 +37,11 @@ type LoadBalancerRequest struct {
 	Name   string `json:"name,omitempty"`
 	Flavor string `json:"flavor,omitempty"`
 }
+
+type LoadBalancerService interface {
+	GenericCreateService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
+	GenericGetService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
+	GenericListService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
+	GenericUpdateService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
+	GenericDeleteService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
+}

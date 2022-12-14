@@ -6,11 +6,23 @@ import (
 	"net/http"
 )
 
-type GenericService[TResource any, TCreateRequest any, TUpdateRequest any] interface {
+type GenericCreateService[TResource any, TCreateRequest any, TUpdateRequest any] interface {
 	Create(ctx context.Context, createRequest *TCreateRequest) (*TResource, error)
+}
+
+type GenericGetService[TResource any, TCreateRequest any, TUpdateRequest any] interface {
 	Get(ctx context.Context, resourceID string) (*TResource, error)
+}
+
+type GenericListService[TResource any, TCreateRequest any, TUpdateRequest any] interface {
 	List(ctx context.Context, modifiers ...ListRequestModifier) ([]TResource, error)
+}
+
+type GenericUpdateService[TResource any, TCreateRequest any, TUpdateRequest any] interface {
 	Update(ctx context.Context, resourceID string, updateRequest *TUpdateRequest) error
+}
+
+type GenericDeleteService[TResource any, TCreateRequest any, TUpdateRequest any] interface {
 	Delete(ctx context.Context, resourceID string) error
 }
 

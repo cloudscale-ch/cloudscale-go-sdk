@@ -26,3 +26,11 @@ type LoadBalancerPoolRequest struct {
 	Algorithm    string `json:"algorithm,omitempty"`
 	Protocol     string `json:"protocol,omitempty"`
 }
+
+type LoadBalancerPoolService interface {
+	GenericCreateService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
+	GenericGetService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
+	GenericListService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
+	GenericUpdateService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
+	GenericDeleteService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
+}
