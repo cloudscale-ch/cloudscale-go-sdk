@@ -70,6 +70,59 @@ func TestIntegrationLoadBalancerPool_CRUD(t *testing.T) {
 	}
 }
 
+func TestIntegrationLoadBalancerPool_Update(t *testing.T) {
+	integrationTest(t)
+
+	lb, err := createLoadBalancer()
+	if err != nil {
+		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
+	}
+
+	waitUntilLB("running", lb.UUID, t)
+
+	createLoadBalancerPoolRequest := &cloudscale.LoadBalancerPoolRequest{
+		Name:         testRunPrefix,
+		Algorithm:    "round_robin",
+		Protocol:     "tcp",
+		LoadBalancer: lb.UUID,
+	}
+
+	pool, err := client.LoadBalancerPools.Create(context.TODO(), createLoadBalancerPoolRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancerPools.Create returned error %s\n", err)
+	}
+
+	newName := testRunPrefix + "-renamed"
+	updateRequest := &cloudscale.LoadBalancerPoolRequest{
+		Name: newName,
+	}
+
+	uuid := pool.UUID
+	err = client.LoadBalancerPools.Update(context.Background(), uuid, updateRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancerPools.Update returned error %s\n", err)
+	}
+
+	updated, err := client.LoadBalancerPools.Get(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancerPools.Get returned error %s\n", err)
+	}
+
+	if name := updated.Name; name != newName {
+		t.Errorf("loadbalancer.Name \n got=%s\nwant=%s", name, newName)
+	}
+
+	err = client.LoadBalancerPools.Delete(context.Background(), updated.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancerPools.Delete returned error %s\n", err)
+	}
+
+	err = client.LoadBalancers.Delete(context.Background(), lb.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+}
+
 func createLoadBalancer() (*cloudscale.LoadBalancer, error) {
 	createRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
