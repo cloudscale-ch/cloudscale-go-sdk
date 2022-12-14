@@ -44,8 +44,8 @@ type Client struct {
 	ObjectsUsers       ObjectsUsersService
 	CustomImages       CustomImageService
 	CustomImageImports CustomImageImportsService
-	LoadBalancers      LoadBalancerService
-	LoadBalancerPools  LoadBalancerPoolService
+	LoadBalancers      GenericService[LoadBalancer, LoadBalancerRequest]
+	LoadBalancerPools  GenericService[LoadBalancerPool, LoadBalancerPoolRequest]
 	Metrics            MetricsService
 }
 
@@ -75,8 +75,14 @@ func NewClient(httpClient *http.Client) *Client {
 	c.ObjectsUsers = ObjectsUsersServiceOperations{client: c}
 	c.CustomImages = CustomImageServiceOperations{client: c}
 	c.CustomImageImports = CustomImageImportsServiceOperations{client: c}
-	c.LoadBalancers = LoadBalancerServiceOperations{client: c}
-	c.LoadBalancerPools = LoadBalancerPoolServiceOperations{client: c}
+	c.LoadBalancers = GenericServiceOperations[LoadBalancer, LoadBalancerRequest]{
+		client: c,
+		path: loadBalancerBasePath,
+	}
+	c.LoadBalancerPools = GenericServiceOperations[LoadBalancerPool, LoadBalancerPoolRequest]{
+		client: c,
+		path: loadBalancerPoolBasePath,
+	}
 	c.Metrics = MetricsServiceOperations{client: c}
 
 	return c
