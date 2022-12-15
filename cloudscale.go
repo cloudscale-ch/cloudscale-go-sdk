@@ -34,21 +34,22 @@ type Client struct {
 	// User agent for client
 	UserAgent string
 
-	Regions                 RegionService
-	Servers                 ServerService
-	Volumes                 VolumeService
-	Networks                NetworkService
-	Subnets                 SubnetService
-	FloatingIPs             FloatingIPsService
-	ServerGroups            ServerGroupService
-	ObjectsUsers            ObjectsUsersService
-	CustomImages            CustomImageService
-	CustomImageImports      CustomImageImportsService
-	LoadBalancers           LoadBalancerService
-	LoadBalancerPools       LoadBalancerPoolService
-	LoadBalancerPoolMembers LoadBalancerPoolMemberService
-	LoadBalancerListeners   LoadBalancerListenerService
-	Metrics                 MetricsService
+	Regions                    RegionService
+	Servers                    ServerService
+	Volumes                    VolumeService
+	Networks                   NetworkService
+	Subnets                    SubnetService
+	FloatingIPs                FloatingIPsService
+	ServerGroups               ServerGroupService
+	ObjectsUsers               ObjectsUsersService
+	CustomImages               CustomImageService
+	CustomImageImports         CustomImageImportsService
+	LoadBalancers              LoadBalancerService
+	LoadBalancerPools          LoadBalancerPoolService
+	LoadBalancerPoolMembers    LoadBalancerPoolMemberService
+	LoadBalancerListeners      LoadBalancerListenerService
+	LoadBalancerHealthMonitors LoadBalancerHealthMonitorService
+	Metrics                    MetricsService
 }
 
 // NewClient returns a new CloudScale API client.
@@ -91,6 +92,10 @@ func NewClient(httpClient *http.Client) *Client {
 	c.LoadBalancerListeners = GenericServiceOperations[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]{
 		client: c,
 		path:   loadBalancerListenerBasePath,
+	}
+	c.LoadBalancerHealthMonitors = GenericServiceOperations[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest, LoadBalancerHealthMonitorRequest]{
+		client: c,
+		path:   loadBalancerHealthMonitorBasePath,
 	}
 	c.Metrics = MetricsServiceOperations{client: c}
 
