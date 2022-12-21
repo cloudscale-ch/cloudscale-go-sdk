@@ -12,17 +12,23 @@ type LoadBalancerStub struct {
 	Name string `json:"name,omitempty"`
 }
 
+type LoadBalancerFlavorStub struct {
+	Slug string `json:"slug,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
 type LoadBalancer struct {
 	ZonalResource
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF         string       `json:"href,omitempty"`
-	UUID         string       `json:"uuid,omitempty"`
-	Name         string       `json:"name,omitempty"`
-	Status       string       `json:"status,omitempty"`
-	VIPAddresses []VIPAddress `json:"vip_addresses,omitempty"`
-	CreatedAt    time.Time    `json:"created_at,omitempty"`
+	HREF         string                 `json:"href,omitempty"`
+	UUID         string                 `json:"uuid,omitempty"`
+	Name         string                 `json:"name,omitempty"`
+	Flavor       LoadBalancerFlavorStub `json:"flavor,omitempty"`
+	Status       string                 `json:"status,omitempty"`
+	VIPAddresses []VIPAddress           `json:"vip_addresses,omitempty"`
+	CreatedAt    time.Time              `json:"created_at,omitempty"`
 }
 
 type VIPAddress struct {
