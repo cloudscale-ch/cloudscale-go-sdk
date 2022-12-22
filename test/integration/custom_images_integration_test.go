@@ -26,6 +26,7 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1", "rma1"},
 		SourceFormat:     "raw",
+		FirmwareType:     "uefi",
 	}
 
 	expected, err := client.CustomImageImports.Create(context.TODO(), createCustomImageRequest)
@@ -78,6 +79,10 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("CustomImages.Get returned error %s\n", err)
+	}
+
+	if firmwareType := customImage.FirmwareType; customImage.FirmwareType != "uefi" {
+		t.Errorf("customImage.FirmwareType got=%s\nwant=%s", firmwareType, "uefi")
 	}
 
 	for _, algo := range []string{"md5", "sha256"} {
