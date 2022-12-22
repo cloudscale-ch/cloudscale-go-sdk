@@ -40,8 +40,18 @@ type VIPAddress struct {
 type LoadBalancerRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
-	Name   string `json:"name,omitempty"`
-	Flavor string `json:"flavor,omitempty"`
+	Name         string               `json:"name,omitempty"`
+	Flavor       string               `json:"flavor,omitempty"`
+	VIPAddresses *[]VIPAddressRequest `json:"vip_addresses,omitempty"`
+}
+
+type VIPAddressRequest struct {
+	Address string        `json:"address,omitempty"`
+	Subnet  SubnetRequest `json:"subnet,omitempty"`
+}
+
+type SubnetRequest struct {
+	UUID string `json:"uuid,omitempty"`
 }
 
 type LoadBalancerService interface {

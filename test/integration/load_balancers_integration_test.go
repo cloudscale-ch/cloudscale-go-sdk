@@ -61,6 +61,76 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 	}
 }
 
+func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
+	integrationTest(t)
+
+	autoCreateIPV4Subnet := false
+	networkRequest := &cloudscale.NetworkCreateRequest{
+		Name:                 testRunPrefix,
+		AutoCreateIPV4Subnet: &autoCreateIPV4Subnet,
+	}
+	networkRequest.Zone = "rma1"
+
+	network, err := client.Networks.Create(context.Background(), networkRequest)
+	if err != nil {
+		t.Fatalf("Networks.Create returned error %s\n", err)
+	}
+
+	subnetRequest := &cloudscale.SubnetCreateRequest{
+		Network: network.UUID,
+		CIDR:    "192.168.7.0/24",
+	}
+
+	subnet, err := client.Subnets.Create(context.Background(), subnetRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	vipAddress := "192.168.7.7"
+	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
+		Name:   testRunPrefix,
+		Flavor: "lb-flex-4-2",
+		VIPAddresses: &[]cloudscale.VIPAddressRequest{
+			{
+				Address: vipAddress,
+				Subnet: cloudscale.SubnetRequest{
+					UUID: subnet.UUID,
+				},
+			},
+		},
+	}
+	createLoadBalancerRequest.Zone = "rma1"
+
+	loadBalancer, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
+	}
+
+	if numVIPAddresses := len(loadBalancer.VIPAddresses); numVIPAddresses != 1 {
+		t.Errorf("numVIPAddresses \n got=%d\nwant=%d", numVIPAddresses, 1)
+	}
+
+	if loadBalancerVIPAddress := loadBalancer.VIPAddresses[0].Address; loadBalancerVIPAddress != vipAddress {
+		t.Errorf("loadBalancerVIPAddress \n got=%s\nwant=%s", loadBalancerVIPAddress, vipAddress)
+	}
+
+	if loadBalancerSubnetUUID := loadBalancer.VIPAddresses[0].Subnet.UUID; loadBalancerSubnetUUID != subnet.UUID {
+		t.Errorf("loadBalancerSubnetUUID \n got=%s\nwant=%s", loadBalancerSubnetUUID, subnet.UUID)
+	}
+
+	waitUntilLB("running", loadBalancer.UUID, t)
+
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
+
+	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+}
+
 func TestIntegrationLoadBalancer_Update(t *testing.T) {
 	integrationTest(t)
 
