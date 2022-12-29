@@ -17,6 +17,7 @@ type LoadBalancerHealthMonitor struct {
 	Timeout        int                  `json:"timeout,omitempty"`
 	MaxRetries     int                  `json:"max_retries,omitempty"`
 	MaxRetriesDown int                  `json:"max_retries_down,omitempty"`
+	Type           string               `json:"type,omitempty"`
 	CreatedAt      time.Time            `json:"created_at,omitempty"`
 }
 
