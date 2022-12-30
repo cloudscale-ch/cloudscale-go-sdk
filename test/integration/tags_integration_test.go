@@ -628,7 +628,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	}
 }
 
-func TestIntegrationTags_LoadBalancer(t *testing.T) {
+func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 	integrationTest(t)
 
 	createRequest := cloudscale.LoadBalancerRequest{
@@ -643,6 +643,8 @@ func TestIntegrationTags_LoadBalancer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
+
+	waitUntilLB("running", loadBalancer.UUID, t)
 
 	getResult, err := client.LoadBalancers.Get(context.Background(), loadBalancer.UUID)
 	if err != nil {
@@ -691,9 +693,290 @@ func TestIntegrationTags_LoadBalancer(t *testing.T) {
 		}
 	}
 
+	// call these test cases inline to avoid recreating the load balancer
+	testIntegrationTags_LoadBalancerPool(t, loadBalancer)
+
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
 	}
 
+}
+
+func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalancer) {
+	createRequest := cloudscale.LoadBalancerPoolRequest{
+		Name:         testRunPrefix,
+		Algorithm:    "round_robin",
+		Protocol:     "tcp",
+		LoadBalancer: b.UUID,
+	}
+	initialTags := getInitialTags()
+	createRequest.Tags = &initialTags
+
+	pool, err := client.LoadBalancerPools.Create(context.Background(), &createRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancerPools.Create returned error %s\n", err)
+	}
+
+	getResult, err := client.LoadBalancerPools.Get(context.Background(), pool.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.LoadBalancerPoolRequest{}
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
+	err = client.LoadBalancerPools.Update(context.Background(), pool.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("LoadBalancers.Update returned error: %v", err)
+	}
+	getResult2, err := client.LoadBalancerPools.Get(context.Background(), pool.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.LoadBalancerPools.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	newTagsKeyOnly := getNewTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.LoadBalancerPools.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	// call these test cases inline to avoid recreating the load balancer
+	testIntegrationTags_LoadBalancerListner(t, pool)
+	testIntegrationTags_LoadBalancerPoolMember(t, pool)
+	testIntegrationTags_LoadBalancerHealthMonitor(t, pool)
+
+	err = client.LoadBalancerPools.Delete(context.Background(), pool.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancerPools.Delete returned error %s\n", err)
+	}
+}
+
+func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	createRequest := cloudscale.LoadBalancerListenerRequest{
+		Name:         testRunPrefix,
+		Pool:         p.UUID,
+		Protocol:     "tcp",
+		ProtocolPort: 8080,
+	}
+	initialTags := getInitialTags()
+	createRequest.Tags = &initialTags
+
+	listener, err := client.LoadBalancerListeners.Create(context.Background(), &createRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Create returned error %s\n", err)
+	}
+
+	getResult, err := client.LoadBalancerListeners.Get(context.Background(), listener.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.LoadBalancerListenerRequest{}
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
+	err = client.LoadBalancerListeners.Update(context.Background(), listener.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("LoadBalancers.Update returned error: %v", err)
+	}
+	getResult2, err := client.LoadBalancerListeners.Get(context.Background(), listener.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.LoadBalancerListeners.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	newTagsKeyOnly := getNewTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.LoadBalancerListeners.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.LoadBalancerListeners.Delete(context.Background(), listener.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Delete returned error %s\n", err)
+	}
+}
+
+func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	createRequest := cloudscale.LoadBalancerPoolMemberRequest{
+		Name:         testRunPrefix,
+		ProtocolPort: 8080,
+		Address:      "5.102.144.111",
+	}
+	initialTags := getInitialTags()
+	createRequest.Tags = &initialTags
+
+	member, err := client.LoadBalancerPoolMembers.Create(context.Background(), p.UUID, &createRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancerPoolMembers.Create returned error %s\n", err)
+	}
+
+	getResult, err := client.LoadBalancerPoolMembers.Get(context.Background(), p.UUID, member.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.LoadBalancerPoolMemberRequest{}
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
+	err = client.LoadBalancerPoolMembers.Update(context.Background(), p.UUID, member.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("LoadBalancers.Update returned error: %v", err)
+	}
+	getResult2, err := client.LoadBalancerPoolMembers.Get(context.Background(), p.UUID, member.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.LoadBalancerPoolMembers.List(context.Background(), p.UUID, cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	newTagsKeyOnly := getNewTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.LoadBalancerPoolMembers.List(context.Background(), p.UUID, cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.LoadBalancerPoolMembers.Delete(context.Background(), p.UUID, member.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancerPoolMembers.Delete returned error %s\n", err)
+	}
+}
+
+func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	createRequest := cloudscale.LoadBalancerHealthMonitorRequest{
+		Pool:           p.UUID,
+		Delay:          10,
+		Timeout:        3,
+		MaxRetries:     5,
+		MaxRetriesDown: 10,
+		Type:           "tcp",
+	}
+	initialTags := getInitialTags()
+	createRequest.Tags = &initialTags
+
+	healthMonitor, err := client.LoadBalancerHealthMonitors.Create(context.Background(), &createRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancerHealthMonitors.Create returned error %s\n", err)
+	}
+
+	getResult, err := client.LoadBalancerHealthMonitors.Get(context.Background(), healthMonitor.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.LoadBalancerHealthMonitorRequest{}
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
+	err = client.LoadBalancerHealthMonitors.Update(context.Background(), healthMonitor.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("LoadBalancers.Update returned error: %v", err)
+	}
+	getResult2, err := client.LoadBalancerHealthMonitors.Get(context.Background(), healthMonitor.UUID)
+	if err != nil {
+		t.Errorf("LoadBalancers.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.LoadBalancerHealthMonitors.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	newTagsKeyOnly := getNewTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.LoadBalancerHealthMonitors.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("LoadBalancers.List returned error %s\n", err)
+		}
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.LoadBalancerHealthMonitors.Delete(context.Background(), healthMonitor.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancerHealthMonitors.Delete returned error %s\n", err)
+	}
 }
