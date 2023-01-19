@@ -108,7 +108,7 @@ func TestIntegrationLoadBalancerHealthMonitor_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerHealthMonitors.Create returned error %s\n", err)
 	}
 
-	newMaxRetries := 42
+	newMaxRetries := 5
 	updateRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
 		MaxRetries: newMaxRetries,
 	}
