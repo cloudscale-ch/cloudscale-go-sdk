@@ -93,9 +93,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 		VIPAddresses: &[]cloudscale.VIPAddressRequest{
 			{
 				Address: vipAddress,
-				Subnet: cloudscale.SubnetRequest{
-					UUID: subnet.UUID,
-				},
+				Subnet:  subnet.UUID,
 			},
 		},
 	}

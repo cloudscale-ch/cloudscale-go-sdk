@@ -46,12 +46,8 @@ type LoadBalancerRequest struct {
 }
 
 type VIPAddressRequest struct {
-	Address string        `json:"address,omitempty"`
-	Subnet  SubnetRequest `json:"subnet,omitempty"`
-}
-
-type SubnetRequest struct {
-	UUID string `json:"uuid,omitempty"`
+	Address string `json:"address,omitempty"`
+	Subnet  string `json:"subnet,omitempty"`
 }
 
 type LoadBalancerService interface {
