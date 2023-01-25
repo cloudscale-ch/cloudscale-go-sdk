@@ -107,6 +107,7 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerListeners.Create returned error %s\n", err)
 	}
 
+	// update name
 	newName := testRunPrefix + "-renamed"
 	updateRequest := &cloudscale.LoadBalancerListenerRequest{
 		Name: newName,
@@ -125,6 +126,26 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 
 	if name := updated.Name; name != newName {
 		t.Errorf("updated.Name \n got=%s\nwant=%s", name, newName)
+	}
+
+	// update allowed ciders
+	updatedAllowedCIDRs := []string{"10.0.0.0/24"}
+	updateRequest2 := &cloudscale.LoadBalancerListenerRequest{
+		AllowedCIDRs: updatedAllowedCIDRs,
+	}
+
+	err = client.LoadBalancerListeners.Update(context.Background(), uuid, updateRequest2)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Update returned error %s\n", err)
+	}
+
+	updated2, err := client.LoadBalancerListeners.Get(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Get returned error %s\n", err)
+	}
+
+	if allowedCIDRs := updated2.AllowedCIDRs; !reflect.DeepEqual(allowedCIDRs, updatedAllowedCIDRs) {
+		t.Errorf("updated2.AllowedCIDRs \n got=%s\nwant=%s", allowedCIDRs, updatedAllowedCIDRs)
 	}
 
 	err = client.LoadBalancerListeners.Delete(context.Background(), updated.UUID)
