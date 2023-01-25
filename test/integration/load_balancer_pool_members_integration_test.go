@@ -105,6 +105,7 @@ func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerPoolMembers.Create returned error %s\n", err)
 	}
 
+	// Update Name
 	newName := testRunPrefix + "-renamed"
 	updateRequest := &cloudscale.LoadBalancerPoolMemberRequest{
 		Name: newName,
@@ -123,6 +124,26 @@ func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
 
 	if name := updated.Name; name != newName {
 		t.Errorf("updated.Name \n got=%s\nwant=%s", name, newName)
+	}
+
+	// Disable
+	newEnabled := false
+	updateRequest2 := &cloudscale.LoadBalancerPoolMemberRequest{
+		Enabled: &newEnabled,
+	}
+
+	err = client.LoadBalancerPoolMembers.Update(context.Background(), pool.UUID, uuid, updateRequest2)
+	if err != nil {
+		t.Fatalf("LoadBalancerPoolMembers.Update returned error %s\n", err)
+	}
+
+	updated2, err := client.LoadBalancerPoolMembers.Get(context.Background(), pool.UUID, uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancerPoolMembers.Get returned error %s\n", err)
+	}
+
+	if enabled := updated2.Enabled; enabled != newEnabled {
+		t.Errorf("updated2.Enabled \n got=%t\nwant=%t", enabled, newEnabled)
 	}
 
 	err = client.LoadBalancerPoolMembers.Delete(context.Background(), pool.UUID, updated.UUID)

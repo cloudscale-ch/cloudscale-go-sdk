@@ -15,6 +15,7 @@ type LoadBalancerPoolMember struct {
 	HREF         string               `json:"href,omitempty"`
 	UUID         string               `json:"uuid,omitempty"`
 	Name         string               `json:"name,omitempty"`
+	Enabled      bool                 `json:"enabled,omitempty"`
 	CreatedAt    time.Time            `json:"created_at,omitempty"`
 	Pool         LoadBalancerPoolStub `json:"pool,omitempty"`
 	ProtocolPort int                  `json:"protocol_port,omitempty"`
@@ -27,6 +28,7 @@ type LoadBalancerPoolMember struct {
 type LoadBalancerPoolMemberRequest struct {
 	TaggedResourceRequest
 	Name         string `json:"name,omitempty"`
+	Enabled      *bool  `json:"enabled,omitempty"`
 	ProtocolPort int    `json:"protocol_port,omitempty"`
 	MonitorPort  int    `json:"monitor_port,omitempty"`
 	Address      string `json:"address,omitempty"`
