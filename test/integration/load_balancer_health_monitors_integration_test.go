@@ -178,14 +178,13 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		Method:        "GET",
 		UrlPath:       "/",
 		Version:       "1.0",
-		DomainName:    nil,
+		Host:          nil,
 	}
 
 	if !reflect.DeepEqual(http, expectedHTTP) {
 		t.Errorf("healthMonitor.HTTP \n got=%#v\nwant=%#v", http, expectedHTTP)
 	}
 
-	//domainName := "example.com"
 	updateRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
 		HTTP: cloudscale.LoadBalancerHealthMonitorHTTPRequest{
 			ExpectedCodes: []string{"201", "200"},
@@ -208,7 +207,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		Method:        "GET",
 		UrlPath:       "/",
 		Version:       "1.0",
-		DomainName:    nil,
+		Host:          nil,
 	}
 	updatedHttp := updated.HTTP
 	if !reflect.DeepEqual(updatedHttp, expectedUpdatedHTTP) {

@@ -27,7 +27,7 @@ type LoadBalancerHealthMonitorHTTPOption struct {
 	Method        string   `json:"method,omitempty"`
 	UrlPath       string   `json:"url_path,omitempty"`
 	Version       string   `json:"version,omitempty"`
-	DomainName    *string  `json:"domain_name,omitempty"`
+	Host          *string  `json:"host,omitempty"`
 }
 
 type LoadBalancerHealthMonitorRequest struct {
@@ -46,7 +46,7 @@ type LoadBalancerHealthMonitorHTTPRequest struct {
 	Method        string   `json:"method,omitempty"`
 	UrlPath       string   `json:"url_path,omitempty"`
 	Version       string   `json:"version,omitempty"`
-	DomainName    *string  `json:"domain_name,omitempty"`
+	Host          *string  `json:"host,omitempty"`
 }
 
 type LoadBalancerHealthMonitorService interface {
