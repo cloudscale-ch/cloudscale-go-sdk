@@ -12,17 +12,17 @@ type LoadBalancerPoolMember struct {
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF         string               `json:"href,omitempty"`
-	UUID         string               `json:"uuid,omitempty"`
-	Name         string               `json:"name,omitempty"`
-	Enabled      bool                 `json:"enabled,omitempty"`
-	CreatedAt    time.Time            `json:"created_at,omitempty"`
-	Pool         LoadBalancerPoolStub `json:"pool,omitempty"`
-	ProtocolPort int                  `json:"protocol_port,omitempty"`
-	MonitorPort  int                  `json:"monitor_port,omitempty"`
-	Address      string               `json:"address,omitempty"`
-	Subnet       SubnetStub           `json:"subnet,omitempty"`
-	Status       string               `json:"status,omitempty"`
+	HREF          string               `json:"href,omitempty"`
+	UUID          string               `json:"uuid,omitempty"`
+	Name          string               `json:"name,omitempty"`
+	Enabled       bool                 `json:"enabled,omitempty"`
+	CreatedAt     time.Time            `json:"created_at,omitempty"`
+	Pool          LoadBalancerPoolStub `json:"pool,omitempty"`
+	ProtocolPort  int                  `json:"protocol_port,omitempty"`
+	MonitorPort   int                  `json:"monitor_port,omitempty"`
+	Address       string               `json:"address,omitempty"`
+	Subnet        SubnetStub           `json:"subnet,omitempty"`
+	MonitorStatus string               `json:"monitor_status,omitempty"`
 }
 
 type LoadBalancerPoolMemberRequest struct {
