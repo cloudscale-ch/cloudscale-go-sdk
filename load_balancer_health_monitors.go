@@ -32,13 +32,13 @@ type LoadBalancerHealthMonitorHTTPOption struct {
 
 type LoadBalancerHealthMonitorRequest struct {
 	TaggedResourceRequest
-	Pool           string                               `json:"pool,omitempty"`
-	Delay          int                                  `json:"delay,omitempty"`
-	Timeout        int                                  `json:"timeout,omitempty"`
-	MaxRetries     int                                  `json:"max_retries,omitempty"`
-	MaxRetriesDown int                                  `json:"max_retries_down,omitempty"`
-	Type           string                               `json:"type,omitempty"`
-	HTTP           LoadBalancerHealthMonitorHTTPRequest `json:"http,omitempty"`
+	Pool           string                                `json:"pool,omitempty"`
+	Delay          int                                   `json:"delay,omitempty"`
+	Timeout        int                                   `json:"timeout,omitempty"`
+	MaxRetries     int                                   `json:"max_retries,omitempty"`
+	MaxRetriesDown int                                   `json:"max_retries_down,omitempty"`
+	Type           string                                `json:"type,omitempty"`
+	HTTP           *LoadBalancerHealthMonitorHTTPRequest `json:"http,omitempty"`
 }
 
 type LoadBalancerHealthMonitorHTTPRequest struct {

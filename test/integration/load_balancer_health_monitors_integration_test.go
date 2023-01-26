@@ -185,10 +185,11 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		t.Errorf("healthMonitor.HTTP \n got=%#v\nwant=%#v", http, expectedHTTP)
 	}
 
+	httpRequest := cloudscale.LoadBalancerHealthMonitorHTTPRequest{
+		ExpectedCodes: []string{"201", "200"},
+	}
 	updateRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
-		HTTP: cloudscale.LoadBalancerHealthMonitorHTTPRequest{
-			ExpectedCodes: []string{"201", "200"},
-		},
+		HTTP: &httpRequest,
 	}
 
 	uuid := healthMonitor.UUID
