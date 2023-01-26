@@ -177,7 +177,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		ExpectedCodes: []string{"200"},
 		Method:        "GET",
 		UrlPath:       "/",
-		Version:       "1.0",
+		Version:       "1.1",
 		Host:          nil,
 	}
 
@@ -207,7 +207,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		ExpectedCodes: []string{"201", "200"},
 		Method:        "GET",
 		UrlPath:       "/",
-		Version:       "1.0",
+		Version:       "1.1",
 		Host:          nil,
 	}
 	updatedHttp := updated.HTTP
