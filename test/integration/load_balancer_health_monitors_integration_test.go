@@ -173,7 +173,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 	}
 
 	http := healthMonitor.HTTP
-	expectedHTTP := cloudscale.LoadBalancerHealthMonitorHTTPOption{
+	expectedHTTP := cloudscale.LoadBalancerHealthMonitorHTTP{
 		ExpectedCodes: []string{"200"},
 		Method:        "GET",
 		UrlPath:       "/",
@@ -203,7 +203,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerHealthMonitors.Get returned error %s\n", err)
 	}
 
-	expectedUpdatedHTTP := cloudscale.LoadBalancerHealthMonitorHTTPOption{
+	expectedUpdatedHTTP := cloudscale.LoadBalancerHealthMonitorHTTP{
 		ExpectedCodes: []string{"201", "200"},
 		Method:        "GET",
 		UrlPath:       "/",
