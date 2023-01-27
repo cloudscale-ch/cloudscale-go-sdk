@@ -10,16 +10,16 @@ type LoadBalancerHealthMonitor struct {
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF           string                              `json:"href,omitempty"`
-	UUID           string                              `json:"uuid,omitempty"`
-	Pool           LoadBalancerPoolStub                `json:"pool,omitempty"`
-	Delay          int                                 `json:"delay,omitempty"`
-	Timeout        int                                 `json:"timeout,omitempty"`
-	MaxRetries     int                                 `json:"max_retries,omitempty"`
-	MaxRetriesDown int                                 `json:"max_retries_down,omitempty"`
-	Type           string                              `json:"type,omitempty"`
-	HTTP           LoadBalancerHealthMonitorHTTPOption `json:"http,omitempty"`
-	CreatedAt      time.Time                           `json:"created_at,omitempty"`
+	HREF           string                               `json:"href,omitempty"`
+	UUID           string                               `json:"uuid,omitempty"`
+	Pool           LoadBalancerPoolStub                 `json:"pool,omitempty"`
+	Delay          int                                  `json:"delay,omitempty"`
+	Timeout        int                                  `json:"timeout,omitempty"`
+	MaxRetries     int                                  `json:"max_retries,omitempty"`
+	MaxRetriesDown int                                  `json:"max_retries_down,omitempty"`
+	Type           string                               `json:"type,omitempty"`
+	HTTP           *LoadBalancerHealthMonitorHTTPOption `json:"http,omitempty"`
+	CreatedAt      time.Time                            `json:"created_at,omitempty"`
 }
 
 type LoadBalancerHealthMonitorHTTPOption struct {
