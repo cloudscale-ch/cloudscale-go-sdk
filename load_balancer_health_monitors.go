@@ -10,16 +10,16 @@ type LoadBalancerHealthMonitor struct {
 	TaggedResource
 	// Just use omitempty everywhere. This makes it easy to use restful. Errors
 	// will be coming from the API if something is disabled.
-	HREF           string                         `json:"href,omitempty"`
-	UUID           string                         `json:"uuid,omitempty"`
-	Pool           LoadBalancerPoolStub           `json:"pool,omitempty"`
-	Delay          int                            `json:"delay,omitempty"`
-	Timeout        int                            `json:"timeout,omitempty"`
-	MaxRetries     int                            `json:"max_retries,omitempty"`
-	MaxRetriesDown int                            `json:"max_retries_down,omitempty"`
-	Type           string                         `json:"type,omitempty"`
-	HTTP           *LoadBalancerHealthMonitorHTTP `json:"http,omitempty"`
-	CreatedAt      time.Time                      `json:"created_at,omitempty"`
+	HREF          string                         `json:"href,omitempty"`
+	UUID          string                         `json:"uuid,omitempty"`
+	Pool          LoadBalancerPoolStub           `json:"pool,omitempty"`
+	DelayS        int                            `json:"delay_s,omitempty"`
+	TimeoutS      int                            `json:"timeout_s,omitempty"`
+	UpThreshold   int                            `json:"up_threshold,omitempty"`
+	DownThreshold int                            `json:"down_threshold,omitempty"`
+	Type          string                         `json:"type,omitempty"`
+	HTTP          *LoadBalancerHealthMonitorHTTP `json:"http,omitempty"`
+	CreatedAt     time.Time                      `json:"created_at,omitempty"`
 }
 
 type LoadBalancerHealthMonitorHTTP struct {
@@ -32,13 +32,13 @@ type LoadBalancerHealthMonitorHTTP struct {
 
 type LoadBalancerHealthMonitorRequest struct {
 	TaggedResourceRequest
-	Pool           string                                `json:"pool,omitempty"`
-	Delay          int                                   `json:"delay,omitempty"`
-	Timeout        int                                   `json:"timeout,omitempty"`
-	MaxRetries     int                                   `json:"max_retries,omitempty"`
-	MaxRetriesDown int                                   `json:"max_retries_down,omitempty"`
-	Type           string                                `json:"type,omitempty"`
-	HTTP           *LoadBalancerHealthMonitorHTTPRequest `json:"http,omitempty"`
+	Pool          string                                `json:"pool,omitempty"`
+	DelayS        int                                   `json:"delay_s,omitempty"`
+	TimeoutS      int                                   `json:"timeout_s,omitempty"`
+	UpThreshold   int                                   `json:"up_threshold,omitempty"`
+	DownThreshold int                                   `json:"down_threshold,omitempty"`
+	Type          string                                `json:"type,omitempty"`
+	HTTP          *LoadBalancerHealthMonitorHTTPRequest `json:"http,omitempty"`
 }
 
 type LoadBalancerHealthMonitorHTTPRequest struct {

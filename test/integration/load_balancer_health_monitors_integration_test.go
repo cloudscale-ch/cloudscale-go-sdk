@@ -27,10 +27,10 @@ func TestIntegrationLoadBalancerHealthMonitor_CRUD(t *testing.T) {
 	}
 
 	createLoadBalancerHealthMonitorRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
-		Pool:    pool.UUID,
-		Delay:   20,
-		Timeout: 15,
-		Type:    "tcp",
+		Pool:     pool.UUID,
+		DelayS:   20,
+		TimeoutS: 15,
+		Type:     "tcp",
 	}
 
 	expected, err := client.LoadBalancerHealthMonitors.Create(context.Background(), createLoadBalancerHealthMonitorRequest)
@@ -96,11 +96,11 @@ func TestIntegrationLoadBalancerHealthMonitor_Update(t *testing.T) {
 	}
 
 	createLoadBalancerHealthMonitorRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
-		Pool:       pool.UUID,
-		Delay:      20,
-		Timeout:    15,
-		Type:       "tcp",
-		MaxRetries: 10,
+		Pool:        pool.UUID,
+		DelayS:      20,
+		TimeoutS:    15,
+		Type:        "tcp",
+		UpThreshold: 10,
 	}
 
 	healthMonitor, err := client.LoadBalancerHealthMonitors.Create(context.Background(), createLoadBalancerHealthMonitorRequest)
@@ -110,7 +110,7 @@ func TestIntegrationLoadBalancerHealthMonitor_Update(t *testing.T) {
 
 	newMaxRetries := 5
 	updateRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
-		MaxRetries: newMaxRetries,
+		UpThreshold: newMaxRetries,
 	}
 
 	uuid := healthMonitor.UUID
@@ -124,7 +124,7 @@ func TestIntegrationLoadBalancerHealthMonitor_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerHealthMonitors.Get returned error %s\n", err)
 	}
 
-	if name := updated.MaxRetries; name != newMaxRetries {
+	if name := updated.UpThreshold; name != newMaxRetries {
 		t.Errorf("updated.Name \n got=%#v\nwant=%#v", name, newMaxRetries)
 	}
 
@@ -160,11 +160,11 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 	}
 
 	createLoadBalancerHealthMonitorRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
-		Pool:       pool.UUID,
-		Delay:      20,
-		Timeout:    15,
-		Type:       "http",
-		MaxRetries: 10,
+		Pool:        pool.UUID,
+		DelayS:      20,
+		TimeoutS:    15,
+		Type:        "http",
+		UpThreshold: 10,
 	}
 
 	healthMonitor, err := client.LoadBalancerHealthMonitors.Create(context.Background(), createLoadBalancerHealthMonitorRequest)

@@ -913,12 +913,12 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 
 func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.LoadBalancerPool) {
 	createRequest := cloudscale.LoadBalancerHealthMonitorRequest{
-		Pool:           p.UUID,
-		Delay:          10,
-		Timeout:        3,
-		MaxRetries:     5,
-		MaxRetriesDown: 10,
-		Type:           "tcp",
+		Pool:          p.UUID,
+		DelayS:        10,
+		TimeoutS:      3,
+		UpThreshold:   5,
+		DownThreshold: 10,
+		Type:          "tcp",
 	}
 	initialTags := getInitialTags()
 	createRequest.Tags = &initialTags
