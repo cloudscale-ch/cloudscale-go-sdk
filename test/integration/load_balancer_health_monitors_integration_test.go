@@ -181,8 +181,8 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		Host:          nil,
 	}
 
-	if !reflect.DeepEqual(http, expectedHTTP) {
-		t.Errorf("healthMonitor.HTTP \n got=%#v\nwant=%#v", http, expectedHTTP)
+	if !reflect.DeepEqual(http, &expectedHTTP) {
+		t.Errorf("healthMonitor.HTTP \n got=%#v\nwant=%#v", http, &expectedHTTP)
 	}
 
 	httpRequest := cloudscale.LoadBalancerHealthMonitorHTTPRequest{
