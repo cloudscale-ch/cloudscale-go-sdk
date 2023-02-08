@@ -211,8 +211,8 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		Host:          nil,
 	}
 	updatedHttp := updated.HTTP
-	if !reflect.DeepEqual(updatedHttp, expectedUpdatedHTTP) {
-		t.Errorf("updated.HTTP \n got=%#v\nwant=%#v", updatedHttp, expectedUpdatedHTTP)
+	if !reflect.DeepEqual(updatedHttp, &expectedUpdatedHTTP) {
+		t.Errorf("updated.HTTP \n got=%#v\nwant=%#v", updatedHttp, &expectedUpdatedHTTP)
 	}
 
 	err = client.LoadBalancerHealthMonitors.Delete(context.Background(), updated.UUID)
