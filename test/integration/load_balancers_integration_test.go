@@ -42,8 +42,8 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 		t.Errorf("Error = %#v, expected %#v", loadBalancer, expected)
 	}
 
-	if numberOfVIPAddresses := len(loadBalancer.VIPAddresses); numberOfVIPAddresses != 1 {
-		t.Errorf("numberOfVIPAddresses \n got=%d\nwant=%d", numberOfVIPAddresses, 1)
+	if numberOfVIPAddresses := len(loadBalancer.VIPAddresses); numberOfVIPAddresses != 2 {
+		t.Errorf("numberOfVIPAddresses \n got=%d\nwant=%d", numberOfVIPAddresses, 2)
 	}
 
 	loadBalancers, err := client.LoadBalancers.List(context.Background())
