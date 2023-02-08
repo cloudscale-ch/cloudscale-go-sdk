@@ -126,7 +126,7 @@ func TestIntegrationLoadBalancerPool_Update(t *testing.T) {
 func createLoadBalancer() (*cloudscale.LoadBalancer, error) {
 	createRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-flex-4-2",
+		Flavor: "lb-small",
 	}
 	createRequest.Zone = "rma1"
 

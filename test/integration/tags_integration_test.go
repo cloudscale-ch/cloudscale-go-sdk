@@ -633,7 +633,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 
 	createRequest := cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-flex-4-2",
+		Flavor: "lb-small",
 	}
 	createRequest.Zone = "rma1"
 	initialTags := getInitialTags()

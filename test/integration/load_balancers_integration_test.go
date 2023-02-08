@@ -18,7 +18,7 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-flex-4-2",
+		Flavor: "lb-small",
 	}
 	createLoadBalancerRequest.Zone = "rma1"
 
@@ -89,7 +89,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 	vipAddress := "192.168.7.7"
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-flex-4-2",
+		Flavor: "lb-small",
 		VIPAddresses: &[]cloudscale.VIPAddressRequest{
 			{
 				Address: vipAddress,
@@ -134,7 +134,7 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-flex-4-2",
+		Flavor: "lb-small",
 	}
 	createLoadBalancerRequest.Zone = "rma1"
 
@@ -187,7 +187,7 @@ func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalan
 		return nil
 	}
 
-	err := backoff.Retry(operation, backoff.NewConstantBackOff(2 * time.Second))
+	err := backoff.Retry(operation, backoff.NewConstantBackOff(2*time.Second))
 	if err != nil {
 		t.Fatalf("Error while waiting for status change %s\n", err)
 	}
