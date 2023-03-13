@@ -192,8 +192,6 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 		})
 	}
 
-	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
-	time.Sleep(10 * time.Second)
 	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
@@ -274,8 +272,6 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
 
-	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
-	time.Sleep(5 * time.Second)
 	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
@@ -362,8 +358,6 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
 
-	// sending the next request immediately can cause errors, since the port cleanup process is still ongoing
-	time.Sleep(5 * time.Second)
 	err = client.Networks.Delete(context.Background(), network.UUID)
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
