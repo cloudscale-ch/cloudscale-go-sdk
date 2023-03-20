@@ -26,10 +26,16 @@ func TestIntegrationLoadBalancerPoolMember_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancerPools.Create returned error %s\n", err)
 	}
 
+	network, subnet, err := createNetworkAndSubnet()
+	if err != nil {
+		t.Fatalf("error while creating network and subnet: %s\n", err)
+	}
+
 	createLoadBalancerPoolMemberRequest := &cloudscale.LoadBalancerPoolMemberRequest{
 		Name:         testRunPrefix,
-		Address:      "5.102.144.111",
+		Address:      "192.168.42.11",
 		ProtocolPort: 80,
+		Subnet:       subnet.UUID,
 	}
 
 	expected, err := client.LoadBalancerPoolMembers.Create(context.Background(), pool.UUID, createLoadBalancerPoolMemberRequest)
@@ -77,6 +83,11 @@ func TestIntegrationLoadBalancerPoolMember_CRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
 	}
+
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
 }
 
 func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
@@ -94,10 +105,16 @@ func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerPools.Create returned error %s\n", err)
 	}
 
+	network, subnet, err := createNetworkAndSubnet()
+	if err != nil {
+		t.Fatalf("error while creating network and subnet: %s\n", err)
+	}
+
 	createLoadBalancerPoolMemberRequest := &cloudscale.LoadBalancerPoolMemberRequest{
 		Name:         testRunPrefix,
-		Address:      "5.102.144.111",
+		Address:      "192.168.42.11",
 		ProtocolPort: 80,
+		Subnet:       subnet.UUID,
 	}
 
 	poolMember, err := client.LoadBalancerPoolMembers.Create(context.Background(), pool.UUID, createLoadBalancerPoolMemberRequest)
@@ -159,5 +176,10 @@ func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
 	err = client.LoadBalancers.Delete(context.Background(), lb.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }

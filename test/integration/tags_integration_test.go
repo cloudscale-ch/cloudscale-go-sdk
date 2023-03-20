@@ -845,10 +845,16 @@ func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBal
 }
 
 func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	network, subnet, err := createNetworkAndSubnet()
+	if err != nil {
+		t.Fatalf("error while creating network and subnet: %s\n", err)
+	}
+
 	createRequest := cloudscale.LoadBalancerPoolMemberRequest{
 		Name:         testRunPrefix,
 		ProtocolPort: 8080,
-		Address:      "5.102.144.111",
+		Address:      "192.168.42.12",
+		Subnet:       subnet.UUID,
 	}
 	initialTags := getInitialTags()
 	createRequest.Tags = &initialTags
@@ -908,6 +914,11 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 	err = client.LoadBalancerPoolMembers.Delete(context.Background(), p.UUID, member.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancerPoolMembers.Delete returned error %s\n", err)
+	}
+
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }
 
