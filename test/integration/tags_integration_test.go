@@ -635,7 +635,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 		Name:   testRunPrefix,
 		Flavor: "lb-small",
 	}
-	createRequest.Zone = "rma1"
+	createRequest.Zone = testZone
 	initialTags := getInitialTags()
 	createRequest.Tags = &initialTags
 

@@ -20,7 +20,7 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 		Name:   testRunPrefix,
 		Flavor: "lb-small",
 	}
-	createLoadBalancerRequest.Zone = "rma1"
+	createLoadBalancerRequest.Zone = testZone
 
 	expected, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
 	if err != nil {
@@ -69,7 +69,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateIPV4Subnet,
 	}
-	networkRequest.Zone = "rma1"
+	networkRequest.Zone = testZone
 
 	network, err := client.Networks.Create(context.Background(), networkRequest)
 	if err != nil {
@@ -97,7 +97,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 			},
 		},
 	}
-	createLoadBalancerRequest.Zone = "rma1"
+	createLoadBalancerRequest.Zone = testZone
 
 	loadBalancer, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
 	if err != nil {
@@ -136,7 +136,7 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 		Name:   testRunPrefix,
 		Flavor: "lb-small",
 	}
-	createLoadBalancerRequest.Zone = "rma1"
+	createLoadBalancerRequest.Zone = testZone
 
 	lb, err := client.LoadBalancers.Create(context.TODO(), createLoadBalancerRequest)
 	if err != nil {

@@ -128,7 +128,7 @@ func createLoadBalancer() (*cloudscale.LoadBalancer, error) {
 		Name:   testRunPrefix,
 		Flavor: "lb-small",
 	}
-	createRequest.Zone = "rma1"
+	createRequest.Zone = testZone
 
 	return client.LoadBalancers.Create(context.Background(), createRequest)
 }

@@ -20,6 +20,7 @@ import (
 var (
 	client        *cloudscale.Client
 	testRunPrefix string
+	testZone      string
 )
 
 func TestMain(m *testing.M) {
@@ -35,6 +36,11 @@ func TestMain(m *testing.M) {
 		&oauth2.Token{AccessToken: token},
 	))
 	client = cloudscale.NewClient(tc)
+
+	testZone = os.Getenv("INTEGRATION_TEST_ZONE")
+	if testZone == "" {
+		testZone = "rma1"
+	}
 
 	// run the tests
 	runResult := m.Run()
