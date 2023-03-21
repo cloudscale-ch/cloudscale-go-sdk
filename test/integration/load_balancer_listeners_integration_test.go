@@ -174,28 +174,3 @@ func createPoolOnLB(lb *cloudscale.LoadBalancer) (*cloudscale.LoadBalancerPool, 
 
 	return client.LoadBalancerPools.Create(context.TODO(), createLoadBalancerPoolRequest)
 }
-
-func createNetworkAndSubnet() (*cloudscale.Network, *cloudscale.Subnet, error) {
-	autoCreateSubnet := false
-
-	network, err := client.Networks.Create(context.TODO(), &cloudscale.NetworkCreateRequest{
-		Name:                 testRunPrefix,
-		AutoCreateIPV4Subnet: &autoCreateSubnet,
-		ZonalResourceRequest: cloudscale.ZonalResourceRequest{
-			Zone: testZone,
-		},
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-
-	subnets, err := client.Subnets.Create(context.TODO(), &cloudscale.SubnetCreateRequest{
-		CIDR:    "192.168.42.0/24",
-		Network: network.UUID,
-	})
-	if err != nil {
-		return network, nil, err
-	}
-
-	return network, subnets, err
-}
