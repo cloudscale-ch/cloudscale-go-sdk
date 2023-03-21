@@ -179,7 +179,7 @@ func createNetworkAndSubnet() (*cloudscale.Network, *cloudscale.Subnet, error) {
 	autoCreateSubnet := false
 
 	network, err := client.Networks.Create(context.TODO(), &cloudscale.NetworkCreateRequest{
-		Name:                 "lb-net",
+		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
 	})
 	if err != nil {
