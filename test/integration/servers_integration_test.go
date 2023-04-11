@@ -244,7 +244,7 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 	integrationTest(t)
 
 	request := getDefaultServerRequest()
-	request.Volumes = &([]cloudscale.Volume{
+	request.Volumes = &([]cloudscale.ServerVolumeRequest{
 		{SizeGB: 3, Type: "ssd"},
 		{SizeGB: 100, Type: "bulk"},
 	})
