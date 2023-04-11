@@ -118,14 +118,14 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 
 	waitUntilLB("running", loadBalancer.UUID, t)
 
-	err = client.Networks.Delete(context.Background(), network.UUID)
-	if err != nil {
-		t.Fatalf("Networks.Delete returned error %s\n", err)
-	}
-
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
 }
 
