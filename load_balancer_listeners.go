@@ -26,7 +26,6 @@ type LoadBalancerListener struct {
 	TimeoutClientDataMS    int                  `json:"timeout_client_data_ms,omitempty"`
 	TimeoutMemberConnectMS int                  `json:"timeout_member_connect_ms,omitempty"`
 	TimeoutMemberDataMS    int                  `json:"timeout_member_data_ms,omitempty"`
-	TimeoutTCPInspectMS    int                  `json:"timeout_tcp_inspect_ms,omitempty"`
 	CreatedAt              time.Time            `json:"created_at,omitempty"`
 }
 
@@ -40,7 +39,6 @@ type LoadBalancerListenerRequest struct {
 	TimeoutClientDataMS    int      `json:"timeout_client_data_ms,omitempty"`
 	TimeoutMemberConnectMS int      `json:"timeout_member_connect_ms,omitempty"`
 	TimeoutMemberDataMS    int      `json:"timeout_member_data_ms,omitempty"`
-	TimeoutTCPInspectMS    int      `json:"timeout_tcp_inspect_ms,omitempty"`
 }
 
 type LoadBalancerListenerService interface {
