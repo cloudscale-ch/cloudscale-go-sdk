@@ -18,7 +18,7 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-small",
+		Flavor: "lb-standard",
 	}
 	createLoadBalancerRequest.Zone = testZone
 
@@ -89,7 +89,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 	vipAddress := "192.168.7.7"
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-small",
+		Flavor: "lb-standard",
 		VIPAddresses: &[]cloudscale.VIPAddressRequest{
 			{
 				Address: vipAddress,
@@ -134,7 +134,7 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
-		Flavor: "lb-small",
+		Flavor: "lb-standard",
 	}
 	createLoadBalancerRequest.Zone = testZone
 
