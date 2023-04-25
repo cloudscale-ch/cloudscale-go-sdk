@@ -15,7 +15,7 @@ import (
 
 const pubKey string = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY="
 
-func TestIntegrationFloatingIP_CRUD(t *testing.T) {
+func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
 	integrationTest(t)
 
 	createServerRequest := &cloudscale.ServerRequest{
@@ -51,6 +51,10 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 
 	if uuid := expectedIP.Server.UUID; uuid != server.UUID {
 		t.Errorf("expectedIP.Server.UUID \n got=%s\nwant=%s", uuid, server.UUID)
+	}
+
+	if nextHop := expectedIP.NextHop; nextHop != server.Interfaces[0].Addresses[0].Address {
+		t.Errorf("expectedIP.NextHop \n got=%s\nwant=%s", nextHop, server.Interfaces[0].Addresses[0].Address)
 	}
 
 	ip := expectedIP.IP()
