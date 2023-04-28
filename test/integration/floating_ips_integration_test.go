@@ -15,7 +15,7 @@ import (
 
 const pubKey string = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY="
 
-func TestIntegrationFloatingIP_CRUD(t *testing.T) {
+func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
 	integrationTest(t)
 
 	createServerRequest := &cloudscale.ServerRequest{
@@ -53,6 +53,10 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 		t.Errorf("expectedIP.Server.UUID \n got=%s\nwant=%s", uuid, server.UUID)
 	}
 
+	if nextHop := expectedIP.NextHop; nextHop != server.Interfaces[0].Addresses[0].Address {
+		t.Errorf("expectedIP.NextHop \n got=%s\nwant=%s", nextHop, server.Interfaces[0].Addresses[0].Address)
+	}
+
 	ip := expectedIP.IP()
 	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
 	if err != nil {
@@ -83,7 +87,78 @@ func TestIntegrationFloatingIP_CRUD(t *testing.T) {
 	}
 }
 
+func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
+	integrationTest(t)
+
+	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
+		Name:   testRunPrefix,
+		Flavor: "lb-standard",
+	}
+	createLoadBalancerRequest.Zone = testZone
+
+	loadBalancer, err := client.LoadBalancers.Create(context.Background(), createLoadBalancerRequest)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
+	}
+
+	waitUntilLB("running", loadBalancer.UUID, t)
+
+	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
+		IPVersion:    4,
+		LoadBalancer: loadBalancer.UUID,
+	}
+	createFloatingIPRequest.Region = testZone[:len(testZone)-1]
+
+	expectedIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
+	if err != nil {
+		t.Fatalf("floatingIP.Create returned error %s\n", err)
+	}
+
+	if h := time.Since(expectedIP.CreatedAt).Hours(); !(-1 < h && h < 1) {
+		t.Errorf("expectedIP.CreatedAt ourside of expected range. got=%v", expectedIP.CreatedAt)
+	}
+
+	if uuid := expectedIP.LoadBalancer.UUID; uuid != loadBalancer.UUID {
+		t.Errorf("expectedIP.LoadBalancer.UUID \n got=%s\nwant=%s", uuid, loadBalancer.UUID)
+	}
+
+	if nextHop := expectedIP.NextHop; nextHop != loadBalancer.VIPAddresses[0].Address {
+		t.Errorf("expectedIP.NextHop \n got=%s\nwant=%s", nextHop, loadBalancer.VIPAddresses[0].Address)
+	}
+
+	ip := expectedIP.IP()
+	floatingIP, err := client.FloatingIPs.Get(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Get returned error %s\n", err)
+	}
+
+	if !reflect.DeepEqual(floatingIP, expectedIP) {
+		t.Errorf("Error = %#v, expected %#v", floatingIP, expectedIP)
+	}
+
+	floatingIps, err := client.FloatingIPs.List(context.Background())
+	if err != nil {
+		t.Fatalf("FloatingIPs.List returned error %s\n", err)
+	}
+
+	if numFloatingIps := len(floatingIps); numFloatingIps < 1 {
+		t.Errorf("FloatingIPs.List \n got=%d\nwant=%d", numFloatingIps, 1)
+	}
+
+	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
+	if err != nil {
+		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
+	}
+
+	err = client.FloatingIPs.Delete(context.Background(), ip)
+	if err != nil {
+		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
+	}
+}
+
 func TestIntegrationFloatingIP_Update(t *testing.T) {
+	integrationTest(t)
+
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
 		Flavor:       "flex-4-2",

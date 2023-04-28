@@ -41,6 +41,11 @@ If you want to give params to `go test`, you can use something like this:
 TESTARGS='-run FloatingIP' make integration
 ```
 
+Some test default to "rma1" for testing. To override this, you can set the following variable
+```
+INTEGRATION_TEST_ZONE="lpg1"  make integration
+```
+
 ## Releasing
 
 To create a new release, please do the following:
