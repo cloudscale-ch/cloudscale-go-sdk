@@ -107,6 +107,7 @@ func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
 		IPVersion:    4,
 		LoadBalancer: loadBalancer.UUID,
 	}
+	createFloatingIPRequest.Region = testZone[:len(testZone)-1]
 
 	expectedIP, err := client.FloatingIPs.Create(context.TODO(), createFloatingIPRequest)
 	if err != nil {
