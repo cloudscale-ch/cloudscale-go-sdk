@@ -159,12 +159,16 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		t.Fatalf("LoadBalancerPools.Create returned error %s\n", err)
 	}
 
+	hostName := "hostName"
 	createLoadBalancerHealthMonitorRequest := &cloudscale.LoadBalancerHealthMonitorRequest{
 		Pool:        pool.UUID,
 		DelayS:      20,
 		TimeoutS:    15,
 		Type:        "http",
 		UpThreshold: 10,
+		HTTP: &cloudscale.LoadBalancerHealthMonitorHTTPRequest{
+			Host: &hostName,
+		},
 	}
 
 	healthMonitor, err := client.LoadBalancerHealthMonitors.Create(context.Background(), createLoadBalancerHealthMonitorRequest)
@@ -178,7 +182,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		Method:        "GET",
 		UrlPath:       "/",
 		Version:       "1.1",
-		Host:          nil,
+		Host:          &hostName,
 	}
 
 	if !reflect.DeepEqual(http, &expectedHTTP) {
@@ -208,7 +212,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		Method:        "GET",
 		UrlPath:       "/",
 		Version:       "1.1",
-		Host:          nil,
+		Host:          &hostName,
 	}
 	updatedHttp := updated.HTTP
 	if !reflect.DeepEqual(updatedHttp, &expectedUpdatedHTTP) {
