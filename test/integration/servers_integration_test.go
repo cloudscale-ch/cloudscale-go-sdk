@@ -16,7 +16,7 @@ import (
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v3"
 )
 
-const DefaultImageSlug = "debian-9"
+const DefaultImageSlug = "debian-11"
 
 func integrationTest(t *testing.T) {
 	if testing.Short() {
