@@ -20,6 +20,7 @@ type LoadBalancerListener struct {
 	UUID                   string               `json:"uuid,omitempty"`
 	Name                   string               `json:"name,omitempty"`
 	Pool                   LoadBalancerPoolStub `json:"pool,omitempty"`
+	LoadBalancer           LoadBalancerStub     `json:"load_balancer,omitempty"`
 	Protocol               string               `json:"protocol,omitempty"`
 	ProtocolPort           int                  `json:"protocol_port,omitempty"`
 	AllowedCIDRs           []string             `json:"allowed_cidrs,omitempty"`
