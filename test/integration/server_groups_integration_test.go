@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package integration
@@ -7,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v3"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
 )
 
 func TestIntegrationServerGroup_CRUD(t *testing.T) {
@@ -89,4 +90,3 @@ func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sy
 		t.Errorf("ServerGroups.Delete returned error %s\n", err)
 	}
 }
-

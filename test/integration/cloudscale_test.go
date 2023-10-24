@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v3"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
 	"golang.org/x/oauth2"
 )
 

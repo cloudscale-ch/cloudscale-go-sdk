@@ -5,7 +5,7 @@ package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v3"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
 	"testing"
 	"time"
 )

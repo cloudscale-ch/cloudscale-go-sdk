@@ -1,14 +1,14 @@
+//go:build integration
 // +build integration
 
 package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v3"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
 	"reflect"
 	"testing"
 )
-
 
 func TestIntegrationSubnet_GetAndList(t *testing.T) {
 	integrationTest(t)
@@ -62,7 +62,7 @@ func TestIntegrationSubnet_GetAndList(t *testing.T) {
 func TestIntegrationSubnet_CRUD(t *testing.T) {
 	integrationTest(t)
 
-	autoCreateSubnet := false;
+	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
@@ -73,10 +73,10 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 	}
 
 	createSubnetRequest := &cloudscale.SubnetCreateRequest{
-		CIDR: "192.168.192.0/22",
+		CIDR:           "192.168.192.0/22",
 		GatewayAddress: "192.168.192.2",
-		DNSServers: []string{"77.109.128.2", "213.144.129.20"},
-		Network: network.UUID,
+		DNSServers:     []string{"77.109.128.2", "213.144.129.20"},
+		Network:        network.UUID,
 	}
 	expected, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
 	if err != nil {
@@ -114,7 +114,7 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 func TestIntegrationSubnet_Update(t *testing.T) {
 	integrationTest(t)
 
-	autoCreateSubnet := false;
+	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name:                 testRunPrefix,
 		AutoCreateIPV4Subnet: &autoCreateSubnet,
@@ -126,7 +126,7 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 
 	createSubnetRequest := &cloudscale.SubnetCreateRequest{
 		Network: network.UUID,
-		CIDR:  "10.0.0.0/8",
+		CIDR:    "10.0.0.0/8",
 	}
 
 	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v3"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
 )
 
 const DefaultImageSlug = "debian-11"
