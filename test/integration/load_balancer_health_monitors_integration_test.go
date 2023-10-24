@@ -55,6 +55,10 @@ func TestIntegrationLoadBalancerHealthMonitor_CRUD(t *testing.T) {
 		t.Errorf("poolLbUUID \n got=%#v\nwant=%#v", poolLbUUID, pool.UUID)
 	}
 
+	if lbUUID := loadBalancerHealthMonitor.LoadBalancer.UUID; lbUUID != lb.UUID {
+		t.Errorf("lbUUID \n got=%#v\nwant=%#v", lbUUID, lb.UUID)
+	}
+
 	loadBalancerHealthMonitors, err := client.LoadBalancerHealthMonitors.List(context.Background())
 	if err != nil {
 		t.Fatalf("LoadBalancerHealthMonitors.List returned error %s\n", err)

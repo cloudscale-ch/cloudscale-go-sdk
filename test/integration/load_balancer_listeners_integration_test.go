@@ -51,8 +51,17 @@ func TestIntegrationLoadBalancerListener_CRUD(t *testing.T) {
 		t.Errorf("Error = %#v, expected %#v", loadBalancerListener, expected)
 	}
 
-	if poolLbUUID := loadBalancerListener.Pool.UUID; poolLbUUID != pool.UUID {
+	lbPool := loadBalancerListener.Pool
+	if lbPool == nil {
+		t.Errorf("expected lbPool not to be nil, got=%#v", lbPool)
+	}
+
+	if poolLbUUID := lbPool.UUID; poolLbUUID != pool.UUID {
 		t.Errorf("poolLbUUID \n got=%#v\nwant=%#v", poolLbUUID, pool.UUID)
+	}
+
+	if lbUUID := loadBalancerListener.LoadBalancer.UUID; lbUUID != lb.UUID {
+		t.Errorf("lbUUID \n got=%#v\nwant=%#v", lbUUID, lb.UUID)
 	}
 
 	loadBalancerListeners, err := client.LoadBalancerListeners.List(context.Background())

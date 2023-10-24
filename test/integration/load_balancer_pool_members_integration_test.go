@@ -60,6 +60,10 @@ func TestIntegrationLoadBalancerPoolMember_CRUD(t *testing.T) {
 		t.Errorf("poolLbUUID \n got=%#v\nwant=%#v", memberPoolUUID, pool.UUID)
 	}
 
+	if lbUUID := loadBalancerPoolMember.LoadBalancer.UUID; lbUUID != lb.UUID {
+		t.Errorf("poolLbUUID \n got=%#v\nwant=%#v", lbUUID, lb.UUID)
+	}
+
 	loadBalancerPoolMembers, err := client.LoadBalancerPoolMembers.List(context.Background(), pool.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancerPoolMembers.List returned error %s\n", err)
