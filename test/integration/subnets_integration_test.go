@@ -193,6 +193,25 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", actualDNSServers, []string{})
 	}
 
+	// update to Default DNSServer by submitting nil
+	updateRequest = &cloudscale.SubnetUpdateRequest{
+		DNSServers: nil,
+	}
+
+	err = client.Subnets.Update(context.Background(), subnet.UUID, updateRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Update returned error %s\n", err)
+	}
+
+	updatedSubnet, err = client.Subnets.Get(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Get returned error %s\n", err)
+	}
+
+	if actualDNSServers := updatedSubnet.DNSServers; !reflect.DeepEqual(actualDNSServers, []string{}) {
+		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", actualDNSServers, []string{})
+	}
+
 	err = client.Subnets.Delete(context.Background(), subnet.UUID)
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)

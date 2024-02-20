@@ -37,7 +37,7 @@ type SubnetCreateRequest struct {
 type SubnetUpdateRequest struct {
 	TaggedResourceRequest
 	GatewayAddress string    `json:"gateway_address,omitempty"`
-	DNSServers     *[]string `json:"dns_servers,omitempty"`
+	DNSServers     *[]string `json:"dns_servers"`
 }
 
 type SubnetService interface {
