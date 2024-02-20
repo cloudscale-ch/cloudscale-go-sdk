@@ -154,8 +154,8 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 		t.Errorf("Subnet MTU\ngot=%#v\nwant=%#v", updatedSubnet.GatewayAddress, expectedGateway)
 	}
 
-	// update dNSServers
-	expectedDNSServers := []string{"77.109.128.2", "213.144.129.20", "1.1.1.1"}
+	// update DNSServers
+	expectedDNSServers := &[]string{"77.109.128.2", "213.144.129.20", "1.1.1.1"}
 	updateRequest = &cloudscale.SubnetUpdateRequest{
 		DNSServers: expectedDNSServers,
 	}
@@ -170,8 +170,27 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 		t.Fatalf("Subnets.Get returned error %s\n", err)
 	}
 
-	if actualDNSServers := updatedSubnet.DNSServers; !reflect.DeepEqual(actualDNSServers, expectedDNSServers) {
-		t.Errorf("Subnet MTU\ngot=%#v\nwant=%#v", updatedSubnet.DNSServers, expectedDNSServers)
+	if actualDNSServers := updatedSubnet.DNSServers; !reflect.DeepEqual(actualDNSServers, *expectedDNSServers) {
+		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", actualDNSServers, *expectedDNSServers)
+	}
+
+	// update to no DNSServers
+	updateRequest = &cloudscale.SubnetUpdateRequest{
+		DNSServers: &[]string{},
+	}
+
+	err = client.Subnets.Update(context.Background(), subnet.UUID, updateRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Update returned error %s\n", err)
+	}
+
+	updatedSubnet, err = client.Subnets.Get(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Get returned error %s\n", err)
+	}
+
+	if actualDNSServers := updatedSubnet.DNSServers; !reflect.DeepEqual(actualDNSServers, []string{}) {
+		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", actualDNSServers, []string{})
 	}
 
 	err = client.Subnets.Delete(context.Background(), subnet.UUID)

@@ -36,8 +36,8 @@ type SubnetCreateRequest struct {
 
 type SubnetUpdateRequest struct {
 	TaggedResourceRequest
-	GatewayAddress string   `json:"gateway_address,omitempty"`
-	DNSServers     []string `json:"dns_servers,omitempty"`
+	GatewayAddress string    `json:"gateway_address,omitempty"`
+	DNSServers     *[]string `json:"dns_servers,omitempty"`
 }
 
 type SubnetService interface {
@@ -85,7 +85,6 @@ func (f SubnetServiceOperations) Update(ctx context.Context, subnetID string, up
 	return nil
 }
 
-
 func (s SubnetServiceOperations) Get(ctx context.Context, subnetID string) (*Subnet, error) {
 	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
 
@@ -112,7 +111,6 @@ func (s SubnetServiceOperations) Delete(ctx context.Context, subnetID string) er
 	}
 	return s.client.Do(ctx, req, nil)
 }
-
 
 func (s SubnetServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Subnet, error) {
 	path := subnetBasePath
