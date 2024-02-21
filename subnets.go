@@ -70,15 +70,15 @@ func (s SubnetServiceOperations) Create(ctx context.Context, createRequest *Subn
 	return subnet, nil
 }
 
-func (f SubnetServiceOperations) Update(ctx context.Context, subnetID string, updateRequest *SubnetUpdateRequest) error {
+func (s SubnetServiceOperations) Update(ctx context.Context, subnetID string, updateRequest *SubnetUpdateRequest) error {
 	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
 
-	req, err := f.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
+	req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
 	if err != nil {
 		return err
 	}
 
-	err = f.client.Do(ctx, req, nil)
+	err = s.client.Do(ctx, req, nil)
 	if err != nil {
 		return err
 	}
