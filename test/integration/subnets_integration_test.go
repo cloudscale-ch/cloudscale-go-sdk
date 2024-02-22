@@ -10,6 +10,8 @@ import (
 	"testing"
 )
 
+const numberOfDefaultEntries = 2
+
 func TestIntegrationSubnet_GetAndList(t *testing.T) {
 	integrationTest(t)
 
@@ -75,7 +77,7 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 	createSubnetRequest := &cloudscale.SubnetCreateRequest{
 		CIDR:           "192.168.192.0/22",
 		GatewayAddress: "192.168.192.2",
-		DNSServers:     []string{"77.109.128.2", "213.144.129.20"},
+		DNSServers:     &[]string{"77.109.128.2", "213.144.129.20"},
 		Network:        network.UUID,
 	}
 	expected, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
@@ -132,6 +134,11 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
 	if err != nil {
 		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	// assert initial DNSServers, no option was passed, hence defaults should be used
+	if actualDNSServers := subnet.DNSServers; !(len(actualDNSServers) == 2) {
+		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", len(actualDNSServers), 2)
 	}
 
 	// update gateway
@@ -193,9 +200,9 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", actualDNSServers, []string{})
 	}
 
-	// update to Default DNSServer by submitting nil
+	// update to Default DNSServer
 	updateRequest = &cloudscale.SubnetUpdateRequest{
-		DNSServers: nil,
+		DNSServers: &cloudscale.UseCloudscaleDefaults,
 	}
 
 	err = client.Subnets.Update(context.Background(), subnet.UUID, updateRequest)
@@ -208,8 +215,69 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 		t.Fatalf("Subnets.Get returned error %s\n", err)
 	}
 
-	if actualDNSServers := updatedSubnet.DNSServers; !reflect.DeepEqual(actualDNSServers, []string{}) {
-		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", actualDNSServers, []string{})
+	// assert default servers
+	if actualNumberOfEntries := len(updatedSubnet.DNSServers); !(actualNumberOfEntries == numberOfDefaultEntries) {
+		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
+	}
+
+	err = client.Subnets.Delete(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
+
+	err = client.Networks.Delete(context.Background(), network.UUID)
+	if err != nil {
+		t.Fatalf("Networks.Delete returned error %s\n", err)
+	}
+}
+
+func TestIntegrationSubnet_InitialEmptyDNSServers(t *testing.T) {
+	integrationTest(t)
+
+	autoCreateSubnet := false
+	createNetworkRequest := &cloudscale.NetworkCreateRequest{
+		Name:                 testRunPrefix,
+		AutoCreateIPV4Subnet: &autoCreateSubnet,
+	}
+	network, err := client.Networks.Create(context.TODO(), createNetworkRequest)
+	if err != nil {
+		t.Fatalf("Networks.Create returned error %s\n", err)
+	}
+
+	createSubnetRequest := &cloudscale.SubnetCreateRequest{
+		Network:    network.UUID,
+		CIDR:       "10.0.0.0/8",
+		DNSServers: &[]string{},
+	}
+
+	subnet, err := client.Subnets.Create(context.TODO(), createSubnetRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Create returned error %s\n", err)
+	}
+
+	// assert initial DNSServers
+	if actualDNSServers := subnet.DNSServers; !reflect.DeepEqual(actualDNSServers, []string{}) {
+		t.Errorf("Subnet DNSServers\ngot=%#v\nwant=%#v", subnet.DNSServers, []string{})
+	}
+
+	// update DNSServers
+	updateRequest := &cloudscale.SubnetUpdateRequest{
+		DNSServers: &cloudscale.UseCloudscaleDefaults,
+	}
+
+	err = client.Subnets.Update(context.Background(), subnet.UUID, updateRequest)
+	if err != nil {
+		t.Fatalf("Subnets.Update returned error %s\n", err)
+	}
+
+	updatedSubnet, err := client.Subnets.Get(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Get returned error %s\n", err)
+	}
+
+	// assert default servers
+	if actualNumberOfEntries := len(updatedSubnet.DNSServers); !(actualNumberOfEntries == numberOfDefaultEntries) {
+		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
 	}
 
 	err = client.Subnets.Delete(context.Background(), subnet.UUID)

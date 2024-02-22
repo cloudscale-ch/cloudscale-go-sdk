@@ -2,11 +2,15 @@ package cloudscale
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 )
 
 const subnetBasePath = "v1/subnets"
+
+var UseCloudscaleDefaults = []string{"CLOUDSCALE_DEFAULTS"}
 
 type Subnet struct {
 	TaggedResource
@@ -28,16 +32,74 @@ type SubnetStub struct {
 
 type SubnetCreateRequest struct {
 	TaggedResourceRequest
-	CIDR           string   `json:"cidr,omitempty"`
-	Network        string   `json:"network,omitempty"`
-	GatewayAddress string   `json:"gateway_address,omitempty"`
-	DNSServers     []string `json:"dns_servers,omitempty"`
+	CIDR           string    `json:"cidr,omitempty"`
+	Network        string    `json:"network,omitempty"`
+	GatewayAddress string    `json:"gateway_address,omitempty"`
+	DNSServers     *[]string `json:"dns_servers,omitempty"`
 }
 
 type SubnetUpdateRequest struct {
 	TaggedResourceRequest
 	GatewayAddress string    `json:"gateway_address,omitempty"`
 	DNSServers     *[]string `json:"dns_servers"`
+}
+
+func (request SubnetUpdateRequest) MarshalJSON() ([]byte, error) {
+	type Alias SubnetUpdateRequest // Create an alias to avoid recursion
+
+	if request.DNSServers == nil {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers,omitempty"`
+		}{
+			Alias: (Alias)(request),
+		})
+	}
+
+	if reflect.DeepEqual(*request.DNSServers, UseCloudscaleDefaults) {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers"` // important: no omitempty
+		}{
+			Alias:      (Alias)(request),
+			DNSServers: nil,
+		})
+	}
+
+	return json.Marshal(&struct {
+		Alias
+	}{
+		Alias: (Alias)(request),
+	})
+}
+
+func (request SubnetCreateRequest) MarshalJSON() ([]byte, error) {
+	type Alias SubnetCreateRequest // Create an alias to avoid recursion
+
+	if request.DNSServers == nil {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers,omitempty"`
+		}{
+			Alias: (Alias)(request),
+		})
+	}
+
+	if reflect.DeepEqual(*request.DNSServers, UseCloudscaleDefaults) {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers"` // important: no omitempty
+		}{
+			Alias:      (Alias)(request),
+			DNSServers: nil,
+		})
+	}
+
+	return json.Marshal(&struct {
+		Alias
+	}{
+		Alias: (Alias)(request),
+	})
 }
 
 type SubnetService interface {
