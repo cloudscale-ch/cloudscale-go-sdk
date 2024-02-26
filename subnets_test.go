@@ -53,7 +53,7 @@ func TestMarshalingOfDNSServersInSubnetUpdateRequest(t *testing.T) {
 	testCases := []struct {
 		name     string
 		request  SubnetUpdateRequest
-		expected string
+		expected string // This tests the value sent to the API, this is not the expected value returned on the subnet.
 	}{
 		{
 			name: "one dns server",
@@ -109,7 +109,7 @@ func TestMarshalingOfDNSServersInSubnetSubnetCreateRequest(t *testing.T) {
 	testCases := []struct {
 		name     string
 		request  SubnetCreateRequest
-		expected string
+		expected string // This tests the value sent to the API, this is not the expected value returned on the subnet.
 	}{
 		{
 			name: "one dns server",
