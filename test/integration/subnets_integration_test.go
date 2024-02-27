@@ -220,6 +220,26 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
 	}
 
+	// update to invalid DNSServer value 0.0.0.0
+	invalidDNSServers := &[]string{"0.0.0.0"}
+	updateRequest = &cloudscale.SubnetUpdateRequest{
+		DNSServers: invalidDNSServers,
+	}
+	err = client.Subnets.Update(context.Background(), subnet.UUID, updateRequest)
+	if err == nil {
+		t.Fatal("Subnets.Update returned no error, invalid DNS entry must trigger error.\n")
+	}
+
+	updatedSubnet, err = client.Subnets.Get(context.Background(), subnet.UUID)
+	if err != nil {
+		t.Fatalf("Subnets.Get returned error %s\n", err)
+	}
+
+	// assert default servers are still set
+	if actualNumberOfEntries := len(updatedSubnet.DNSServers); !(actualNumberOfEntries == numberOfDefaultEntries) {
+		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
+	}
+
 	err = client.Subnets.Delete(context.Background(), subnet.UUID)
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
