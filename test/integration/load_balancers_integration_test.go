@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 	"github.com/cenkalti/backoff"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
 	"time"

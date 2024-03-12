@@ -1,6 +1,7 @@
 package cloudscale
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -46,4 +47,116 @@ func TestSubnets_List(t *testing.T) {
 		t.Errorf("Subnets.List\n got=%#v\nwant=%#v", subnets, expected)
 	}
 
+}
+
+func TestMarshalingOfDNSServersInSubnetUpdateRequest(t *testing.T) {
+	testCases := []struct {
+		name     string
+		request  SubnetUpdateRequest
+		expected string // This tests the value sent to the API, this is not the expected value returned on the subnet.
+	}{
+		{
+			name: "one dns server",
+			request: SubnetUpdateRequest{
+				DNSServers: &[]string{"8.8.8.8"},
+			},
+			expected: "{\"dns_servers\":[\"8.8.8.8\"]}",
+		},
+		{
+			name: "two dns servers",
+			request: SubnetUpdateRequest{
+				DNSServers: &[]string{"8.8.8.8", "8.8.4.4"},
+			},
+			expected: "{\"dns_servers\":[\"8.8.8.8\",\"8.8.4.4\"]}",
+		},
+		{
+			name: "no dns servers",
+			request: SubnetUpdateRequest{
+				DNSServers: &[]string{},
+			},
+			expected: "{\"dns_servers\":[]}",
+		},
+		{
+			name: "defaults",
+			request: SubnetUpdateRequest{
+				DNSServers: &UseCloudscaleDefaults,
+			},
+			expected: "{\"dns_servers\":null}",
+		},
+		{
+			name: "gateway",
+			request: SubnetUpdateRequest{
+				GatewayAddress: "192.168.1.1",
+			},
+			expected: "{\"gateway_address\":\"192.168.1.1\"}",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			b, err := json.Marshal(tc.request)
+			if err != nil {
+				t.Errorf("Error marshaling JSON: %v", err)
+			}
+			if actualOutput := string(b); actualOutput != tc.expected {
+				t.Errorf("Unexpected JSON output:\nExpected: %s\nActual:   %s", tc.expected, actualOutput)
+			}
+		})
+	}
+}
+
+func TestMarshalingOfDNSServersInSubnetSubnetCreateRequest(t *testing.T) {
+	testCases := []struct {
+		name     string
+		request  SubnetCreateRequest
+		expected string // This tests the value sent to the API, this is not the expected value returned on the subnet.
+	}{
+		{
+			name: "one dns server",
+			request: SubnetCreateRequest{
+				DNSServers: &[]string{"8.8.8.8"},
+			},
+			expected: "{\"dns_servers\":[\"8.8.8.8\"]}",
+		},
+		{
+			name: "two dns servers",
+			request: SubnetCreateRequest{
+				DNSServers: &[]string{"8.8.8.8", "8.8.4.4"},
+			},
+			expected: "{\"dns_servers\":[\"8.8.8.8\",\"8.8.4.4\"]}",
+		},
+		{
+			name: "no dns servers",
+			request: SubnetCreateRequest{
+				DNSServers: &[]string{},
+			},
+			expected: "{\"dns_servers\":[]}",
+		},
+		{
+			name: "defaults",
+			request: SubnetCreateRequest{
+				DNSServers: &UseCloudscaleDefaults,
+			},
+			expected: "{\"dns_servers\":null}",
+		},
+		{
+			name: "gateway",
+			request: SubnetCreateRequest{
+				GatewayAddress: "192.168.1.1",
+			},
+			expected: "{\"gateway_address\":\"192.168.1.1\"}",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			b, err := json.Marshal(tc.request)
+			if err != nil {
+				t.Errorf("Error marshaling JSON: %v", err)
+			}
+			if actualOutput := string(b); actualOutput != tc.expected {
+				t.Errorf("Unexpected JSON output:\nExpected: %s\nActual:   %s", tc.expected, actualOutput)
+			}
+		})
+	}
 }

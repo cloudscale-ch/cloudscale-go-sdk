@@ -2,11 +2,15 @@ package cloudscale
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 )
 
 const subnetBasePath = "v1/subnets"
+
+var UseCloudscaleDefaults = []string{"CLOUDSCALE_DEFAULTS"}
 
 type Subnet struct {
 	TaggedResource
@@ -28,16 +32,74 @@ type SubnetStub struct {
 
 type SubnetCreateRequest struct {
 	TaggedResourceRequest
-	CIDR           string   `json:"cidr,omitempty"`
-	Network        string   `json:"network,omitempty"`
-	GatewayAddress string   `json:"gateway_address,omitempty"`
-	DNSServers     []string `json:"dns_servers,omitempty"`
+	CIDR           string    `json:"cidr,omitempty"`
+	Network        string    `json:"network,omitempty"`
+	GatewayAddress string    `json:"gateway_address,omitempty"`
+	DNSServers     *[]string `json:"dns_servers,omitempty"`
 }
 
 type SubnetUpdateRequest struct {
 	TaggedResourceRequest
-	GatewayAddress string   `json:"gateway_address,omitempty"`
-	DNSServers     []string `json:"dns_servers,omitempty"`
+	GatewayAddress string    `json:"gateway_address,omitempty"`
+	DNSServers     *[]string `json:"dns_servers"`
+}
+
+func (request SubnetUpdateRequest) MarshalJSON() ([]byte, error) {
+	type Alias SubnetUpdateRequest // Create an alias to avoid recursion
+
+	if request.DNSServers == nil {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers,omitempty"`
+		}{
+			Alias: (Alias)(request),
+		})
+	}
+
+	if reflect.DeepEqual(*request.DNSServers, UseCloudscaleDefaults) {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers"` // important: no omitempty
+		}{
+			Alias:      (Alias)(request),
+			DNSServers: nil,
+		})
+	}
+
+	return json.Marshal(&struct {
+		Alias
+	}{
+		Alias: (Alias)(request),
+	})
+}
+
+func (request SubnetCreateRequest) MarshalJSON() ([]byte, error) {
+	type Alias SubnetCreateRequest // Create an alias to avoid recursion
+
+	if request.DNSServers == nil {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers,omitempty"`
+		}{
+			Alias: (Alias)(request),
+		})
+	}
+
+	if reflect.DeepEqual(*request.DNSServers, UseCloudscaleDefaults) {
+		return json.Marshal(&struct {
+			Alias
+			DNSServers []string `json:"dns_servers"` // important: no omitempty
+		}{
+			Alias:      (Alias)(request),
+			DNSServers: nil,
+		})
+	}
+
+	return json.Marshal(&struct {
+		Alias
+	}{
+		Alias: (Alias)(request),
+	})
 }
 
 type SubnetService interface {
@@ -70,21 +132,20 @@ func (s SubnetServiceOperations) Create(ctx context.Context, createRequest *Subn
 	return subnet, nil
 }
 
-func (f SubnetServiceOperations) Update(ctx context.Context, subnetID string, updateRequest *SubnetUpdateRequest) error {
+func (s SubnetServiceOperations) Update(ctx context.Context, subnetID string, updateRequest *SubnetUpdateRequest) error {
 	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
 
-	req, err := f.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
+	req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
 	if err != nil {
 		return err
 	}
 
-	err = f.client.Do(ctx, req, nil)
+	err = s.client.Do(ctx, req, nil)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
 
 func (s SubnetServiceOperations) Get(ctx context.Context, subnetID string) (*Subnet, error) {
 	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
@@ -112,7 +173,6 @@ func (s SubnetServiceOperations) Delete(ctx context.Context, subnetID string) er
 	}
 	return s.client.Do(ctx, req, nil)
 }
-
 
 func (s SubnetServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Subnet, error) {
 	path := subnetBasePath
