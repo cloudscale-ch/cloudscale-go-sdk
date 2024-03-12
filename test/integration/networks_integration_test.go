@@ -6,7 +6,7 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"regexp"
 	"sync"
 	"testing"

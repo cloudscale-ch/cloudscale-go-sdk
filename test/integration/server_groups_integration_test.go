@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v4"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 )
 
 func TestIntegrationServerGroup_CRUD(t *testing.T) {
