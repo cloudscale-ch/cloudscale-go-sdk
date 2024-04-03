@@ -1,4 +1,4 @@
-name: Tests
+name: Go SDK Integration Tests
 on:
   push:
     paths-ignore:
