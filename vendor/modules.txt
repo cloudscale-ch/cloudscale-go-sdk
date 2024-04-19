@@ -4,8 +4,8 @@ github.com/cenkalti/backoff
 # github.com/golang/protobuf v1.2.0
 ## explicit
 github.com/golang/protobuf/proto
-# golang.org/x/net v0.17.0
-## explicit; go 1.17
+# golang.org/x/net v0.23.0
+## explicit; go 1.18
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 # golang.org/x/oauth2 v0.0.0-20190517181255-950ef44c6e07
