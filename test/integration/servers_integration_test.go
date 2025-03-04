@@ -180,7 +180,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		t.Errorf("Servers.Update failed %s\n", err)
 	}
 
-	getServer, err := client.Servers.Get(context.TODO(), server.UUID)
+	getServer := waitUntil("stopped", server.UUID, t)
 	if err == nil {
 		if getServer.Flavor.Slug != scaleFlavor {
 			t.Errorf("Scaling failed, could not scale, is at %s\n", getServer.Flavor.Slug)
