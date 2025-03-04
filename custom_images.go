@@ -3,7 +3,6 @@ package cloudscale
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 )
 

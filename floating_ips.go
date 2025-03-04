@@ -50,9 +50,9 @@ type FloatingIPUpdateRequest struct {
 }
 
 type FloatingIPsService interface {
-	GenericCreateService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
-	GenericGetService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
-	GenericListService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
-	GenericUpdateService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
-	GenericDeleteService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
+	GenericCreateService[FloatingIP, FloatingIPCreateRequest]
+	GenericGetService[FloatingIP]
+	GenericListService[FloatingIP]
+	GenericUpdateService[FloatingIP, FloatingIPUpdateRequest]
+	GenericDeleteService[FloatingIP]
 }

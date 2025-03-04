@@ -41,11 +41,11 @@ type NetworkUpdateRequest struct {
 }
 
 type NetworkService interface {
-	GenericCreateService[Network, NetworkCreateRequest, NetworkUpdateRequest]
-	GenericGetService[Network, NetworkCreateRequest, NetworkUpdateRequest]
-	GenericListService[Network, NetworkCreateRequest, NetworkUpdateRequest]
-	GenericUpdateService[Network, NetworkCreateRequest, NetworkUpdateRequest]
-	GenericDeleteService[Network, NetworkCreateRequest, NetworkUpdateRequest]
+	GenericCreateService[Network, NetworkCreateRequest]
+	GenericGetService[Network]
+	GenericListService[Network]
+	GenericUpdateService[Network, NetworkUpdateRequest]
+	GenericDeleteService[Network]
 }
 
 type NetworkServiceOperations struct {

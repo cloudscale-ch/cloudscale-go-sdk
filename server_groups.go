@@ -20,9 +20,9 @@ type ServerGroupRequest struct {
 }
 
 type ServerGroupService interface {
-	GenericCreateService[ServerGroup, ServerGroupRequest, ServerGroupRequest]
-	GenericGetService[ServerGroup, ServerGroupRequest, ServerGroupRequest]
-	GenericListService[ServerGroup, ServerGroupRequest, ServerGroupRequest]
-	GenericUpdateService[ServerGroup, ServerGroupRequest, ServerGroupRequest]
-	GenericDeleteService[ServerGroup, ServerGroupRequest, ServerGroupRequest]
+	GenericCreateService[ServerGroup, ServerGroupRequest]
+	GenericGetService[ServerGroup]
+	GenericListService[ServerGroup]
+	GenericUpdateService[ServerGroup, ServerGroupRequest]
+	GenericDeleteService[ServerGroup]
 }

@@ -100,11 +100,11 @@ func (request SubnetCreateRequest) MarshalJSON() ([]byte, error) {
 }
 
 type SubnetService interface {
-	GenericCreateService[Subnet, SubnetCreateRequest, SubnetUpdateRequest]
-	GenericGetService[Subnet, SubnetCreateRequest, SubnetUpdateRequest]
-	GenericListService[Subnet, SubnetCreateRequest, SubnetUpdateRequest]
-	GenericUpdateService[Subnet, SubnetCreateRequest, SubnetUpdateRequest]
-	GenericDeleteService[Subnet, SubnetCreateRequest, SubnetUpdateRequest]
+	GenericCreateService[Subnet, SubnetCreateRequest]
+	GenericGetService[Subnet]
+	GenericListService[Subnet]
+	GenericUpdateService[Subnet, SubnetUpdateRequest]
+	GenericDeleteService[Subnet]
 }
 
 type SubnetServiceOperations struct {

@@ -19,9 +19,9 @@ type ObjectsUserRequest struct {
 
 // ObjectsUsersService manages users of the S3-compatible objects storage
 type ObjectsUsersService interface {
-	GenericCreateService[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]
-	GenericGetService[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]
-	GenericListService[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]
-	GenericUpdateService[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]
-	GenericDeleteService[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]
+	GenericCreateService[ObjectsUser, ObjectsUserRequest]
+	GenericGetService[ObjectsUser]
+	GenericListService[ObjectsUser]
+	GenericUpdateService[ObjectsUser, ObjectsUserRequest]
+	GenericDeleteService[ObjectsUser]
 }

@@ -28,9 +28,9 @@ type LoadBalancerPoolRequest struct {
 }
 
 type LoadBalancerPoolService interface {
-	GenericCreateService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
-	GenericGetService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
-	GenericListService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
-	GenericUpdateService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
-	GenericDeleteService[LoadBalancerPool, LoadBalancerPoolRequest, LoadBalancerPoolRequest]
+	GenericCreateService[LoadBalancerPool, LoadBalancerPoolRequest]
+	GenericGetService[LoadBalancerPool]
+	GenericListService[LoadBalancerPool]
+	GenericUpdateService[LoadBalancerPool, LoadBalancerPoolRequest]
+	GenericDeleteService[LoadBalancerPool]
 }
