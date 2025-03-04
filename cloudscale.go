@@ -76,7 +76,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Volumes = VolumeServiceOperations{client: c}
 	c.ServerGroups = GenericServiceOperations[ServerGroup, ServerGroupRequest, ServerGroupRequest]{client: c, path: serverGroupsBasePath}
 	c.ObjectsUsers = GenericServiceOperations[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]{client: c, path: objectsUsersBasePath}
-	c.CustomImages = CustomImageServiceOperations{client: c}
+	c.CustomImages = GenericServiceOperations[CustomImage, CustomImageRequest, CustomImageRequest]{client: c, path: customImagesBasePath}
 	c.CustomImageImports = CustomImageImportsServiceOperations{client: c}
 	c.LoadBalancers = GenericServiceOperations[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]{
 		client: c,

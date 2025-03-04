@@ -1,8 +1,6 @@
 package cloudscale
 
 import (
-	"context"
-	"fmt"
 	"time"
 )
 
@@ -36,74 +34,12 @@ type CustomImageRequest struct {
 }
 
 type CustomImageService interface {
-	Get(ctx context.Context, CustomImageID string) (*CustomImage, error)
-	List(ctx context.Context, modifiers ...ListRequestModifier) ([]CustomImage, error)
-	Update(ctx context.Context, customImageID string, updateRequest *CustomImageRequest) error
-	Delete(ctx context.Context, customImageID string) error
+	GenericGetService[CustomImage]
+	GenericListService[CustomImage]
+	GenericUpdateService[CustomImage, CustomImageRequest]
+	GenericDeleteService[CustomImage]
 }
 
 type CustomImageServiceOperations struct {
 	client *Client
-}
-
-func (s CustomImageServiceOperations) Get(ctx context.Context, customImageID string) (*CustomImage, error) {
-	path := fmt.Sprintf("%s/%s", customImagesBasePath, customImageID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	customImage := new(CustomImage)
-	err = s.client.Do(ctx, req, customImage)
-	if err != nil {
-		return nil, err
-	}
-
-	return customImage, nil
-}
-
-func (s CustomImageServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]CustomImage, error) {
-	path := customImagesBasePath
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, modifier := range modifiers {
-		modifier(req)
-	}
-
-	customImages := []CustomImage{}
-	err = s.client.Do(ctx, req, &customImages)
-	if err != nil {
-		return nil, err
-	}
-
-	return customImages, nil
-}
-
-func (s CustomImageServiceOperations) Update(ctx context.Context, customImageID string, updateRequest *CustomImageRequest) error {
-	path := fmt.Sprintf("%s/%s", customImagesBasePath, customImageID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
-	if err != nil {
-		return err
-	}
-
-	err = s.client.Do(ctx, req, nil)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s CustomImageServiceOperations) Delete(ctx context.Context, customImageID string) error {
-	path := fmt.Sprintf("%s/%s", customImagesBasePath, customImageID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
-	if err != nil {
-		return err
-	}
-	return s.client.Do(ctx, req, nil)
 }
