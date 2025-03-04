@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cenkalti/backoff"
+	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"io"
 	"net/http"

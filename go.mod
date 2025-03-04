@@ -1,9 +1,11 @@
 module github.com/cloudscale-ch/cloudscale-go-sdk/v5
 
-go 1.18
+go 1.23
+
+toolchain go1.23.4
 
 require (
-	github.com/cenkalti/backoff v2.1.1+incompatible
+	github.com/cenkalti/backoff/v5 v5.0.2
 	golang.org/x/oauth2 v0.0.0-20190517181255-950ef44c6e07
 )
 
