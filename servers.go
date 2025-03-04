@@ -99,6 +99,14 @@ type ServerRequest struct {
 	UserData          string                 `json:"user_data,omitempty"`
 }
 
+type ServerUpdateRequest struct {
+	TaggedResourceRequest
+	Name       string              `json:"name,omitempty"`
+	Status     string              `json:"status,omitempty"`
+	Flavor     string              `json:"flavor,omitempty"`
+	Interfaces *[]InterfaceRequest `json:"interfaces,omitempty"`
+}
+
 type ServerVolumeRequest struct {
 	SizeGB int    `json:"size_gb,omitempty"`
 	Type   string `json:"type,omitempty"`
@@ -115,102 +123,19 @@ type AddressRequest struct {
 }
 
 type ServerService interface {
-	Create(ctx context.Context, createRequest *ServerRequest) (*Server, error)
-	Get(ctx context.Context, serverID string) (*Server, error)
-	Update(ctx context.Context, serverID string, updateRequest *ServerUpdateRequest) error
-	Delete(ctx context.Context, serverID string) error
-	List(ctx context.Context, modifiers ...ListRequestModifier) ([]Server, error)
+	GenericCreateService[Server, ServerRequest]
+	GenericGetService[Server]
+	GenericListService[Server]
+	GenericUpdateService[Server, ServerUpdateRequest]
+	GenericDeleteService[Server]
 	Reboot(ctx context.Context, serverID string) error
 	Start(ctx context.Context, serverID string) error
 	Stop(ctx context.Context, serverID string) error
 }
 
 type ServerServiceOperations struct {
+	GenericServiceOperations[Server, ServerRequest, ServerUpdateRequest]
 	client *Client
-}
-
-func (s ServerServiceOperations) Create(ctx context.Context, createRequest *ServerRequest) (*Server, error) {
-	path := serverBasePath
-
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, createRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	server := new(Server)
-
-	err = s.client.Do(ctx, req, server)
-	if err != nil {
-		return nil, err
-	}
-
-	return server, nil
-}
-
-type ServerUpdateRequest struct {
-	TaggedResourceRequest
-	Name       string              `json:"name,omitempty"`
-	Status     string              `json:"status,omitempty"`
-	Flavor     string              `json:"flavor,omitempty"`
-	Interfaces *[]InterfaceRequest `json:"interfaces,omitempty"`
-}
-
-func (s ServerServiceOperations) Update(ctx context.Context, serverID string, updateRequest *ServerUpdateRequest) error {
-	if updateRequest.Status != "" {
-		err := error(nil)
-		switch updateRequest.Status {
-		case ServerRunning:
-			err = s.Start(ctx, serverID)
-		case ServerStopped:
-			err = s.Stop(ctx, serverID)
-		case ServerRebooted:
-			err = s.Reboot(ctx, serverID)
-		default:
-			return fmt.Errorf("Status Not Supported %s", updateRequest.Status)
-		}
-		if err != nil {
-			return err
-		}
-		// Get rid of status
-		updateRequest.Status = ""
-	}
-
-	emptyRequest := ServerUpdateRequest{}
-	if !reflect.DeepEqual(emptyRequest, *updateRequest) {
-		path := fmt.Sprintf("%s/%s", serverBasePath, serverID)
-
-		req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
-		if err != nil {
-			return err
-		}
-
-		err = s.client.Do(ctx, req, nil)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (s ServerServiceOperations) Get(ctx context.Context, serverID string) (*Server, error) {
-	path := fmt.Sprintf("%s/%s", serverBasePath, serverID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	server := new(Server)
-	err = s.client.Do(ctx, req, server)
-	if err != nil {
-		return nil, err
-	}
-
-	return server, nil
-}
-
-func (s ServerServiceOperations) Delete(ctx context.Context, serverID string) error {
-	return genericDelete(s.client, ctx, serverBasePath, serverID)
 }
 
 func (s ServerServiceOperations) Reboot(ctx context.Context, serverID string) error {
@@ -240,22 +165,31 @@ func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) erro
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s ServerServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Server, error) {
-	path := serverBasePath
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
+func (s ServerServiceOperations) Update(ctx context.Context, id string, req *ServerUpdateRequest) error {
+	if req.Status != "" {
+		err := error(nil)
+		switch req.Status {
+		case ServerRunning:
+			err = s.Start(ctx, id)
+		case ServerStopped:
+			err = s.Stop(ctx, id)
+		case ServerRebooted:
+			err = s.Reboot(ctx, id)
+		default:
+			return fmt.Errorf("Status Not Supported %s", req.Status)
+		}
+		if err != nil {
+			return err
+		}
+		// Get rid of status
+		req.Status = ""
 	}
-	for _, modifier := range modifiers {
-		modifier(req)
+
+	emptyRequest := ServerUpdateRequest{}
+	if reflect.DeepEqual(emptyRequest, *req) {
+		return nil
 	}
 
-	servers := []Server{}
-	err = s.client.Do(ctx, req, &servers)
-	if err != nil {
-		return nil, err
-	}
-
-	return servers, nil
+	// Call the generic Update method directly using the embedded field name
+	return s.GenericServiceOperations.Update(ctx, id, req)
 }
