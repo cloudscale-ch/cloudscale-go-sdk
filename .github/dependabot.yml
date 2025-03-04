@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # Check for major GitHub Actions updates daily.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      - update-type: "version-update:semver-patch"
+      - update-type: "version-update:semver-minor"
