@@ -222,24 +222,26 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 	}
 }
 
-func waitForImport(status string, uuid string, t *testing.T) (customImageImport *cloudscale.CustomImageImport) {
+func waitForImport(status string, uuid string, t *testing.T) *cloudscale.CustomImageImport {
 	// An operation that may fail.
-	operation := func() error {
+	operation := func() (*cloudscale.CustomImageImport, error) {
 		i, err := client.CustomImageImports.Get(context.Background(), uuid)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if i.Status != status {
-			return errors.New(fmt.Sprintf("Import status is: %v", i.Status))
+			return nil, errors.New(fmt.Sprintf("Import status is: %v", i.Status))
 		}
-		customImageImport = i
-		return nil
+		return i, nil
 	}
 
-	err := backoff.Retry(operation, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 10))
+	result, err := backoff.Retry(context.TODO(), operation,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(10),
+	)
 	if err != nil {
 		t.Fatalf("Error while waiting for status=%s change %s\n", status, err)
 	}
-	return customImageImport
+	return result
 }

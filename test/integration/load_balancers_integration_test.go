@@ -173,23 +173,24 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 
 func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalancer {
 	// An operation that may fail.
-	loadBalancer := new(cloudscale.LoadBalancer)
-	operation := func() error {
+	operation := func() (*cloudscale.LoadBalancer, error) {
 		lb, err := client.LoadBalancers.Get(context.Background(), uuid)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if lb.Status != status {
-			return errors.New("Status not reached")
+			return nil, errors.New("Status not reached")
 		}
-		loadBalancer = lb
-		return nil
+		return lb, nil
 	}
 
-	err := backoff.Retry(operation, backoff.NewConstantBackOff(2*time.Second))
+	result, err := backoff.Retry(context.TODO(), operation,
+		backoff.WithBackOff(backoff.NewConstantBackOff(2*time.Second)),
+		backoff.WithMaxTries(60),
+	)
 	if err != nil {
 		t.Fatalf("Error while waiting for status change %s\n", err)
 	}
-	return loadBalancer
+	return result
 }

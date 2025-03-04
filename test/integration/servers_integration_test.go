@@ -329,23 +329,24 @@ func createServerInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 
 func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
 	// An operation that may fail.
-	server := new(cloudscale.Server)
-	operation := func() error {
+	operation := func() (*cloudscale.Server, error) {
 		s, err := client.Servers.Get(context.Background(), uuid)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if s.Status != status {
-			return errors.New("Status not reached")
+			return nil, errors.New("Status not reached")
 		}
-		server = s
-		return nil
+		return s, nil
 	}
 
-	err := backoff.Retry(operation, backoff.NewExponentialBackOff())
+	result, err := backoff.Retry(context.TODO(), operation,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
 	if err != nil {
 		t.Fatalf("Error while waiting for status change %s\n", err)
 	}
-	return server
+	return result
 }
