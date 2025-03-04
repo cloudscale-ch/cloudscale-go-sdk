@@ -73,7 +73,7 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Networks = GenericServiceOperations[Network, NetworkCreateRequest, NetworkUpdateRequest]{client: c, path: networkBasePath}
 	c.Subnets = GenericServiceOperations[Subnet, SubnetCreateRequest, SubnetUpdateRequest]{client: c, path: subnetBasePath}
 	c.FloatingIPs = GenericServiceOperations[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]{client: c, path: floatingIPsBasePath}
-	c.Volumes = VolumeServiceOperations{client: c}
+	c.Volumes = GenericServiceOperations[Volume, VolumeRequest, VolumeRequest]{client: c, path: volumeBasePath}
 	c.ServerGroups = GenericServiceOperations[ServerGroup, ServerGroupRequest, ServerGroupRequest]{client: c, path: serverGroupsBasePath}
 	c.ObjectsUsers = GenericServiceOperations[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]{client: c, path: objectsUsersBasePath}
 	c.CustomImages = GenericServiceOperations[CustomImage, CustomImageRequest, CustomImageRequest]{client: c, path: customImagesBasePath}
