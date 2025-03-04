@@ -1,9 +1,6 @@
 package cloudscale
 
 import (
-	"context"
-	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -53,83 +50,9 @@ type FloatingIPUpdateRequest struct {
 }
 
 type FloatingIPsService interface {
-	Create(ctx context.Context, floatingIPRequest *FloatingIPCreateRequest) (*FloatingIP, error)
-	Get(ctx context.Context, ip string) (*FloatingIP, error)
-	Update(ctx context.Context, ip string, FloatingIPRequest *FloatingIPUpdateRequest) error
-	Delete(ctx context.Context, ip string) error
-	List(ctx context.Context, modifiers ...ListRequestModifier) ([]FloatingIP, error)
-}
-
-type FloatingIPsServiceOperations struct {
-	client *Client
-}
-
-func (f FloatingIPsServiceOperations) Create(ctx context.Context, floatingIPRequest *FloatingIPCreateRequest) (*FloatingIP, error) {
-	path := floatingIPsBasePath
-
-	req, err := f.client.NewRequest(ctx, http.MethodPost, path, floatingIPRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	floatingIP := new(FloatingIP)
-
-	err = f.client.Do(ctx, req, floatingIP)
-	if err != nil {
-		return nil, err
-	}
-
-	return floatingIP, nil
-}
-
-func (f FloatingIPsServiceOperations) Get(ctx context.Context, ip string) (*FloatingIP, error) {
-	path := fmt.Sprintf("%s/%s", floatingIPsBasePath, ip)
-
-	req, err := f.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	floatingIP := new(FloatingIP)
-	err = f.client.Do(ctx, req, floatingIP)
-	if err != nil {
-		return nil, err
-	}
-
-	return floatingIP, nil
-}
-
-func (f FloatingIPsServiceOperations) Update(ctx context.Context, ip string, floatingIPUpdateRequest *FloatingIPUpdateRequest) error {
-	path := fmt.Sprintf("%s/%s", floatingIPsBasePath, ip)
-
-	req, err := f.client.NewRequest(ctx, http.MethodPatch, path, floatingIPUpdateRequest)
-	if err != nil {
-		return err
-	}
-
-	return f.client.Do(ctx, req, nil)
-}
-
-func (f FloatingIPsServiceOperations) Delete(ctx context.Context, ip string) error {
-	return genericDelete(f.client, ctx, floatingIPsBasePath, ip)
-}
-
-func (f FloatingIPsServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]FloatingIP, error) {
-	path := floatingIPsBasePath
-
-	req, err := f.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-	for _, modifier := range modifiers {
-		modifier(req)
-	}
-
-	floatingIps := []FloatingIP{}
-	err = f.client.Do(ctx, req, &floatingIps)
-	if err != nil {
-		return nil, err
-	}
-
-	return floatingIps, nil
+	GenericCreateService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
+	GenericGetService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
+	GenericListService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
+	GenericUpdateService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
+	GenericDeleteService[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]
 }
