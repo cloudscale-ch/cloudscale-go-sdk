@@ -1,11 +1,5 @@
 package cloudscale
 
-import (
-	"context"
-	"fmt"
-	"net/http"
-)
-
 const customImageImportsBasePath = "v1/custom-images/import"
 
 type CustomImageStub struct {
@@ -38,66 +32,7 @@ type CustomImageImportRequest struct {
 }
 
 type CustomImageImportsService interface {
-	Create(ctx context.Context, createRequest *CustomImageImportRequest) (*CustomImageImport, error)
-	Get(ctx context.Context, CustomImageImportID string) (*CustomImageImport, error)
-	List(ctx context.Context, modifiers ...ListRequestModifier) ([]CustomImageImport, error)
-}
-
-type CustomImageImportsServiceOperations struct {
-	client *Client
-}
-
-func (s CustomImageImportsServiceOperations) Create(ctx context.Context, createRequest *CustomImageImportRequest) (*CustomImageImport, error) {
-	path := customImageImportsBasePath
-
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, createRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	customImageImport := new(CustomImageImport)
-
-	err = s.client.Do(ctx, req, customImageImport)
-	if err != nil {
-		return nil, err
-	}
-
-	return customImageImport, nil
-}
-
-func (s CustomImageImportsServiceOperations) Get(ctx context.Context, CustomImageImportID string) (*CustomImageImport, error) {
-	path := fmt.Sprintf("%s/%s", customImageImportsBasePath, CustomImageImportID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	customImageImport := new(CustomImageImport)
-	err = s.client.Do(ctx, req, customImageImport)
-	if err != nil {
-		return nil, err
-	}
-
-	return customImageImport, nil
-}
-
-func (s CustomImageImportsServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]CustomImageImport, error) {
-	path := customImageImportsBasePath
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, modifier := range modifiers {
-		modifier(req)
-	}
-
-	customImageImports := []CustomImageImport{}
-	err = s.client.Do(ctx, req, &customImageImports)
-	if err != nil {
-		return nil, err
-	}
-
-	return customImageImports, nil
+	GenericCreateService[CustomImageImport, CustomImageImportRequest]
+	GenericGetService[CustomImageImport]
+	GenericListService[CustomImageImport]
 }
