@@ -69,15 +69,45 @@ func NewClient(httpClient *http.Client) *Client {
 
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
 	c.Regions = RegionServiceOperations{client: c}
-	c.Servers = ServerServiceOperations{client: c}
-	c.Networks = NetworkServiceOperations{client: c}
-	c.Subnets = SubnetServiceOperations{client: c}
-	c.FloatingIPs = FloatingIPsServiceOperations{client: c}
-	c.Volumes = VolumeServiceOperations{client: c}
-	c.ServerGroups = ServerGroupServiceOperations{client: c}
-	c.ObjectsUsers = ObjectsUsersServiceOperations{client: c}
-	c.CustomImages = CustomImageServiceOperations{client: c}
-	c.CustomImageImports = CustomImageImportsServiceOperations{client: c}
+	c.Servers = ServerServiceOperations{
+		GenericServiceOperations: GenericServiceOperations[Server, ServerRequest, ServerUpdateRequest]{
+			client: c,
+			path:   serverBasePath,
+		},
+		client: c,
+	}
+	c.Networks = GenericServiceOperations[Network, NetworkCreateRequest, NetworkUpdateRequest]{
+		client: c,
+		path:   networkBasePath,
+	}
+	c.Subnets = GenericServiceOperations[Subnet, SubnetCreateRequest, SubnetUpdateRequest]{
+		client: c,
+		path:   subnetBasePath,
+	}
+	c.FloatingIPs = GenericServiceOperations[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]{
+		client: c,
+		path:   floatingIPsBasePath,
+	}
+	c.Volumes = GenericServiceOperations[Volume, VolumeRequest, VolumeRequest]{
+		client: c,
+		path:   volumeBasePath,
+	}
+	c.ServerGroups = GenericServiceOperations[ServerGroup, ServerGroupRequest, ServerGroupRequest]{
+		client: c,
+		path:   serverGroupsBasePath,
+	}
+	c.ObjectsUsers = GenericServiceOperations[ObjectsUser, ObjectsUserRequest, ObjectsUserRequest]{
+		client: c,
+		path:   objectsUsersBasePath,
+	}
+	c.CustomImages = GenericServiceOperations[CustomImage, CustomImageRequest, CustomImageRequest]{
+		client: c,
+		path:   customImagesBasePath,
+	}
+	c.CustomImageImports = GenericServiceOperations[CustomImageImport, CustomImageImportRequest, CustomImageImportRequest]{
+		client: c,
+		path:   customImageImportsBasePath,
+	}
 	c.LoadBalancers = GenericServiceOperations[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]{
 		client: c,
 		path:   loadBalancerBasePath,

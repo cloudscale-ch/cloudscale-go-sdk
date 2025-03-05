@@ -51,9 +51,9 @@ type LoadBalancerHealthMonitorHTTPRequest struct {
 }
 
 type LoadBalancerHealthMonitorService interface {
-	GenericCreateService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest, LoadBalancerHealthMonitorRequest]
-	GenericGetService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest, LoadBalancerHealthMonitorRequest]
-	GenericListService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest, LoadBalancerHealthMonitorRequest]
-	GenericUpdateService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest, LoadBalancerHealthMonitorRequest]
-	GenericDeleteService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest, LoadBalancerHealthMonitorRequest]
+	GenericCreateService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest]
+	GenericGetService[LoadBalancerHealthMonitor]
+	GenericListService[LoadBalancerHealthMonitor]
+	GenericUpdateService[LoadBalancerHealthMonitor, LoadBalancerHealthMonitorRequest]
+	GenericDeleteService[LoadBalancerHealthMonitor]
 }

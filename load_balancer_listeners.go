@@ -43,9 +43,9 @@ type LoadBalancerListenerRequest struct {
 }
 
 type LoadBalancerListenerService interface {
-	GenericCreateService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
-	GenericGetService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
-	GenericListService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
-	GenericUpdateService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
-	GenericDeleteService[LoadBalancerListener, LoadBalancerListenerRequest, LoadBalancerListenerRequest]
+	GenericCreateService[LoadBalancerListener, LoadBalancerListenerRequest]
+	GenericGetService[LoadBalancerListener]
+	GenericListService[LoadBalancerListener]
+	GenericUpdateService[LoadBalancerListener, LoadBalancerListenerRequest]
+	GenericDeleteService[LoadBalancerListener]
 }

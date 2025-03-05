@@ -51,9 +51,9 @@ type VIPAddressRequest struct {
 }
 
 type LoadBalancerService interface {
-	GenericCreateService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
-	GenericGetService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
-	GenericListService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
-	GenericUpdateService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
-	GenericDeleteService[LoadBalancer, LoadBalancerRequest, LoadBalancerRequest]
+	GenericCreateService[LoadBalancer, LoadBalancerRequest]
+	GenericGetService[LoadBalancer]
+	GenericListService[LoadBalancer]
+	GenericUpdateService[LoadBalancer, LoadBalancerRequest]
+	GenericDeleteService[LoadBalancer]
 }

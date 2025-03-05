@@ -1,10 +1,7 @@
 package cloudscale
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"reflect"
 )
 
@@ -103,94 +100,13 @@ func (request SubnetCreateRequest) MarshalJSON() ([]byte, error) {
 }
 
 type SubnetService interface {
-	Create(ctx context.Context, createRequest *SubnetCreateRequest) (*Subnet, error)
-	Get(ctx context.Context, subnetID string) (*Subnet, error)
-	List(ctx context.Context, modifiers ...ListRequestModifier) ([]Subnet, error)
-	Update(ctx context.Context, subnetID string, updateRequest *SubnetUpdateRequest) error
-	Delete(ctx context.Context, subnetID string) error
+	GenericCreateService[Subnet, SubnetCreateRequest]
+	GenericGetService[Subnet]
+	GenericListService[Subnet]
+	GenericUpdateService[Subnet, SubnetUpdateRequest]
+	GenericDeleteService[Subnet]
 }
 
 type SubnetServiceOperations struct {
 	client *Client
-}
-
-func (s SubnetServiceOperations) Create(ctx context.Context, createRequest *SubnetCreateRequest) (*Subnet, error) {
-	path := subnetBasePath
-
-	req, err := s.client.NewRequest(ctx, http.MethodPost, path, createRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	subnet := new(Subnet)
-
-	err = s.client.Do(ctx, req, subnet)
-	if err != nil {
-		return nil, err
-	}
-
-	return subnet, nil
-}
-
-func (s SubnetServiceOperations) Update(ctx context.Context, subnetID string, updateRequest *SubnetUpdateRequest) error {
-	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
-	if err != nil {
-		return err
-	}
-
-	err = s.client.Do(ctx, req, nil)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s SubnetServiceOperations) Get(ctx context.Context, subnetID string) (*Subnet, error) {
-	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	subnet := new(Subnet)
-	err = s.client.Do(ctx, req, subnet)
-	if err != nil {
-		return nil, err
-	}
-
-	return subnet, nil
-}
-
-func (s SubnetServiceOperations) Delete(ctx context.Context, subnetID string) error {
-	path := fmt.Sprintf("%s/%s", subnetBasePath, subnetID)
-
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, path, nil)
-	if err != nil {
-		return err
-	}
-	return s.client.Do(ctx, req, nil)
-}
-
-func (s SubnetServiceOperations) List(ctx context.Context, modifiers ...ListRequestModifier) ([]Subnet, error) {
-	path := subnetBasePath
-
-	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, modifier := range modifiers {
-		modifier(req)
-	}
-
-	subnets := []Subnet{}
-	err = s.client.Do(ctx, req, &subnets)
-	if err != nil {
-		return nil, err
-	}
-
-	return subnets, nil
 }
