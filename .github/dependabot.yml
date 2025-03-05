@@ -5,3 +5,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+  # Check for Go module updates
+  - package-ecosystem: "gomod"
+    directory: "/"  # adjust this if your go.mod file is in a subdirectory
+    schedule:
+      interval: "daily"
