@@ -3,7 +3,9 @@ package cloudscale
 import (
 	"context"
 	"fmt"
+	"github.com/cenkalti/backoff/v5"
 	"net/http"
+	"time"
 )
 
 type GenericCreateService[TResource any, TCreateRequest any] interface {
@@ -24,6 +26,10 @@ type GenericUpdateService[TResource any, TUpdateRequest any] interface {
 
 type GenericDeleteService[TResource any] interface {
 	Delete(ctx context.Context, resourceID string) error
+}
+
+type GenericWaitForService[TResource any] interface {
+	WaitFor(ctx context.Context, resourceID string, condition func(resource *TResource) (bool, error), opts ...backoff.RetryOption) (*TResource, error)
 }
 
 type GenericServiceOperations[TResource any, TCreateRequest any, TUpdateRequest any] struct {
@@ -106,4 +112,36 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Del
 		return err
 	}
 	return g.client.Do(ctx, req, nil)
+}
+
+func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) WaitFor(
+	ctx context.Context,
+	resourceID string,
+	condition func(resource *TResource) (bool, error),
+	opts ...backoff.RetryOption,
+) (*TResource, error) {
+	// Prepend the default backoff option.
+	// If a user passes their own WithBackOff option, it will override this default.
+	options := append([]backoff.RetryOption{
+		backoff.WithBackOff(backoff.NewConstantBackOff(2 * time.Second)),
+		backoff.WithMaxElapsedTime(2 * time.Minute),
+	}, opts...)
+
+	return backoff.Retry(ctx, func() (*TResource, error) {
+		resource, err := g.Get(ctx, resourceID)
+		if err != nil {
+			return nil, err
+		}
+
+		ok, condErr := condition(resource)
+		if ok {
+			return resource, nil // Exit when the condition is met.
+		}
+
+		// If the condition provided an error, return it as our retry error message.
+		if condErr != nil {
+			return nil, condErr // Continue retrying
+		}
+		return nil, fmt.Errorf("condition not met yet") // Continue retrying
+	}, options...)
 }

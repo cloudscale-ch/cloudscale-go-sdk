@@ -5,6 +5,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
@@ -97,7 +98,16 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	condition := func(lb *cloudscale.LoadBalancer) (bool, error) {
+		if lb.Status == "running" {
+			return true, nil
+		}
+		return false, fmt.Errorf("load balancer status is not 'running', current status: %s", lb.Status)
+	}
+	_, err = client.LoadBalancers.WaitFor(context.Background(), lb.UUID, condition)
+	if err != nil {
+		t.Fatalf("LoadBalancers.WaitFor returned error %s\n", err)
+	}
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {

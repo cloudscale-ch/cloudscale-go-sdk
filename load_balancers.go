@@ -56,4 +56,5 @@ type LoadBalancerService interface {
 	GenericListService[LoadBalancer]
 	GenericUpdateService[LoadBalancer, LoadBalancerRequest]
 	GenericDeleteService[LoadBalancer]
+	GenericWaitForService[LoadBalancer]
 }
