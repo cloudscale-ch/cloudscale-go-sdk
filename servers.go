@@ -128,6 +128,7 @@ type ServerService interface {
 	GenericListService[Server]
 	GenericUpdateService[Server, ServerUpdateRequest]
 	GenericDeleteService[Server]
+	GenericWaitForService[Server]
 	Reboot(ctx context.Context, serverID string) error
 	Start(ctx context.Context, serverID string) error
 	Stop(ctx context.Context, serverID string) error

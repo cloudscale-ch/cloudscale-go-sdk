@@ -6,6 +6,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"regexp"
 	"sync"
@@ -163,7 +164,16 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Servers.Create returned error %s\n", err)
 			}
-			waitUntil("running", server.UUID, t)
+			_, err = client.Servers.WaitFor(
+				context.Background(),
+				server.UUID,
+				serverRunningCondition,
+				backoff.WithBackOff(backoff.NewExponentialBackOff()),
+				backoff.WithMaxTries(60),
+			)
+			if err != nil {
+				t.Fatalf("Servers.WaitFor returned error %s\n", err)
+			}
 
 			if numNetworks := len(server.Interfaces); numNetworks != tt.expectedNumNetworks {
 				t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, tt.expectedNumNetworks)
@@ -238,7 +248,16 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-	waitUntil("running", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	if numNetworks := len(server.Interfaces); numNetworks != 1 {
 		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 1)
@@ -319,8 +338,16 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-	waitUntil("running", server.UUID, t)
-
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 	if numNetworks := len(server.Interfaces); numNetworks != 2 {
 		t.Errorf("Attatched to number of Networks\ngot=%#v\nwant=%#v", numNetworks, 2)
 	}

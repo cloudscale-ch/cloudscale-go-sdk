@@ -209,7 +209,16 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
-	waitUntil("running", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {

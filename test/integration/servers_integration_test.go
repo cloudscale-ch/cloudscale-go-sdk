@@ -5,7 +5,6 @@ package integration
 
 import (
 	"context"
-	"errors"
 	"reflect"
 	"strings"
 	"sync"
@@ -24,12 +23,38 @@ func integrationTest(t *testing.T) {
 	}
 }
 
+var serverRunningCondition = func(server *cloudscale.Server) (bool, error) {
+	if server.Status == cloudscale.ServerRunning {
+		return true, nil
+	}
+	return false, nil
+}
+
+var serverStoppedCondition = func(server *cloudscale.Server) (bool, error) {
+	if server.Status == cloudscale.ServerStopped {
+		return true, nil
+	}
+	return false, nil
+}
+
 func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
 	server, err := client.Servers.Create(context.Background(), createRequest)
-	if err == nil {
-		waitUntil(cloudscale.ServerRunning, server.UUID, t)
+	if err != nil {
+		return nil, err
 	}
-	return server, err
+
+	server, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+
+	return server, nil
 }
 
 func TestIntegrationServer_CRUD(t *testing.T) {
@@ -90,9 +115,15 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
-	s := waitUntil(cloudscale.ServerStopped, server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerStopped {
-		t.Errorf("Server.Update got=%s\nwant=%s\n", status, cloudscale.ServerStopped)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverStoppedCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// Start a server
@@ -101,9 +132,15 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
-	s = waitUntil(cloudscale.ServerRunning, server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Update got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// Reboot a server
@@ -112,9 +149,15 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
-	s = waitUntil(cloudscale.ServerRunning, server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Update got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -148,7 +191,16 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 	if err != nil {
 		t.Errorf("Servers.Stop returned error %s\n", err)
 	}
-	waitUntil("stopped", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverStoppedCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	multiUpdateRequest := &cloudscale.ServerUpdateRequest{
 		Flavor: "flex-4-4",
@@ -180,13 +232,19 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		t.Errorf("Servers.Update failed %s\n", err)
 	}
 
-	getServer := waitUntil("stopped", server.UUID, t)
-	if err == nil {
-		if getServer.Flavor.Slug != scaleFlavor {
-			t.Errorf("Scaling failed, could not scale, is at %s\n", getServer.Flavor.Slug)
-		}
-	} else {
-		t.Errorf("Servers.Get returned error %s\n", err)
+	getServer, err := client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverStoppedCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+
+	if getServer.Flavor.Slug != scaleFlavor {
+		t.Errorf("Scaling failed, could not scale, is at %s\n", getServer.Flavor.Slug)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -209,9 +267,15 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Stop returned error %s\n", err)
 	}
-	s := waitUntil("stopped", server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerStopped {
-		t.Errorf("Server.Stop got=%s\nwant=%s\n", status, cloudscale.ServerStopped)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverStoppedCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// Start a server
@@ -219,9 +283,15 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Start returned error %s\n", err)
 	}
-	s = waitUntil("running", server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Start got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// reboot server
@@ -229,9 +299,15 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Reboot returned error %s\n", err)
 	}
-	s = waitUntil("running", server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Reboot got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -325,28 +401,4 @@ func createServerInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 	if err != nil {
 		t.Errorf("Servers.Delete returned error %s\n", err)
 	}
-}
-
-func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
-	// An operation that may fail.
-	operation := func() (*cloudscale.Server, error) {
-		s, err := client.Servers.Get(context.Background(), uuid)
-		if err != nil {
-			return nil, err
-		}
-
-		if s.Status != status {
-			return nil, errors.New("Status not reached")
-		}
-		return s, nil
-	}
-
-	result, err := backoff.Retry(context.TODO(), operation,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
-	)
-	if err != nil {
-		t.Fatalf("Error while waiting for status change %s\n", err)
-	}
-	return result
 }

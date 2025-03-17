@@ -5,6 +5,7 @@ package integration
 
 import (
 	"context"
+	"github.com/cenkalti/backoff/v5"
 	"strings"
 	"sync"
 	"testing"
@@ -31,7 +32,16 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	waitUntil("running", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	createVolumeRequest := &cloudscale.VolumeRequest{
 		Name:        testRunPrefix,
@@ -169,8 +179,16 @@ func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	waitUntil("running", server.UUID, t)
-
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		serverRunningCondition,
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 	volumeAttachRequest := &cloudscale.VolumeRequest{
 		ServerUUIDs: &[]string{server.UUID},
 	}
