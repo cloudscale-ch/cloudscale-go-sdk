@@ -211,7 +211,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	}
 	expected, err = client.Servers.WaitFor(
 		context.Background(),
-		server.UUID,
+		expected.UUID,
 		serverRunningCondition,
 		backoff.WithBackOff(backoff.NewExponentialBackOff()),
 		backoff.WithMaxTries(60),
