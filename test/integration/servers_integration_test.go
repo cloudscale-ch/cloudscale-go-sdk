@@ -5,6 +5,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"strings"
 	"sync"
@@ -27,14 +28,14 @@ var serverRunningCondition = func(server *cloudscale.Server) (bool, error) {
 	if server.Status == cloudscale.ServerRunning {
 		return true, nil
 	}
-	return false, nil
+	return false, fmt.Errorf("server not running, current status: %s", server.Status)
 }
 
 var serverStoppedCondition = func(server *cloudscale.Server) (bool, error) {
 	if server.Status == cloudscale.ServerStopped {
 		return true, nil
 	}
-	return false, nil
+	return false, fmt.Errorf("server not stopped, current status: %s", server.Status)
 }
 
 func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
