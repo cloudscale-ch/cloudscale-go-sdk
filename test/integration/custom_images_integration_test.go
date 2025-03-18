@@ -186,6 +186,7 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1", "rma1"},
 		SourceFormat:     "raw",
+		Slug:             "fancy",
 	}
 
 	customImageImport, err := client.CustomImageImports.Create(context.Background(), createCustomImageImportRequest)
@@ -210,6 +211,19 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 	waitUntil("running", server.UUID, t)
+
+	if server.Image.Slug != "custom:fancy" {
+		t.Errorf("Server.Image.Slug got=%s, want=%s", server.Image.Slug, "=custom:fancy")
+	}
+	if server.Image.Name != createCustomImageImportRequest.Name {
+		t.Errorf("Server.Image.Name got=%s, want '%s'", server.Image.Name, createCustomImageImportRequest.Name)
+	}
+	if server.Image.OperatingSystem != "" {
+		t.Errorf("Server.Image.OperatingSystem got=%s, want an empty string", server.Image.OperatingSystem)
+	}
+	if server.Image.DefaultUsername != "" {
+		t.Errorf("Server.Image.DefaultUsername got=%s, want an empty string", server.Image.DefaultUsername)
+	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
 	if err != nil {
