@@ -5,7 +5,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
@@ -20,7 +19,7 @@ func TestIntegrationLoadBalancerPoolMember_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {
@@ -103,7 +102,7 @@ func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {
@@ -251,7 +250,7 @@ func TestIntegrationLoadBalancerPoolMember_MonitorStatus(t *testing.T) {
 	}()
 
 	// Step 4: Wait for the load balancer to be running
-	waitUntilLB("running", loadBalancer.UUID, t)
+	waitUntilLB(loadBalancer.UUID, t)
 
 	// Step 5: Create a load balancer pool
 	poolRequest := &cloudscale.LoadBalancerPoolRequest{
@@ -303,21 +302,12 @@ func TestIntegrationLoadBalancerPoolMember_MonitorStatus(t *testing.T) {
 		t.Fatalf("LoadBalancerHealthMonitors.Create returned error %s\n", err)
 	}
 
-	// Define the condition to check for the desired status.
-	condition := func(member *cloudscale.LoadBalancerPoolMember) (bool, error) {
-		status := "up"
-		if member.MonitorStatus == status {
-			return true, nil
-		}
-		return false, fmt.Errorf("waiting for status: %s, current status: %s", status, member.MonitorStatus)
-	}
-
 	// Wait for the pool member to reach the desired status.
 	_, err = client.LoadBalancerPoolMembers.WaitFor(
 		context.Background(),
 		pool.UUID,
 		member.UUID,
-		condition,
+		cloudscale.IsLoadBalancerPoolMemberUp,
 	)
 }
 

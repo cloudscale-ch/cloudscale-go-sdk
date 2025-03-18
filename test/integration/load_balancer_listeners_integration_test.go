@@ -20,7 +20,7 @@ func TestIntegrationLoadBalancerListener_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {

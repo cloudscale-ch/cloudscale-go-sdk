@@ -5,7 +5,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
@@ -31,7 +30,7 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Get returned error %s\n", err)
 	}
 
-	waitUntilLB("running", expected.UUID, t)
+	waitUntilLB(expected.UUID, t)
 
 	if h := time.Since(loadBalancer.CreatedAt).Hours(); !(-1 < h && h < 1) {
 		t.Errorf("loadBalancer.CreatedAt ourside of expected range. got=%v", loadBalancer.CreatedAt)
@@ -115,7 +114,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 		t.Errorf("loadBalancerSubnetUUID \n got=%s\nwant=%s", loadBalancerSubnetUUID, subnet.UUID)
 	}
 
-	waitUntilLB("running", loadBalancer.UUID, t)
+	waitUntilLB(loadBalancer.UUID, t)
 
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
@@ -142,7 +141,7 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 		t.Fatalf("loadBalancer.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	newName := testRunPrefix + "-renamed"
 	updateRequest := &cloudscale.LoadBalancerRequest{
@@ -170,19 +169,10 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 	}
 }
 
-func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalancer {
-	// Define the condition to check for the desired status.
-	condition := func(lb *cloudscale.LoadBalancer) (bool, error) {
-		if lb.Status == status {
-			return true, nil
-		}
-		return false, fmt.Errorf("waiting for status: %s, current status: %s", status, lb.Status)
-	}
-
-	// Wait for the custom image import to reach the desired status.
-	lb, err := client.LoadBalancers.WaitFor(context.Background(), uuid, condition)
+func waitUntilLB(uuid string, t *testing.T) *cloudscale.LoadBalancer {
+	lb, err := client.LoadBalancers.WaitFor(context.Background(), uuid, cloudscale.LoadBalancerIsRunning)
 	if err != nil {
-		t.Fatalf("Error while waiting for status=%s: %s\n", status, err)
+		t.Fatalf("client.LoadBalancers.WaitFor returned error %s\n", err)
 	}
 
 	return lb

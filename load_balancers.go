@@ -1,6 +1,7 @@
 package cloudscale
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -57,4 +58,11 @@ type LoadBalancerService interface {
 	GenericUpdateService[LoadBalancer, LoadBalancerRequest]
 	GenericDeleteService[LoadBalancer]
 	GenericWaitForService[LoadBalancer]
+}
+
+var LoadBalancerIsRunning = func(lb *LoadBalancer) (bool, error) {
+	if lb.Status == "running" {
+		return true, nil
+	}
+	return false, fmt.Errorf("waiting for status: %s, current status: %s", "running", lb.Status)
 }

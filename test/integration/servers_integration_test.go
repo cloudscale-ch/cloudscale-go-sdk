@@ -23,20 +23,6 @@ func integrationTest(t *testing.T) {
 	}
 }
 
-var serverRunningCondition = func(server *cloudscale.Server) (bool, error) {
-	if server.Status == cloudscale.ServerRunning {
-		return true, nil
-	}
-	return false, fmt.Errorf("server not running, current status: %s", server.Status)
-}
-
-var serverStoppedCondition = func(server *cloudscale.Server) (bool, error) {
-	if server.Status == cloudscale.ServerStopped {
-		return true, nil
-	}
-	return false, fmt.Errorf("server not stopped, current status: %s", server.Status)
-}
-
 func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
 	server, err := client.Servers.Create(context.Background(), createRequest)
 	if err != nil {
@@ -46,7 +32,7 @@ func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloud
 	server, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -116,7 +102,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverStoppedCondition,
+		cloudscale.ServerIsStopped,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -131,7 +117,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -146,7 +132,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -187,7 +173,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverStoppedCondition,
+		cloudscale.ServerIsStopped,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -226,7 +212,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 	getServer, err := client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverStoppedCondition,
+		cloudscale.ServerIsStopped,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -259,7 +245,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverStoppedCondition,
+		cloudscale.ServerIsStopped,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -273,7 +259,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -287,7 +273,7 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)

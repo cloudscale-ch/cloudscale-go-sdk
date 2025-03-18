@@ -92,3 +92,10 @@ func parameterizeGenericInstance(l LoadBalancerPoolMemberServiceOperations, pool
 		path:   fmt.Sprintf(loadBalancerPoolMemberBasePath, poolID),
 	}
 }
+
+var IsLoadBalancerPoolMemberUp = func(member *LoadBalancerPoolMember) (bool, error) {
+	if member.MonitorStatus == "up" {
+		return true, nil
+	}
+	return false, fmt.Errorf("waiting for monitor status: %s, current status: %s", "up", member.MonitorStatus)
+}

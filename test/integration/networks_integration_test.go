@@ -166,7 +166,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 			_, err = client.Servers.WaitFor(
 				context.Background(),
 				server.UUID,
-				serverRunningCondition,
+				cloudscale.ServerIsRunning,
 			)
 			if err != nil {
 				t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -248,7 +248,7 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -336,7 +336,7 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)

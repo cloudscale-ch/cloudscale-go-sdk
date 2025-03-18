@@ -34,7 +34,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -179,7 +179,7 @@ func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)

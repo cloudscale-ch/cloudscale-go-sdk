@@ -37,7 +37,10 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 		t.Fatalf("CustomImageImports.Get returned error %s\n", err)
 	}
 
-	customImageImport = waitForImport("success", expected.UUID, t)
+	customImageImport, err = client.CustomImageImports.WaitFor(context.Background(), customImageImport.UUID, cloudscale.ImportIsSuccessful)
+	if err != nil {
+		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
+	}
 
 	if uuid := customImageImport.UUID; uuid != expected.UUID {
 		t.Errorf("customImageImport.UUID got=%s\nwant=%s", uuid, expected.UUID)
@@ -126,8 +129,14 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 		t.Fatalf("CustomImageImports.Create returned error %s\n", err)
 	}
 
-	customImageImport := waitForImport("failed", expected.UUID, t)
-
+	customImageImport, err := client.CustomImageImports.WaitFor(
+		context.Background(),
+		expected.UUID,
+		func(resource *cloudscale.CustomImageImport) (bool, error) { return resource.Status == "failed", nil },
+	)
+	if err != nil {
+		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
+	}
 	expectedMessage := "Expected HTTP 200, got HTTP 404"
 	if errorMessage := customImageImport.ErrorMessage; errorMessage != expectedMessage {
 		t.Errorf("customImageImport.ErrorMessage got=%s\nwant=%s\n", errorMessage, expectedMessage)
@@ -149,7 +158,10 @@ func TestIntegrationCustomImage_Update(t *testing.T) {
 		t.Fatalf("CustomImageImports.Create returned error %s\n", err)
 	}
 
-	customImageImport = waitForImport("success", customImageImport.UUID, t)
+	customImageImport, err = client.CustomImageImports.WaitFor(context.Background(), customImageImport.UUID, cloudscale.ImportIsSuccessful)
+	if err != nil {
+		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
+	}
 
 	expectedNewName := fmt.Sprintf("%s-renamed", testRunPrefix)
 	updateRequest := &cloudscale.CustomImageRequest{
@@ -191,7 +203,10 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 		t.Fatalf("CustomImageImports.Create returned error %s\n", err)
 	}
 
-	customImageImport = waitForImport("success", customImageImport.UUID, t)
+	customImageImport, err = client.CustomImageImports.WaitFor(context.Background(), customImageImport.UUID, cloudscale.ImportIsSuccessful)
+	if err != nil {
+		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
+	}
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -210,7 +225,7 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -225,22 +240,4 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CustomImageImports.Delete returned error %s\n", err)
 	}
-}
-
-func waitForImport(status string, uuid string, t *testing.T) *cloudscale.CustomImageImport {
-	// Define the condition to check for the desired status.
-	condition := func(importInfo *cloudscale.CustomImageImport) (bool, error) {
-		if importInfo.Status == status {
-			return true, nil
-		}
-		return false, fmt.Errorf("waiting for status: %s, current status: %s", status, importInfo.Status)
-	}
-
-	// Wait for the custom image import to reach the desired status.
-	importInfo, err := client.CustomImageImports.WaitFor(context.Background(), uuid, condition)
-	if err != nil {
-		t.Fatalf("Error while waiting for status=%s: %s\n", status, err)
-	}
-
-	return importInfo
 }

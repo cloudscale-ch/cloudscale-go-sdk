@@ -36,7 +36,7 @@ func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -108,7 +108,7 @@ func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", loadBalancer.UUID, t)
+	waitUntilLB(loadBalancer.UUID, t)
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion:    4,
@@ -199,7 +199,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	server, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -207,7 +207,7 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 	expected, err = client.Servers.WaitFor(
 		context.Background(),
 		expected.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -301,7 +301,7 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -355,7 +355,7 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	_, err = client.Servers.WaitFor(
 		context.Background(),
 		server.UUID,
-		serverRunningCondition,
+		cloudscale.ServerIsRunning,
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -420,7 +420,7 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 		_, err = client.Servers.WaitFor(
 			context.Background(),
 			server.UUID,
-			serverRunningCondition,
+			cloudscale.ServerIsRunning,
 		)
 		if err != nil {
 			t.Fatalf("Servers.WaitFor returned error %s\n", err)
