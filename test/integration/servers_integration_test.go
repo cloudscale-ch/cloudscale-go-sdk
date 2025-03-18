@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 )
 
@@ -48,8 +47,6 @@ func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloud
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -120,8 +117,6 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverStoppedCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -137,8 +132,6 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -154,8 +147,6 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -196,8 +187,6 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverStoppedCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -237,8 +226,6 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverStoppedCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -272,8 +259,6 @@ func TestIntegrationServer_Actions(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverStoppedCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -288,8 +273,6 @@ func TestIntegrationServer_Actions(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -304,8 +287,6 @@ func TestIntegrationServer_Actions(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -344,8 +325,6 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 			}
 			return true, nil
 		},
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)

@@ -38,8 +38,6 @@ func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -203,8 +201,6 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -213,8 +209,6 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		context.Background(),
 		expected.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -309,8 +303,6 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
@@ -365,8 +357,6 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)

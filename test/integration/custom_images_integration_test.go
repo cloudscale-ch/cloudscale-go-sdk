@@ -213,8 +213,6 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 		context.Background(),
 		server.UUID,
 		serverRunningCondition,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
 	)
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
