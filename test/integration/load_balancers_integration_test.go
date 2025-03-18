@@ -5,8 +5,7 @@ package integration
 
 import (
 	"context"
-	"errors"
-	"github.com/cenkalti/backoff/v5"
+	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
@@ -172,25 +171,19 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 }
 
 func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalancer {
-	// An operation that may fail.
-	operation := func() (*cloudscale.LoadBalancer, error) {
-		lb, err := client.LoadBalancers.Get(context.Background(), uuid)
-		if err != nil {
-			return nil, err
+	// Define the condition to check for the desired status.
+	condition := func(lb *cloudscale.LoadBalancer) (bool, error) {
+		if lb.Status == status {
+			return true, nil
 		}
-
-		if lb.Status != status {
-			return nil, errors.New("Status not reached")
-		}
-		return lb, nil
+		return false, fmt.Errorf("waiting for status: %s, current status: %s", status, lb.Status)
 	}
 
-	result, err := backoff.Retry(context.TODO(), operation,
-		backoff.WithBackOff(backoff.NewConstantBackOff(2*time.Second)),
-		backoff.WithMaxTries(60),
-	)
+	// Wait for the custom image import to reach the desired status.
+	lb, err := client.LoadBalancers.WaitFor(context.Background(), uuid, condition)
 	if err != nil {
-		t.Fatalf("Error while waiting for status change %s\n", err)
+		t.Fatalf("Error while waiting for status=%s: %s\n", status, err)
 	}
-	return result
+
+	return lb
 }
