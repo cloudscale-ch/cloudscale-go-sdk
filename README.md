@@ -25,66 +25,61 @@ To use the `cloudscale-go-sdk` for managing your cloudscale.ch resources, follow
    package main
 
    import (
-      "context"
-      "fmt"
-      "github.com/cenkalti/backoff/v5"
-      "github.com/cloudscale-ch/cloudscale-go-sdk/v5"
-      "golang.org/x/oauth2"
-      "log"
-      "os"
-      "time"
+       "context"
+       "fmt"
+       "github.com/cenkalti/backoff/v5"
+       "github.com/cloudscale-ch/cloudscale-go-sdk/v5"
+       "golang.org/x/oauth2"
+       "log"
+       "os"
+       "time"
    )
 
    func main() {
-      // Read the API token from the environment variable
-      apiToken := os.Getenv("CLOUDSCALE_API_TOKEN")
-      if apiToken == "" {
-         log.Fatalf("CLOUDSCALE_API_TOKEN environment variable is not set")
-      }
+       // Read the API token from the environment variable
+       apiToken := os.Getenv("CLOUDSCALE_API_TOKEN")
+       if apiToken == "" {
+           log.Fatalf("CLOUDSCALE_API_TOKEN environment variable is not set")
+       }
 
-      // Create a new client
-      tc := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
-         &oauth2.Token{AccessToken: apiToken},
-      ))
-      client := cloudscale.NewClient(tc)
+       // Create a new client
+       tc := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
+           &oauth2.Token{AccessToken: apiToken},
+       ))
+       client := cloudscale.NewClient(tc)
 
-      // Define server configuration
-      createRequest := &cloudscale.ServerRequest{
-         Name:    "example-server",
-         Flavor:  "flex-8-2",
-         Image:   "debian-11",
-         Zone:    "rma1",
-         SSHKeys: []string{"<KEY>"},
-      }
+       // Define server configuration
+       createRequest := &cloudscale.ServerRequest{
+           Name:    "example-server",
+           Flavor:  "flex-8-2",
+           Image:   "debian-11",
+           Zone:    "rma1",
+           SSHKeys: []string{"<KEY>"},
+       }
 
-      // Create a server
-      server, err := client.Servers.Create(context.Background(), createRequest)
-      if err != nil {
-         log.Fatalf("Error creating server: %v", err)
-      }
+       // Create a server
+       server, err := client.Servers.Create(context.Background(), createRequest)
+       if err != nil {
+           log.Fatalf("Error creating server: %v", err)
+       }
 
-      fmt.Printf("Creating server with UUID: %s\n", server.UUID)
+       fmt.Printf("Creating server with UUID: %s\n", server.UUID)
 
-      // Wait for the server to be in "running" state
-      server, err = client.Servers.WaitFor(
-         context.Background(),
-         server.UUID,
-         func(server *cloudscale.Server) (bool, error) {
-            if server.Status == "running" {
-               return true, nil
-            }
-            return false, fmt.Errorf("server is not yet in 'running' state, current status: %s", server.Status)
-         },
-         // optionally, pass any option that github.com/cenkalti/backoff/v5 supports
-         backoff.WithNotify(func(err error, duration time.Duration) {
-            fmt.Printf("Retrying after error: %v, waiting for %v\n", err, duration)
-         }),
-      )
-      if err != nil {
-         log.Fatalf("Error waiting for server to start: %v\n", err)
-      }
+       // Wait for the server to be in "running" state
+       server, err = client.Servers.WaitFor(
+           context.Background(),
+           server.UUID,
+           cloudscale.ServerIsRunning, // can be replaced with custom condition funcs
+           // optionally, pass any option that github.com/cenkalti/backoff/v5 supports
+           backoff.WithNotify(func(err error, duration time.Duration) {
+               fmt.Printf("Retrying after error: %v, waiting for %v\n", err, duration)
+           }),
+       )
+       if err != nil {
+           log.Fatalf("Error waiting for server to start: %v\n", err)
+       }
 
-      fmt.Printf("Server is now running with status: %s\n", server.Status)
+       fmt.Printf("Server is now running with status: %s\n", server.Status)
    }
    ```
 
