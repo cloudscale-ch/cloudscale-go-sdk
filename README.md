@@ -1,5 +1,5 @@
 # cloudscale.ch Go API SDK
-[![Go Reference](https://pkg.go.dev/badge/github.com/cloudscale-ch/cloudscale-go-sdk.svg)](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk)
+[![Go Reference](https://pkg.go.dev/badge/github.com/cloudscale-ch/cloudscale-go-sdk.svg)](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v5)
 [![Tests](https://github.com/cloudscale-ch/cloudscale-go-sdk/actions/workflows/test.yaml/badge.svg)](https://github.com/cloudscale-ch/cloudscale-go-sdk/actions/workflows/test.yaml)
 
 If you want to manage your cloudscale.ch server resources with Go, you are at
@@ -53,6 +53,7 @@ To create a new release, please do the following:
  * Checkout the release branch
  * Run `make NEW_VERSION=v1.x.x bump-version`
    * For a new major release, follow [these instructions](https://go.dev/doc/modules/major-version)
- * Commit the changes
+   * Update the `pkg.go.dev` link in this file.
+ * Commit changes
  * Merge the release branch into master
  * Create a [new release](https://github.com/cloudscale-ch/cloudscale-go-sdk/releases/new) on GitHub.
