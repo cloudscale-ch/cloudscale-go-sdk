@@ -124,7 +124,7 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Wai
 	// If a user passes their own WithBackOff option, it will override this default.
 	options := append([]backoff.RetryOption{
 		backoff.WithBackOff(backoff.NewConstantBackOff(2 * time.Second)),
-		backoff.WithMaxElapsedTime(2 * time.Minute),
+		backoff.WithMaxElapsedTime(5 * time.Minute),
 	}, opts...)
 
 	return backoff.Retry(ctx, func() (*TResource, error) {
@@ -140,7 +140,7 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Wai
 
 		// If the condition provided an error, return it as our retry error message.
 		if condErr != nil {
-			return nil, condErr // Continue retrying
+			return nil, fmt.Errorf("condition not met yet: %w", condErr) // Continue retrying
 		}
 		return nil, fmt.Errorf("condition not met yet") // Continue retrying
 	}, options...)
