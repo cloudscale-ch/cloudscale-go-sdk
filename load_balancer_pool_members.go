@@ -3,6 +3,7 @@ package cloudscale
 import (
 	"context"
 	"fmt"
+	"github.com/cenkalti/backoff/v5"
 	"time"
 )
 
@@ -42,6 +43,7 @@ type LoadBalancerPoolMemberService interface {
 	List(ctx context.Context, poolID string, modifiers ...ListRequestModifier) ([]LoadBalancerPoolMember, error)
 	Update(ctx context.Context, poolID string, resourceID string, updateRequest *LoadBalancerPoolMemberRequest) error
 	Delete(ctx context.Context, poolID string, resourceID string) error
+	WaitFor(ctx context.Context, poolID string, resourceID string, condition func(resource *LoadBalancerPoolMember) (bool, error), opts ...backoff.RetryOption) (*LoadBalancerPoolMember, error)
 }
 
 type LoadBalancerPoolMemberServiceOperations struct {
@@ -71,6 +73,17 @@ func (l LoadBalancerPoolMemberServiceOperations) Update(ctx context.Context, poo
 func (l LoadBalancerPoolMemberServiceOperations) Delete(ctx context.Context, poolID string, resourceID string) error {
 	g := parameterizeGenericInstance(l, poolID)
 	return g.Delete(ctx, resourceID)
+}
+
+func (l LoadBalancerPoolMemberServiceOperations) WaitFor(
+	ctx context.Context,
+	poolID string,
+	resourceID string,
+	condition func(resource *LoadBalancerPoolMember) (bool, error),
+	opts ...backoff.RetryOption,
+) (*LoadBalancerPoolMember, error) {
+	g := parameterizeGenericInstance(l, poolID)
+	return g.WaitFor(ctx, resourceID, condition, opts...)
 }
 
 func parameterizeGenericInstance(l LoadBalancerPoolMemberServiceOperations, poolID string) GenericServiceOperations[LoadBalancerPoolMember, LoadBalancerPoolMemberRequest, LoadBalancerPoolMemberRequest] {
