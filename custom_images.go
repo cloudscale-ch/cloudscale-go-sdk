@@ -38,6 +38,7 @@ type CustomImageService interface {
 	GenericListService[CustomImage]
 	GenericUpdateService[CustomImage, CustomImageRequest]
 	GenericDeleteService[CustomImage]
+	GenericWaitForService[CustomImage]
 }
 
 type CustomImageServiceOperations struct {

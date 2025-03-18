@@ -37,6 +37,7 @@ type VolumeService interface {
 	GenericListService[Volume]
 	GenericUpdateService[Volume, VolumeRequest]
 	GenericDeleteService[Volume]
+	GenericWaitForService[Volume]
 }
 
 // WithNameFilter uses an undocumented feature of the cloudscale.ch API

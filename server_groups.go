@@ -25,4 +25,5 @@ type ServerGroupService interface {
 	GenericListService[ServerGroup]
 	GenericUpdateService[ServerGroup, ServerGroupRequest]
 	GenericDeleteService[ServerGroup]
+	GenericWaitForService[ServerGroup]
 }

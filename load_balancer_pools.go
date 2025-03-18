@@ -33,4 +33,5 @@ type LoadBalancerPoolService interface {
 	GenericListService[LoadBalancerPool]
 	GenericUpdateService[LoadBalancerPool, LoadBalancerPoolRequest]
 	GenericDeleteService[LoadBalancerPool]
+	GenericWaitForService[LoadBalancerPool]
 }

@@ -46,6 +46,7 @@ type NetworkService interface {
 	GenericListService[Network]
 	GenericUpdateService[Network, NetworkUpdateRequest]
 	GenericDeleteService[Network]
+	GenericWaitForService[Network]
 }
 
 type NetworkServiceOperations struct {

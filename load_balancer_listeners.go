@@ -48,4 +48,5 @@ type LoadBalancerListenerService interface {
 	GenericListService[LoadBalancerListener]
 	GenericUpdateService[LoadBalancerListener, LoadBalancerListenerRequest]
 	GenericDeleteService[LoadBalancerListener]
+	GenericWaitForService[LoadBalancerListener]
 }
