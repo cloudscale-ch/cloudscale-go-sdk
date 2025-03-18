@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -185,6 +186,9 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 	createRequest := cloudscale.FloatingIPCreateRequest{
 		IPVersion: 6,
 		Server:    server.UUID,
+		RegionalResourceRequest: cloudscale.RegionalResourceRequest{
+			Region: strings.TrimRight(server.Zone.Slug, "0123456789"),
+		},
 	}
 	initialTags := getInitialTags()
 	createRequest.Tags = &initialTags
