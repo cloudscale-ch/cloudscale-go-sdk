@@ -54,6 +54,7 @@ type Image struct {
 	Slug            string `json:"slug"`
 	Name            string `json:"name"`
 	OperatingSystem string `json:"operating_system"`
+	DefaultUsername string `json:"default_username,omitempty"`
 }
 
 type VolumeStub struct {
