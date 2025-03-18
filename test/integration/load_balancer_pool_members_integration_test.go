@@ -6,7 +6,6 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
@@ -319,6 +318,7 @@ func TestIntegrationServer_LoadBalancer_PrivateNetwork_Port22(t *testing.T) {
 		pool.UUID,
 		member.UUID,
 		condition,
+	)
 }
 
 func createNetworkAndSubnet() (*cloudscale.Network, *cloudscale.Subnet, error) {
