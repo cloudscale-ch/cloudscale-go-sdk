@@ -307,7 +307,7 @@ func TestIntegrationLoadBalancerPoolMember_MonitorStatus(t *testing.T) {
 		context.Background(),
 		pool.UUID,
 		member.UUID,
-		cloudscale.IsLoadBalancerPoolMemberUp,
+		cloudscale.LoadBalancerPoolMemberIsUp,
 	)
 }
 

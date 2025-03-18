@@ -93,7 +93,7 @@ func parameterizeGenericInstance(l LoadBalancerPoolMemberServiceOperations, pool
 	}
 }
 
-var IsLoadBalancerPoolMemberUp = func(member *LoadBalancerPoolMember) (bool, error) {
+var LoadBalancerPoolMemberIsUp = func(member *LoadBalancerPoolMember) (bool, error) {
 	if member.MonitorStatus == "up" {
 		return true, nil
 	}
