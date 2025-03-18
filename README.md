@@ -6,10 +6,6 @@
 If you want to manage your cloudscale.ch server resources with Go, you are at
 the right place.
 
-There's a possibility to specify the `CLOUDSCALE_API_URL` environment variable to
-change the default url of https://api.cloudscale.ch, but you can almost certainly
-use the default.
-
 ## Getting Started
 
 To use the `cloudscale-go-sdk` for managing your cloudscale.ch resources, follow these steps:
@@ -23,9 +19,7 @@ To use the `cloudscale-go-sdk` for managing your cloudscale.ch resources, follow
    ```
 
 1. **Create a File**:\
-   Save the following code into a file, for example, `main.go`. Be sure to set the `CLOUDSCALE_API_TOKEN` environment variable with your API token.
-
-   Example code to create a server and wait until it is running:
+   Save the following code into a file, for example, `main.go`.
 
    ```go
    package main
@@ -122,8 +116,11 @@ Run the tests using:
 
 ```
 CLOUDSCALE_API_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration
-
 ```
+
+There's a possibility to specify the `CLOUDSCALE_API_URL` environment variable to
+change the default url of https://api.cloudscale.ch, but you can almost certainly
+use the default.
 
 If you want to give params to `go test`, you can use something like this:
 
