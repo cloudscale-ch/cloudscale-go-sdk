@@ -161,6 +161,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 func getDefaultServerRequest() cloudscale.ServerRequest {
 	return cloudscale.ServerRequest{
 		Name:         testRunPrefix,
+		Zone:         testZone,
 		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
