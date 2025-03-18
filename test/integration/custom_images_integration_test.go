@@ -5,9 +5,7 @@ package integration
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"io"
 	"net/http"
@@ -230,25 +228,19 @@ func TestIntegrationCustomImage_Boot(t *testing.T) {
 }
 
 func waitForImport(status string, uuid string, t *testing.T) *cloudscale.CustomImageImport {
-	// An operation that may fail.
-	operation := func() (*cloudscale.CustomImageImport, error) {
-		i, err := client.CustomImageImports.Get(context.Background(), uuid)
-		if err != nil {
-			return nil, err
+	// Define the condition to check for the desired status.
+	condition := func(importInfo *cloudscale.CustomImageImport) (bool, error) {
+		if importInfo.Status == status {
+			return true, nil
 		}
-
-		if i.Status != status {
-			return nil, errors.New(fmt.Sprintf("Import status is: %v", i.Status))
-		}
-		return i, nil
+		return false, fmt.Errorf("waiting for status: %s, current status: %s", status, importInfo.Status)
 	}
 
-	result, err := backoff.Retry(context.TODO(), operation,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(10),
-	)
+	// Wait for the custom image import to reach the desired status.
+	importInfo, err := client.CustomImageImports.WaitFor(context.Background(), uuid, condition)
 	if err != nil {
-		t.Fatalf("Error while waiting for status=%s change %s\n", status, err)
+		t.Fatalf("Error while waiting for status=%s: %s\n", status, err)
 	}
-	return result
+
+	return importInfo
 }

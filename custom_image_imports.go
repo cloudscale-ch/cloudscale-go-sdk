@@ -35,4 +35,5 @@ type CustomImageImportsService interface {
 	GenericCreateService[CustomImageImport, CustomImageImportRequest]
 	GenericGetService[CustomImageImport]
 	GenericListService[CustomImageImport]
+	GenericWaitForService[CustomImageImport]
 }
