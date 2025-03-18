@@ -189,7 +189,7 @@ func TestIntegrationLoadBalancerPoolMember_Update(t *testing.T) {
 	}
 }
 
-func TestIntegrationServer_LoadBalancer_PrivateNetwork_Port22(t *testing.T) {
+func TestIntegrationLoadBalancerPoolMember_MonitorStatus(t *testing.T) {
 	// Ensure integration tests are enabled
 	integrationTest(t)
 
