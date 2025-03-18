@@ -331,19 +331,42 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
+	// Wait until the volumes are actually allocated and have UUIDs
+	// https://www.cloudscale.ch/en/api/v1#volumes-create
+	server, err = client.Servers.WaitFor(
+		context.TODO(),
+		server.UUID,
+		func(s *cloudscale.Server) (bool, error) {
+			for i, volume := range s.Volumes {
+				if len(volume.UUID) <= 1 {
+					return false, fmt.Errorf("volume at index %d has an invalid or unassigned UUID", i)
+				}
+			}
+			return true, nil
+		},
+		backoff.WithBackOff(backoff.NewExponentialBackOff()),
+		backoff.WithMaxTries(60),
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+
+	// Ignore UUIDs in this comparison
+	actual := make([]cloudscale.VolumeStub, len(server.Volumes))
+	copy(actual, server.Volumes)
+	for i := range actual {
+		actual[i].UUID = ""
+	}
 	expected := []cloudscale.VolumeStub{
 		{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
 		{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
 		{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
 	}
-	if !reflect.DeepEqual(server.Volumes, expected) {
-		t.Errorf("Volumes response\n got=%#v\nwant=%#v", server.Volumes, expected)
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Volumes response\n got=%#v\nwant=%#v", actual, expected)
 	}
 
-	// Wait a bit until the volumes are actually allocated and have UUID's see
-	// https://www.cloudscale.ch/en/api/v1#volumes-create
-	time.Sleep(5 * time.Second)
-	server, err = client.Servers.Get(context.TODO(), server.UUID)
+	// delete all volume, except the root volume
 	for _, volume := range server.Volumes[1:] {
 		volumeUUID := volume.UUID
 		if len(volumeUUID) <= 1 {
