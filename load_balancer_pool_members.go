@@ -3,6 +3,7 @@ package cloudscale
 import (
 	"context"
 	"fmt"
+	"github.com/cenkalti/backoff/v5"
 	"time"
 )
 
@@ -42,6 +43,7 @@ type LoadBalancerPoolMemberService interface {
 	List(ctx context.Context, poolID string, modifiers ...ListRequestModifier) ([]LoadBalancerPoolMember, error)
 	Update(ctx context.Context, poolID string, resourceID string, updateRequest *LoadBalancerPoolMemberRequest) error
 	Delete(ctx context.Context, poolID string, resourceID string) error
+	WaitFor(ctx context.Context, poolID string, resourceID string, condition func(resource *LoadBalancerPoolMember) (bool, error), opts ...backoff.RetryOption) (*LoadBalancerPoolMember, error)
 }
 
 type LoadBalancerPoolMemberServiceOperations struct {
@@ -73,9 +75,27 @@ func (l LoadBalancerPoolMemberServiceOperations) Delete(ctx context.Context, poo
 	return g.Delete(ctx, resourceID)
 }
 
+func (l LoadBalancerPoolMemberServiceOperations) WaitFor(
+	ctx context.Context,
+	poolID string,
+	resourceID string,
+	condition func(resource *LoadBalancerPoolMember) (bool, error),
+	opts ...backoff.RetryOption,
+) (*LoadBalancerPoolMember, error) {
+	g := parameterizeGenericInstance(l, poolID)
+	return g.WaitFor(ctx, resourceID, condition, opts...)
+}
+
 func parameterizeGenericInstance(l LoadBalancerPoolMemberServiceOperations, poolID string) GenericServiceOperations[LoadBalancerPoolMember, LoadBalancerPoolMemberRequest, LoadBalancerPoolMemberRequest] {
 	return GenericServiceOperations[LoadBalancerPoolMember, LoadBalancerPoolMemberRequest, LoadBalancerPoolMemberRequest]{
 		client: l.client,
 		path:   fmt.Sprintf(loadBalancerPoolMemberBasePath, poolID),
 	}
+}
+
+var LoadBalancerPoolMemberIsUp = func(member *LoadBalancerPoolMember) (bool, error) {
+	if member.MonitorStatus == "up" {
+		return true, nil
+	}
+	return false, fmt.Errorf("waiting for monitor status: %s, current status: %s", "up", member.MonitorStatus)
 }

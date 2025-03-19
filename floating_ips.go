@@ -55,4 +55,5 @@ type FloatingIPsService interface {
 	GenericListService[FloatingIP]
 	GenericUpdateService[FloatingIP, FloatingIPUpdateRequest]
 	GenericDeleteService[FloatingIP]
+	GenericWaitForService[FloatingIP]
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -185,6 +186,9 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 	createRequest := cloudscale.FloatingIPCreateRequest{
 		IPVersion: 6,
 		Server:    server.UUID,
+		RegionalResourceRequest: cloudscale.RegionalResourceRequest{
+			Region: strings.TrimRight(server.Zone.Slug, "0123456789"),
+		},
 	}
 	initialTags := getInitialTags()
 	createRequest.Tags = &initialTags
@@ -572,7 +576,10 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CustomImages.Create returned error %s\n", err)
 	}
-	waitForImport("success", customImageImport.UUID, t)
+	_, err = client.CustomImageImports.WaitFor(context.Background(), customImageImport.UUID, cloudscale.ImportIsSuccessful)
+	if err != nil {
+		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
+	}
 
 	imageID := customImageImport.CustomImage.UUID
 	getResult, err := client.CustomImages.Get(context.Background(), imageID)
@@ -644,7 +651,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", loadBalancer.UUID, t)
+	waitUntilLB(loadBalancer.UUID, t)
 
 	getResult, err := client.LoadBalancers.Get(context.Background(), loadBalancer.UUID)
 	if err != nil {

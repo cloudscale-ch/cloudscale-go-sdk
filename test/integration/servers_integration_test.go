@@ -5,14 +5,13 @@ package integration
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 )
 
@@ -26,10 +25,20 @@ func integrationTest(t *testing.T) {
 
 func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
 	server, err := client.Servers.Create(context.Background(), createRequest)
-	if err == nil {
-		waitUntil(cloudscale.ServerRunning, server.UUID, t)
+	if err != nil {
+		return nil, err
 	}
-	return server, err
+
+	server, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+
+	return server, nil
 }
 
 func TestIntegrationServer_CRUD(t *testing.T) {
@@ -90,9 +99,13 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
-	s := waitUntil(cloudscale.ServerStopped, server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerStopped {
-		t.Errorf("Server.Update got=%s\nwant=%s\n", status, cloudscale.ServerStopped)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsStopped,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// Start a server
@@ -101,9 +114,13 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
-	s = waitUntil(cloudscale.ServerRunning, server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Update got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// Reboot a server
@@ -112,9 +129,13 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Update returned error %s\n", err)
 	}
-	s = waitUntil(cloudscale.ServerRunning, server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Update got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -126,6 +147,7 @@ func TestIntegrationServer_UpdateStatus(t *testing.T) {
 func getDefaultServerRequest() cloudscale.ServerRequest {
 	return cloudscale.ServerRequest{
 		Name:         testRunPrefix,
+		Zone:         testZone,
 		Flavor:       "flex-4-2",
 		Image:        DefaultImageSlug,
 		VolumeSizeGB: 10,
@@ -148,7 +170,14 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 	if err != nil {
 		t.Errorf("Servers.Stop returned error %s\n", err)
 	}
-	waitUntil("stopped", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsStopped,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	multiUpdateRequest := &cloudscale.ServerUpdateRequest{
 		Flavor: "flex-4-4",
@@ -180,13 +209,17 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		t.Errorf("Servers.Update failed %s\n", err)
 	}
 
-	getServer := waitUntil("stopped", server.UUID, t)
-	if err == nil {
-		if getServer.Flavor.Slug != scaleFlavor {
-			t.Errorf("Scaling failed, could not scale, is at %s\n", getServer.Flavor.Slug)
-		}
-	} else {
-		t.Errorf("Servers.Get returned error %s\n", err)
+	getServer, err := client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsStopped,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+
+	if getServer.Flavor.Slug != scaleFlavor {
+		t.Errorf("Scaling failed, could not scale, is at %s\n", getServer.Flavor.Slug)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -209,9 +242,13 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Stop returned error %s\n", err)
 	}
-	s := waitUntil("stopped", server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerStopped {
-		t.Errorf("Server.Stop got=%s\nwant=%s\n", status, cloudscale.ServerStopped)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsStopped,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// Start a server
@@ -219,9 +256,13 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Start returned error %s\n", err)
 	}
-	s = waitUntil("running", server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Start got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	// reboot server
@@ -229,9 +270,13 @@ func TestIntegrationServer_Actions(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Reboot returned error %s\n", err)
 	}
-	s = waitUntil("running", server.UUID, t)
-	if status := s.Status; status != cloudscale.ServerRunning {
-		t.Errorf("Server.Reboot got=%s\nwant=%s\n", status, cloudscale.ServerRunning)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
 	err = client.Servers.Delete(context.Background(), server.UUID)
@@ -254,19 +299,40 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
+	// Wait until the volumes are actually allocated and have UUIDs
+	// https://www.cloudscale.ch/en/api/v1#volumes-create
+	server, err = client.Servers.WaitFor(
+		context.TODO(),
+		server.UUID,
+		func(s *cloudscale.Server) (bool, error) {
+			for i, volume := range s.Volumes {
+				if len(volume.UUID) <= 1 {
+					return false, fmt.Errorf("volume at index %d has an invalid or unassigned UUID", i)
+				}
+			}
+			return true, nil
+		},
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+
+	// Ignore UUIDs in this comparison
+	actual := make([]cloudscale.VolumeStub, len(server.Volumes))
+	copy(actual, server.Volumes)
+	for i := range actual {
+		actual[i].UUID = ""
+	}
 	expected := []cloudscale.VolumeStub{
 		{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
 		{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
 		{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
 	}
-	if !reflect.DeepEqual(server.Volumes, expected) {
-		t.Errorf("Volumes response\n got=%#v\nwant=%#v", server.Volumes, expected)
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Volumes response\n got=%#v\nwant=%#v", actual, expected)
 	}
 
-	// Wait a bit until the volumes are actually allocated and have UUID's see
-	// https://www.cloudscale.ch/en/api/v1#volumes-create
-	time.Sleep(5 * time.Second)
-	server, err = client.Servers.Get(context.TODO(), server.UUID)
+	// delete all volume, except the root volume
 	for _, volume := range server.Volumes[1:] {
 		volumeUUID := volume.UUID
 		if len(volumeUUID) <= 1 {
@@ -325,28 +391,4 @@ func createServerInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.Wa
 	if err != nil {
 		t.Errorf("Servers.Delete returned error %s\n", err)
 	}
-}
-
-func waitUntil(status string, uuid string, t *testing.T) *cloudscale.Server {
-	// An operation that may fail.
-	operation := func() (*cloudscale.Server, error) {
-		s, err := client.Servers.Get(context.Background(), uuid)
-		if err != nil {
-			return nil, err
-		}
-
-		if s.Status != status {
-			return nil, errors.New("Status not reached")
-		}
-		return s, nil
-	}
-
-	result, err := backoff.Retry(context.TODO(), operation,
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(60),
-	)
-	if err != nil {
-		t.Fatalf("Error while waiting for status change %s\n", err)
-	}
-	return result
 }

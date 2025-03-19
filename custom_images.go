@@ -1,6 +1,7 @@
 package cloudscale
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -38,8 +39,16 @@ type CustomImageService interface {
 	GenericListService[CustomImage]
 	GenericUpdateService[CustomImage, CustomImageRequest]
 	GenericDeleteService[CustomImage]
+	GenericWaitForService[CustomImage]
 }
 
 type CustomImageServiceOperations struct {
 	client *Client
+}
+
+var ImportIsSuccessful = func(importInfo *CustomImageImport) (bool, error) {
+	if importInfo.Status == "success" {
+		return true, nil
+	}
+	return false, fmt.Errorf("waiting for status: %s, current status: %s", "success", importInfo.Status)
 }

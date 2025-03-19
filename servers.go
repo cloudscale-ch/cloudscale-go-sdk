@@ -128,6 +128,7 @@ type ServerService interface {
 	GenericListService[Server]
 	GenericUpdateService[Server, ServerUpdateRequest]
 	GenericDeleteService[Server]
+	GenericWaitForService[Server]
 	Reboot(ctx context.Context, serverID string) error
 	Start(ctx context.Context, serverID string) error
 	Stop(ctx context.Context, serverID string) error
@@ -192,4 +193,18 @@ func (s ServerServiceOperations) Update(ctx context.Context, id string, req *Ser
 
 	// Call the generic Update method directly using the embedded field name
 	return s.GenericServiceOperations.Update(ctx, id, req)
+}
+
+var ServerIsRunning = func(server *Server) (bool, error) {
+	if server.Status == ServerRunning {
+		return true, nil
+	}
+	return false, fmt.Errorf("waiting for status: %s, current status: %s", ServerRunning, server.Status)
+}
+
+var ServerIsStopped = func(server *Server) (bool, error) {
+	if server.Status == ServerStopped {
+		return true, nil
+	}
+	return false, fmt.Errorf("waiting for status: %s, current status: %s", ServerStopped, server.Status)
 }

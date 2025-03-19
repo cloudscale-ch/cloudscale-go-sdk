@@ -24,4 +24,5 @@ type ObjectsUsersService interface {
 	GenericListService[ObjectsUser]
 	GenericUpdateService[ObjectsUser, ObjectsUserRequest]
 	GenericDeleteService[ObjectsUser]
+	GenericWaitForService[ObjectsUser]
 }

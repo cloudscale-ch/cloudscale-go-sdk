@@ -105,6 +105,7 @@ type SubnetService interface {
 	GenericListService[Subnet]
 	GenericUpdateService[Subnet, SubnetUpdateRequest]
 	GenericDeleteService[Subnet]
+	GenericWaitForService[Subnet]
 }
 
 type SubnetServiceOperations struct {

@@ -33,7 +33,14 @@ func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	waitUntil("running", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion: 4,
@@ -101,7 +108,7 @@ func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", loadBalancer.UUID, t)
+	waitUntilLB(loadBalancer.UUID, t)
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion:    4,
@@ -189,8 +196,22 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	waitUntil("running", server.UUID, t)
-	waitUntil("running", expected.UUID, t)
+	server, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
+	expected, err = client.Servers.WaitFor(
+		context.Background(),
+		expected.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion: 4,
@@ -277,7 +298,14 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	waitUntil("running", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion: 6,
@@ -324,7 +352,14 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 		t.Fatalf("Servers.Create returned error %s\n", err)
 	}
 
-	waitUntil("running", server.UUID, t)
+	_, err = client.Servers.WaitFor(
+		context.Background(),
+		server.UUID,
+		cloudscale.ServerIsRunning,
+	)
+	if err != nil {
+		t.Fatalf("Servers.WaitFor returned error %s\n", err)
+	}
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion:    6,
@@ -382,7 +417,14 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 	}
 
 	for _, server := range servers {
-		waitUntil("running", server.UUID, t)
+		_, err = client.Servers.WaitFor(
+			context.Background(),
+			server.UUID,
+			cloudscale.ServerIsRunning,
+		)
+		if err != nil {
+			t.Fatalf("Servers.WaitFor returned error %s\n", err)
+		}
 	}
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{

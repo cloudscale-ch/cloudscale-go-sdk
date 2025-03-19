@@ -19,7 +19,7 @@ func TestIntegrationLoadBalancerPool_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	createLoadBalancerPoolRequest := &cloudscale.LoadBalancerPoolRequest{
 		Name:         testRunPrefix,
@@ -78,7 +78,7 @@ func TestIntegrationLoadBalancerPool_Update(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	createLoadBalancerPoolRequest := &cloudscale.LoadBalancerPoolRequest{
 		Name:         testRunPrefix,

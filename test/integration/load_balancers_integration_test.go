@@ -5,8 +5,6 @@ package integration
 
 import (
 	"context"
-	"errors"
-	"github.com/cenkalti/backoff/v5"
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
 	"reflect"
 	"testing"
@@ -32,7 +30,7 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Get returned error %s\n", err)
 	}
 
-	waitUntilLB("running", expected.UUID, t)
+	waitUntilLB(expected.UUID, t)
 
 	if h := time.Since(loadBalancer.CreatedAt).Hours(); !(-1 < h && h < 1) {
 		t.Errorf("loadBalancer.CreatedAt ourside of expected range. got=%v", loadBalancer.CreatedAt)
@@ -116,7 +114,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 		t.Errorf("loadBalancerSubnetUUID \n got=%s\nwant=%s", loadBalancerSubnetUUID, subnet.UUID)
 	}
 
-	waitUntilLB("running", loadBalancer.UUID, t)
+	waitUntilLB(loadBalancer.UUID, t)
 
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
@@ -143,7 +141,7 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 		t.Fatalf("loadBalancer.Create returned error %s\n", err)
 	}
 
-	waitUntilLB("running", lb.UUID, t)
+	waitUntilLB(lb.UUID, t)
 
 	newName := testRunPrefix + "-renamed"
 	updateRequest := &cloudscale.LoadBalancerRequest{
@@ -171,26 +169,11 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 	}
 }
 
-func waitUntilLB(status string, uuid string, t *testing.T) *cloudscale.LoadBalancer {
-	// An operation that may fail.
-	operation := func() (*cloudscale.LoadBalancer, error) {
-		lb, err := client.LoadBalancers.Get(context.Background(), uuid)
-		if err != nil {
-			return nil, err
-		}
-
-		if lb.Status != status {
-			return nil, errors.New("Status not reached")
-		}
-		return lb, nil
-	}
-
-	result, err := backoff.Retry(context.TODO(), operation,
-		backoff.WithBackOff(backoff.NewConstantBackOff(2*time.Second)),
-		backoff.WithMaxTries(60),
-	)
+func waitUntilLB(uuid string, t *testing.T) *cloudscale.LoadBalancer {
+	lb, err := client.LoadBalancers.WaitFor(context.Background(), uuid, cloudscale.LoadBalancerIsRunning)
 	if err != nil {
-		t.Fatalf("Error while waiting for status change %s\n", err)
+		t.Fatalf("client.LoadBalancers.WaitFor returned error %s\n", err)
 	}
-	return result
+
+	return lb
 }
