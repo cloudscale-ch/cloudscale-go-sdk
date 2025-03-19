@@ -66,6 +66,21 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 		t.Errorf("server.CreatedAt ourside of expected range. got=%v", server.CreatedAt)
 	}
 
+	if server.Image.Slug != DefaultImageSlug {
+		t.Errorf("Server.Image.Slug got=%s, want=%s", server.Image.Slug, DefaultImageSlug)
+	}
+
+	const expectedValue = "debian"
+	if !strings.Contains(strings.ToLower(server.Image.Name), expectedValue) {
+		t.Errorf("Server.Image.Name got=%s, want to contain '%s'", server.Image.Name, expectedValue)
+	}
+	if !strings.Contains(strings.ToLower(server.Image.OperatingSystem), expectedValue) {
+		t.Errorf("Server.Image.OperatingSystem got=%s, want to contain '%s'", server.Image.OperatingSystem, expectedValue)
+	}
+	if !strings.Contains(strings.ToLower(server.Image.DefaultUsername), expectedValue) {
+		t.Errorf("Server.Image.DefaultUsername got=%s, want to contain '%s'", server.Image.DefaultUsername, expectedValue)
+	}
+
 	servers, err := client.Servers.List(context.Background())
 	if err != nil {
 		t.Fatalf("Servers.List returned error %s\n", err)
