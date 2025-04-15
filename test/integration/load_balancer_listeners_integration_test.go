@@ -150,7 +150,7 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 	// update allowed ciders
 	updatedAllowedCIDRs := []string{"10.0.0.0/24"}
 	updateRequest2 := &cloudscale.LoadBalancerListenerRequest{
-		AllowedCIDRs: updatedAllowedCIDRs,
+		AllowedCIDRs: &updatedAllowedCIDRs,
 	}
 
 	err = client.LoadBalancerListeners.Update(context.Background(), uuid, updateRequest2)
@@ -170,7 +170,7 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 	// set allowed CIDRs to an empty list
 	updatedAllowedCIDRsEmpty := []string{}
 	updateRequest3 := &cloudscale.LoadBalancerListenerRequest{
-		AllowedCIDRs: updatedAllowedCIDRsEmpty,
+		AllowedCIDRs: &updatedAllowedCIDRsEmpty,
 	}
 
 	err = client.LoadBalancerListeners.Update(context.Background(), uuid, updateRequest3)
