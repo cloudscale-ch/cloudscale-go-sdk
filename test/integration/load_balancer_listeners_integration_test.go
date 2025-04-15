@@ -167,6 +167,26 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 		t.Errorf("updated2.AllowedCIDRs \n got=%s\nwant=%s", allowedCIDRs, updatedAllowedCIDRs)
 	}
 
+	// set allowed CIDRs to an empty list
+	updatedAllowedCIDRsEmpty := []string{}
+	updateRequest3 := &cloudscale.LoadBalancerListenerRequest{
+		AllowedCIDRs: updatedAllowedCIDRsEmpty,
+	}
+
+	err = client.LoadBalancerListeners.Update(context.Background(), uuid, updateRequest3)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Update returned error %s\n", err)
+	}
+
+	updated3, err := client.LoadBalancerListeners.Get(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Get returned error %s\n", err)
+	}
+
+	if allowedCIDRs := updated3.AllowedCIDRs; !reflect.DeepEqual(allowedCIDRs, updatedAllowedCIDRsEmpty) {
+		t.Errorf("updated3.AllowedCIDRs \n got=%s\nwant=%s", allowedCIDRs, updatedAllowedCIDRsEmpty)
+	}
+
 	err = client.LoadBalancerListeners.Delete(context.Background(), updated.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancerListeners.Delete returned error %s\n", err)
