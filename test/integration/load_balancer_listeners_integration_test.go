@@ -6,7 +6,7 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v5"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
 	"reflect"
 	"testing"
 	"time"
@@ -150,7 +150,7 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 	// update allowed ciders
 	updatedAllowedCIDRs := []string{"10.0.0.0/24"}
 	updateRequest2 := &cloudscale.LoadBalancerListenerRequest{
-		AllowedCIDRs: updatedAllowedCIDRs,
+		AllowedCIDRs: &updatedAllowedCIDRs,
 	}
 
 	err = client.LoadBalancerListeners.Update(context.Background(), uuid, updateRequest2)
@@ -165,6 +165,26 @@ func TestIntegrationLoadBalancerListener_Update(t *testing.T) {
 
 	if allowedCIDRs := updated2.AllowedCIDRs; !reflect.DeepEqual(allowedCIDRs, updatedAllowedCIDRs) {
 		t.Errorf("updated2.AllowedCIDRs \n got=%s\nwant=%s", allowedCIDRs, updatedAllowedCIDRs)
+	}
+
+	// set allowed CIDRs to an empty list
+	updatedAllowedCIDRsEmpty := []string{}
+	updateRequest3 := &cloudscale.LoadBalancerListenerRequest{
+		AllowedCIDRs: &updatedAllowedCIDRsEmpty,
+	}
+
+	err = client.LoadBalancerListeners.Update(context.Background(), uuid, updateRequest3)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Update returned error %s\n", err)
+	}
+
+	updated3, err := client.LoadBalancerListeners.Get(context.Background(), uuid)
+	if err != nil {
+		t.Fatalf("LoadBalancerListeners.Get returned error %s\n", err)
+	}
+
+	if allowedCIDRs := updated3.AllowedCIDRs; !reflect.DeepEqual(allowedCIDRs, updatedAllowedCIDRsEmpty) {
+		t.Errorf("updated3.AllowedCIDRs \n got=%s\nwant=%s", allowedCIDRs, updatedAllowedCIDRsEmpty)
 	}
 
 	err = client.LoadBalancerListeners.Delete(context.Background(), updated.UUID)

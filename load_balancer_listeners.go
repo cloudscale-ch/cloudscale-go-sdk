@@ -32,14 +32,14 @@ type LoadBalancerListener struct {
 
 type LoadBalancerListenerRequest struct {
 	TaggedResourceRequest
-	Name                   string   `json:"name,omitempty"`
-	Pool                   string   `json:"pool,omitempty"`
-	Protocol               string   `json:"protocol,omitempty"`
-	ProtocolPort           int      `json:"protocol_port,omitempty"`
-	AllowedCIDRs           []string `json:"allowed_cidrs,omitempty"`
-	TimeoutClientDataMS    int      `json:"timeout_client_data_ms,omitempty"`
-	TimeoutMemberConnectMS int      `json:"timeout_member_connect_ms,omitempty"`
-	TimeoutMemberDataMS    int      `json:"timeout_member_data_ms,omitempty"`
+	Name                   string    `json:"name,omitempty"`
+	Pool                   string    `json:"pool,omitempty"`
+	Protocol               string    `json:"protocol,omitempty"`
+	ProtocolPort           int       `json:"protocol_port,omitempty"`
+	AllowedCIDRs           *[]string `json:"allowed_cidrs,omitempty"`
+	TimeoutClientDataMS    int       `json:"timeout_client_data_ms,omitempty"`
+	TimeoutMemberConnectMS int       `json:"timeout_member_connect_ms,omitempty"`
+	TimeoutMemberDataMS    int       `json:"timeout_member_data_ms,omitempty"`
 }
 
 type LoadBalancerListenerService interface {
