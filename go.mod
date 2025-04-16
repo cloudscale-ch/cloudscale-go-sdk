@@ -1,4 +1,4 @@
-module github.com/cloudscale-ch/cloudscale-go-sdk/v5
+module github.com/cloudscale-ch/cloudscale-go-sdk/v6
 
 go 1.23.0
 
