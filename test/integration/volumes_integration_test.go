@@ -118,7 +118,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 	if err == nil {
 		t.Error("Expected an error when updating multiple volume attributes\n")
 	} else {
-		expected := "To keep changes atomic"
+		expected := "Only one attribute"
 		err, ok := err.(*cloudscale.ErrorResponse)
 		if !ok {
 			t.Errorf("Couldn't cast %s\n", err)
