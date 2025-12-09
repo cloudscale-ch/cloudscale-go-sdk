@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -102,7 +103,7 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		checksum := string(body)
+		checksum := strings.TrimSpace(string(body))
 		if checksum != customImage.Checksums[algo] {
 			t.Error(fmt.Sprintf("Checksum does not match\n got=%#v\nwant=%#v", customImage.Checksums[algo], checksum))
 		}
