@@ -6,21 +6,23 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
 )
 
-const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/alpine"
+const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/alpine.raw"
 
 func TestIntegrationCustomImage_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
-		URL:              "https://at-images.objects.lpg.cloudscale.ch/alpine",
+		URL:              testImageURL,
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1", "rma1"},
 		SourceFormat:     "raw",
@@ -101,7 +103,7 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		checksum := string(body)
+		checksum := strings.TrimSpace(string(body))
 		if checksum != customImage.Checksums[algo] {
 			t.Error(fmt.Sprintf("Checksum does not match\n got=%#v\nwant=%#v", customImage.Checksums[algo], checksum))
 		}

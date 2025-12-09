@@ -6,10 +6,11 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
 )
 
 func getInitialTags() cloudscale.TagMap {
@@ -564,7 +565,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 
 	createRequest := cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
-		URL:              "https://at-images.objects.lpg.cloudscale.ch/alpine",
+		URL:              testImageURL,
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"lpg1"},
 		SourceFormat:     "raw",
