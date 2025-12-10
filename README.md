@@ -1,6 +1,6 @@
 # cloudscale.ch Go API SDK
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/cloudscale-ch/cloudscale-go-sdk.svg)](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v6.0.1)
+[![Go Reference](https://pkg.go.dev/badge/github.com/cloudscale-ch/cloudscale-go-sdk.svg)](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v6)
 [![Tests](https://github.com/cloudscale-ch/cloudscale-go-sdk/actions/workflows/test.yaml/badge.svg)](https://github.com/cloudscale-ch/cloudscale-go-sdk/actions/workflows/test.yaml)
 
 If you want to manage your cloudscale.ch server resources with Go, you are at
@@ -91,7 +91,7 @@ To use the `cloudscale-go-sdk` for managing your cloudscale.ch resources, follow
    go run main.go
    ```
 
-That's it! The code will create a server and leverage the `WaitFor` helper to wait until the server status changes to `running`. For more advanced options, check the [documentation](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v6.0.1).
+That's it! The code will create a server and leverage the `WaitFor` helper to wait until the server status changes to `running`. For more advanced options, check the [documentation](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v6).
 
 ## Testing
 
