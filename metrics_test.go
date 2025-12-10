@@ -2,6 +2,7 @@ package cloudscale
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -54,7 +55,7 @@ func TestMetrics_GetBucketMetrics(t *testing.T) {
 					}
 				]
 			}`
-		fmt.Fprintf(w, jsonStr)
+		io.WriteString(w, jsonStr)
 	})
 
 	metrics, err := client.Metrics.GetBucketMetrics(ctx, metricsRequest)

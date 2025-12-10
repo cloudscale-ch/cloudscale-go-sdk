@@ -3,6 +3,7 @@ package cloudscale
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"reflect"
 	"testing"
@@ -12,7 +13,7 @@ func TestCustomImageImport_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	CustomImageImportRequest := &CustomImageImportRequest{
+	customImageImportRequest := &CustomImageImportRequest{
 		Name: "Test Image",
 		TaggedResourceRequest: TaggedResourceRequest{
 			&TagMap{
@@ -53,10 +54,10 @@ func TestCustomImageImport_Create(t *testing.T) {
   						"error_message": "",
   						"tags": {}
 					}`
-		fmt.Fprintf(w, jsonStr)
+		io.WriteString(w, jsonStr)
 	})
 
-	customImageImport, err := client.CustomImageImports.Create(ctx, CustomImageImportRequest)
+	customImageImport, err := client.CustomImageImports.Create(ctx, customImageImportRequest)
 	if err != nil {
 		t.Errorf("CustomImageImport.Create returned error: %v", err)
 		return

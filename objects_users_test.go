@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"reflect"
 	"testing"
@@ -13,7 +14,7 @@ func TestObjectsUser_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	ObjectsUserRequest := &ObjectsUserRequest{
+	objectsUserRequest := &ObjectsUserRequest{
 		DisplayName: "TestBucket",
 		TaggedResourceRequest: TaggedResourceRequest{
 			&TagMap{
@@ -54,10 +55,10 @@ func TestObjectsUser_Create(t *testing.T) {
 							"other": "tag"
 						}
 					}`
-		fmt.Fprintf(w, jsonStr)
+		io.WriteString(w, jsonStr)
 	})
 
-	objectsUser, err := client.ObjectsUsers.Create(ctx, ObjectsUserRequest)
+	objectsUser, err := client.ObjectsUsers.Create(ctx, objectsUserRequest)
 	if err != nil {
 		t.Errorf("ObjectsUser.Create returned error: %v", err)
 		return
