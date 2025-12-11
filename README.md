@@ -133,11 +133,11 @@ INTEGRATION_TEST_ZONE="lpg1"  make integration
 
 To create a new release, please do the following:
 
-- Merge all feature branches into a release branch
-- Checkout the release branch
+- Merge all feature branches into `main`/`master` branch
+- Create a release branch from `main`/`master` branch
 - Run `make NEW_VERSION=v1.x.x bump-version`
-  - For a new major release, follow [these instructions](https://go.dev/doc/modules/major-version)
-  - Update the `pkg.go.dev` refercenes in this file (multiple!).
+  - For a new major release: follow [these instructions](https://go.dev/doc/modules/major-version)
+  - For a new major release: update the `pkg.go.dev` refercenes in this file (multiple!).
 - Commit changes
-- Merge the release branch into master
+- Open a merge request for the release branch and after code review merge the release branch into master
 - Create a [new release](https://github.com/cloudscale-ch/cloudscale-go-sdk/releases/new) on GitHub.
