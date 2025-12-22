@@ -11,7 +11,7 @@ import (
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
 )
 
-func TestVolumeSnapshotIntegration_CRUD(t *testing.T) {
+func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 	integrationTest(t)
 
 	ctx := context.Background()
