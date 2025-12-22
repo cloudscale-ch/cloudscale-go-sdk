@@ -37,6 +37,7 @@ type Client struct {
 	Regions                    RegionService
 	Servers                    ServerService
 	Volumes                    VolumeService
+	VolumeSnapshots            VolumeSnapshotService
 	Networks                   NetworkService
 	Subnets                    SubnetService
 	FloatingIPs                FloatingIPsService
@@ -91,6 +92,10 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Volumes = GenericServiceOperations[Volume, VolumeRequest, VolumeRequest]{
 		client: c,
 		path:   volumeBasePath,
+	}
+	c.VolumeSnapshots = GenericServiceOperations[VolumeSnapshot, VolumeSnapshotRequest, VolumeSnapshotUpdateRequest]{
+		client: c,
+		path:   volumeSnapshotsBasePath,
 	}
 	c.ServerGroups = GenericServiceOperations[ServerGroup, ServerGroupRequest, ServerGroupRequest]{
 		client: c,
