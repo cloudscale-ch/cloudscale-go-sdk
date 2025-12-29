@@ -136,18 +136,29 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 // waitForSnapshotDeletion polls the API until the snapshot no longer exists
 func waitForSnapshotDeletion(ctx context.Context, snapshotUUID string, maxWaitSeconds int) error {
 	for i := 0; i < maxWaitSeconds; i++ {
-		_, err := client.VolumeSnapshots.Get(ctx, snapshotUUID)
+		snapshot, err := client.VolumeSnapshots.Get(ctx, snapshotUUID)
 		if err != nil {
-			// If we get a 404 error, the snapshot is deleted
+
 			if apiErr, ok := err.(*cloudscale.ErrorResponse); ok {
 				if apiErr.StatusCode == 404 {
+					// if we get a 404 error, snapshot is gone, deletion completed
 					return nil
 				}
 			}
-			// Some other error occurred
+			// some other error occurred
 			return err
 		}
-		// Snapshot still exists, wait 1 second and try again
+
+		// if snapshot still exists, it must be in state deleting
+		if snapshot.Status != "deleting" {
+			return fmt.Errorf(
+				"snapshot %s exists but is in unexpected state %q while waiting for deletion",
+				snapshotUUID,
+				snapshot.Status,
+			)
+		}
+
+		// snapshot still exists, wait 1 second and try again
 		time.Sleep(1 * time.Second)
 	}
 	return fmt.Errorf("snapshot %s still exists after %d seconds", snapshotUUID, maxWaitSeconds)

@@ -13,6 +13,7 @@ type VolumeSnapshot struct {
 	SizeGB    int        `json:"size_gb,omitempty"`
 	CreatedAt string     `json:"created_at,omitempty"`
 	Volume    VolumeStub `json:"volume,omitempty"`
+	Status    string     `json:"status,omitempty"`
 }
 
 type VolumeSnapshotRequest struct {
