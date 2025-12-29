@@ -7,18 +7,18 @@ import (
 type VolumeSnapshot struct {
 	ZonalResource
 	TaggedResource
-	HREF      string     `json:"href"`
-	UUID      string     `json:"uuid"`
-	Name      string     `json:"name"`
-	SizeGB    int        `json:"size_gb"`
-	CreatedAt string     `json:"created_at"`
-	Volume    VolumeStub `json:"volume"`
+	HREF      string     `json:"href,omitempty"`
+	UUID      string     `json:"uuid,omitempty"`
+	Name      string     `json:"name,omitempty"`
+	SizeGB    int        `json:"size_gb,omitempty"`
+	CreatedAt string     `json:"created_at,omitempty"`
+	Volume    VolumeStub `json:"volume,omitempty"`
 }
 
 type VolumeSnapshotRequest struct {
 	TaggedResourceRequest
-	Name         string `json:"name"`
-	SourceVolume string `json:"source_volume"`
+	Name         string `json:"name,omitempty"`
+	SourceVolume string `json:"source_volume,omitempty"`
 }
 
 type VolumeSnapshotUpdateRequest struct {
