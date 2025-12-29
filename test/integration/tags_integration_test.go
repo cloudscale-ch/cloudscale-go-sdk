@@ -174,6 +174,94 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	}
 }
 
+func TestIntegrationTags_Snapshot(t *testing.T) {
+	integrationTest(t)
+
+	createVolumeRequest := cloudscale.VolumeRequest{
+		Name:   testRunPrefix,
+		SizeGB: 3,
+	}
+
+	volume, err := client.Volumes.Create(context.Background(), &createVolumeRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Create returned error %s\n", err)
+	}
+
+	snapshotCreateRequest := &cloudscale.VolumeSnapshotRequest{
+		Name:         "test-snapshot",
+		SourceVolume: volume.UUID,
+	}
+	initialTags := getInitialTags()
+	snapshotCreateRequest.Tags = &initialTags
+
+	snapshot, err := client.VolumeSnapshots.Create(context.Background(), snapshotCreateRequest)
+	if err != nil {
+		t.Fatalf("VolumeSnapshots.Create: %v", err)
+	}
+
+	getResult, err := client.VolumeSnapshots.Get(context.Background(), snapshot.UUID)
+	if err != nil {
+		t.Errorf("VolumeSnapshots.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult.Tags, initialTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	updateRequest := cloudscale.VolumeSnapshotUpdateRequest{}
+	newTags := getNewTags()
+	updateRequest.Tags = &newTags
+
+	err = client.VolumeSnapshots.Update(context.Background(), snapshot.UUID, &updateRequest)
+	if err != nil {
+		t.Errorf("VolumeSnapshots.Update returned error: %v", err)
+	}
+	getResult2, err := client.VolumeSnapshots.Get(context.Background(), snapshot.UUID)
+	if err != nil {
+		t.Errorf("VolumeSnapshots.Get returned error %s\n", err)
+	}
+	if !reflect.DeepEqual(getResult2.Tags, newTags) {
+		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
+	}
+
+	// test querying with tags
+	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
+		res, err := client.VolumeSnapshots.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("VolumeSnapshots.List returned error %s\n", err)
+		}
+		if len(res) > 0 {
+			t.Errorf("Expected no result when filter with %#v, got: %#v", tags, res)
+		}
+	}
+
+	newTagsKeyOnly := getNewTagsKeyOnly()
+	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
+		res, err := client.VolumeSnapshots.List(context.Background(), cloudscale.WithTagFilter(tags))
+		if err != nil {
+			t.Errorf("VolumeSnapshots.List returned error %s\n", err)
+		}
+		if len(res) != 1 {
+			t.Errorf("Expected exactly one result when filter with %#v, got: %#v", tags, len(res))
+		}
+	}
+
+	err = client.VolumeSnapshots.Delete(context.Background(), snapshot.UUID)
+	if err != nil {
+		t.Fatalf("VolumeSnapshots.Delete returned error %s\n", err)
+	}
+
+	// Wait for snapshot to be fully deleted before deleting volume
+	err = waitForSnapshotDeletion(context.Background(), snapshot.UUID, 10)
+	if err != nil {
+		t.Fatalf("Snapshot deletion timeout: %v", err)
+	}
+
+	if err := client.Volumes.Delete(context.Background(), volume.UUID); err != nil {
+		t.Fatalf("Warning: failed to delete volume %s: %v", volume.UUID, err)
+	}
+}
+
 func TestIntegrationTags_FloatingIP(t *testing.T) {
 	integrationTest(t)
 
