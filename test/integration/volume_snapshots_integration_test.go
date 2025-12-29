@@ -47,6 +47,54 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 		t.Errorf("Expected retrieved snapshot name 'test-snapshot', got '%s'", retrieved.Name)
 	}
 
+	snapshots, err := client.VolumeSnapshots.List(ctx)
+	if err != nil {
+		t.Fatalf("VolumeSnapshots.List: %v", err)
+	}
+	if len(snapshots) == 0 {
+		t.Error("Expected at least one snapshot")
+	}
+
+	if err := client.VolumeSnapshots.Delete(ctx, snapshot.UUID); err != nil {
+		t.Fatalf("Warning: failed to delete snapshot %s: %v", snapshot.UUID, err)
+	}
+
+	// Wait for snapshot to be fully deleted before deleting volume
+	err = waitForSnapshotDeletion(ctx, snapshot.UUID, 10)
+	if err != nil {
+		t.Fatalf("Snapshot deletion timeout: %v", err)
+	}
+
+	if err := client.Volumes.Delete(ctx, volume.UUID); err != nil {
+		t.Fatalf("Warning: failed to delete volume %s: %v", volume.UUID, err)
+	}
+}
+
+func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
+	integrationTest(t)
+
+	ctx := context.Background()
+
+	// A source volume is needed to create a snapshot.
+	volumeCreateRequest := &cloudscale.VolumeRequest{
+		Name:   "test-volume-for-snapshot",
+		SizeGB: 50,
+		Type:   "ssd",
+	}
+	volume, err := client.Volumes.Create(ctx, volumeCreateRequest)
+	if err != nil {
+		t.Fatalf("Volume.Create: %v", err)
+	}
+
+	snapshotCreateRequest := &cloudscale.VolumeSnapshotRequest{
+		Name:         "test-snapshot",
+		SourceVolume: volume.UUID,
+	}
+	snapshot, err := client.VolumeSnapshots.Create(ctx, snapshotCreateRequest)
+	if err != nil {
+		t.Fatalf("VolumeSnapshots.Create: %v", err)
+	}
+
 	snapshotUpdateRequest := &cloudscale.VolumeSnapshotUpdateRequest{
 		Name: "updated-snapshot",
 	}
@@ -62,14 +110,6 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 	}
 	if updatedSnapshot.Name != "updated-snapshot" {
 		t.Errorf("Expected updated snapshot name 'updated-snapshot', got '%s'", updatedSnapshot.Name)
-	}
-
-	snapshots, err := client.VolumeSnapshots.List(ctx)
-	if err != nil {
-		t.Fatalf("VolumeSnapshots.List: %v", err)
-	}
-	if len(snapshots) == 0 {
-		t.Error("Expected at least one snapshot")
 	}
 
 	if err := client.VolumeSnapshots.Delete(ctx, snapshot.UUID); err != nil {
