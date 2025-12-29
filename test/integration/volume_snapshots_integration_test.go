@@ -21,6 +21,9 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 		Name:   "test-volume-for-snapshot",
 		SizeGB: 50,
 		Type:   "ssd",
+		ZonalResourceRequest: cloudscale.ZonalResourceRequest{
+			Zone: testZone,
+		},
 	}
 	volume, err := client.Volumes.Create(ctx, volumeCreateRequest)
 	if err != nil {
@@ -80,6 +83,9 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 		Name:   "test-volume-for-snapshot",
 		SizeGB: 50,
 		Type:   "ssd",
+		ZonalResourceRequest: cloudscale.ZonalResourceRequest{
+			Zone: testZone,
+		},
 	}
 	volume, err := client.Volumes.Create(ctx, volumeCreateRequest)
 	if err != nil {
