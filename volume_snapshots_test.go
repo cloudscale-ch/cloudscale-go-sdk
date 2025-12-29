@@ -78,10 +78,14 @@ func TestVolumeSnapshots_Get(t *testing.T) {
 		Volume: VolumeStub{
 			UUID: "volume-uuid",
 		},
-		Zone: Zone{
-			Slug: "lpg1",
+		ZonalResource: ZonalResource{
+			Zone{
+				Slug: "lpg1",
+			},
 		},
-		Tags: &TagMap{},
+		TaggedResource: TaggedResource{
+			Tags: TagMap{},
+		},
 	}
 
 	if !reflect.DeepEqual(snapshot, expected) {
@@ -145,8 +149,11 @@ func TestVolumeSnapshots_Update_WithTags(t *testing.T) {
 	})
 
 	tags := TagMap{"environment": "production"}
+
 	updateRequest := &VolumeSnapshotUpdateRequest{
-		Tags: &tags,
+		TaggedResourceRequest: TaggedResourceRequest{
+			Tags: &tags,
+		},
 	}
 
 	err := client.VolumeSnapshots.Update(context.Background(), "snapshot-uuid", updateRequest)
@@ -227,10 +234,14 @@ func TestVolumeSnapshots_List(t *testing.T) {
 			Volume: VolumeStub{
 				UUID: "volume-uuid-1",
 			},
-			Zone: Zone{
-				Slug: "lpg1",
+			ZonalResource: ZonalResource{
+				Zone{
+					Slug: "lpg1",
+				},
 			},
-			Tags: &TagMap{},
+			TaggedResource: TaggedResource{
+				Tags: TagMap{},
+			},
 		},
 		{
 			UUID:      "snapshot-uuid-2",
@@ -240,10 +251,14 @@ func TestVolumeSnapshots_List(t *testing.T) {
 			Volume: VolumeStub{
 				UUID: "volume-uuid-2",
 			},
-			Zone: Zone{
-				Slug: "rma1",
+			ZonalResource: ZonalResource{
+				Zone{
+					Slug: "rma1",
+				},
 			},
-			Tags: &TagMap{"environment": "test"},
+			TaggedResource: TaggedResource{
+				Tags: TagMap{"environment": "test"},
+			},
 		},
 	}
 
