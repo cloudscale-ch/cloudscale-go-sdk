@@ -1,8 +1,6 @@
 package cloudscale
 
-import (
-	"context"
-)
+const volumeSnapshotsBasePath = "v1/volume-snapshots"
 
 type VolumeSnapshot struct {
 	ZonalResource
@@ -27,12 +25,11 @@ type VolumeSnapshotUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 }
 
-const volumeSnapshotsBasePath = "v1/volume-snapshots"
-
 type VolumeSnapshotService interface {
-	Create(ctx context.Context, createRequest *VolumeSnapshotRequest) (*VolumeSnapshot, error)
-	Get(ctx context.Context, snapshotID string) (*VolumeSnapshot, error)
-	Update(ctx context.Context, snapshotID string, updateRequest *VolumeSnapshotUpdateRequest) error
-	Delete(ctx context.Context, snapshotID string) error
-	List(ctx context.Context, opts ...ListRequestModifier) ([]VolumeSnapshot, error)
+	GenericCreateService[VolumeSnapshot, VolumeSnapshotRequest]
+	GenericGetService[VolumeSnapshot]
+	GenericListService[VolumeSnapshot]
+	GenericUpdateService[VolumeSnapshot, VolumeSnapshotUpdateRequest]
+	GenericDeleteService[VolumeSnapshot]
+	GenericWaitForService[VolumeSnapshot]
 }
