@@ -93,7 +93,7 @@ func NewClient(httpClient *http.Client) *Client {
 		client: c,
 		path:   volumeBasePath,
 	}
-	c.VolumeSnapshots = GenericServiceOperations[VolumeSnapshot, VolumeSnapshotRequest, VolumeSnapshotUpdateRequest]{
+	c.VolumeSnapshots = GenericServiceOperations[VolumeSnapshot, VolumeSnapshotCreateRequest, VolumeSnapshotUpdateRequest]{
 		client: c,
 		path:   volumeSnapshotsBasePath,
 	}

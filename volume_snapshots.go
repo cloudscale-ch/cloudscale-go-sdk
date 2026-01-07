@@ -14,7 +14,7 @@ type VolumeSnapshot struct {
 	Status    string     `json:"status,omitempty"`
 }
 
-type VolumeSnapshotRequest struct {
+type VolumeSnapshotCreateRequest struct {
 	TaggedResourceRequest
 	Name         string `json:"name,omitempty"`
 	SourceVolume string `json:"source_volume,omitempty"`
@@ -26,7 +26,7 @@ type VolumeSnapshotUpdateRequest struct {
 }
 
 type VolumeSnapshotService interface {
-	GenericCreateService[VolumeSnapshot, VolumeSnapshotRequest]
+	GenericCreateService[VolumeSnapshot, VolumeSnapshotCreateRequest]
 	GenericGetService[VolumeSnapshot]
 	GenericListService[VolumeSnapshot]
 	GenericUpdateService[VolumeSnapshot, VolumeSnapshotUpdateRequest]

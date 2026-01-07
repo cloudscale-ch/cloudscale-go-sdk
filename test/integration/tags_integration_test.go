@@ -187,7 +187,7 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 		t.Fatalf("Volumes.Create returned error %s\n", err)
 	}
 
-	snapshotCreateRequest := &cloudscale.VolumeSnapshotRequest{
+	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
 		Name:         "test-snapshot",
 		SourceVolume: volume.UUID,
 	}

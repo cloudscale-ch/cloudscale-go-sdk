@@ -30,7 +30,7 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 		t.Fatalf("Volume.Create: %v", err)
 	}
 
-	snapshotCreateRequest := &cloudscale.VolumeSnapshotRequest{
+	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
 		Name:         "test-snapshot",
 		SourceVolume: volume.UUID,
 	}
@@ -92,7 +92,7 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 		t.Fatalf("Volume.Create: %v", err)
 	}
 
-	snapshotCreateRequest := &cloudscale.VolumeSnapshotRequest{
+	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
 		Name:         "test-snapshot",
 		SourceVolume: volume.UUID,
 	}
