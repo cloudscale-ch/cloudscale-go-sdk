@@ -109,7 +109,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 func TestIntegrationTags_Volume(t *testing.T) {
 	integrationTest(t)
 
-	createRequest := cloudscale.VolumeRequest{
+	createRequest := cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 3,
 	}
@@ -129,7 +129,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 		t.Errorf("Tagging failed, could not tag, is at %s\n", getResult.Tags)
 	}
 
-	updateRequest := cloudscale.VolumeRequest{}
+	updateRequest := cloudscale.VolumeUpdateRequest{}
 	newTags := getNewTags()
 	updateRequest.Tags = &newTags
 
@@ -177,7 +177,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 func TestIntegrationTags_Snapshot(t *testing.T) {
 	integrationTest(t)
 
-	createVolumeRequest := cloudscale.VolumeRequest{
+	createVolumeRequest := cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 3,
 	}
