@@ -188,7 +188,7 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 	}
 
 	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
-		Name:         "test-snapshot",
+		Name:         testRunPrefix,
 		SourceVolume: volume.UUID,
 	}
 	initialTags := getInitialTags()

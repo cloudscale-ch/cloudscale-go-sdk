@@ -18,7 +18,7 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 
 	// A source volume is needed to create a snapshot.
 	volumeCreateRequest := &cloudscale.VolumeRequest{
-		Name:   "test-volume-for-snapshot",
+		Name:   testRunPrefix,
 		SizeGB: 50,
 		Type:   "ssd",
 		ZonalResourceRequest: cloudscale.ZonalResourceRequest{
@@ -30,8 +30,9 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 		t.Fatalf("Volume.Create: %v", err)
 	}
 
+	volumeName := fmt.Sprintf("%s-snapshot", testRunPrefix)
 	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
-		Name:         "test-snapshot",
+		Name:         volumeName,
 		SourceVolume: volume.UUID,
 	}
 	snapshot, err := client.VolumeSnapshots.Create(ctx, snapshotCreateRequest)
@@ -46,8 +47,8 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 	if retrieved.UUID != snapshot.UUID {
 		t.Errorf("Expected UUID %s, got %s", snapshot.UUID, retrieved.UUID)
 	}
-	if retrieved.Name != "test-snapshot" {
-		t.Errorf("Expected retrieved snapshot name 'test-snapshot', got '%s'", retrieved.Name)
+	if retrieved.Name != volumeName {
+		t.Errorf("Expected snapshot name '%s', got '%s'", volumeName, retrieved.Name)
 	}
 
 	snapshots, err := client.VolumeSnapshots.List(ctx)
@@ -80,7 +81,7 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 
 	// A source volume is needed to create a snapshot.
 	volumeCreateRequest := &cloudscale.VolumeRequest{
-		Name:   "test-volume-for-snapshot",
+		Name:   testRunPrefix,
 		SizeGB: 50,
 		Type:   "ssd",
 		ZonalResourceRequest: cloudscale.ZonalResourceRequest{
@@ -93,7 +94,7 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 	}
 
 	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
-		Name:         "test-snapshot",
+		Name:         testRunPrefix,
 		SourceVolume: volume.UUID,
 	}
 	snapshot, err := client.VolumeSnapshots.Create(ctx, snapshotCreateRequest)
@@ -101,8 +102,10 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 		t.Fatalf("VolumeSnapshots.Create: %v", err)
 	}
 
+	updatedName := fmt.Sprintf("%s-updated", testRunPrefix)
+
 	snapshotUpdateRequest := &cloudscale.VolumeSnapshotUpdateRequest{
-		Name: "updated-snapshot",
+		Name: updatedName,
 	}
 	err = client.VolumeSnapshots.Update(ctx, snapshot.UUID, snapshotUpdateRequest)
 	if err != nil {
@@ -114,8 +117,8 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 	if err != nil {
 		t.Fatalf("VolumeSnapshots.Get after update: %v", err)
 	}
-	if updatedSnapshot.Name != "updated-snapshot" {
-		t.Errorf("Expected updated snapshot name 'updated-snapshot', got '%s'", updatedSnapshot.Name)
+	if updatedSnapshot.Name != updatedName {
+		t.Errorf("Expected updated snapshot name '%s', got '%s'", updatedName, updatedSnapshot.Name)
 	}
 
 	if err := client.VolumeSnapshots.Delete(ctx, snapshot.UUID); err != nil {
