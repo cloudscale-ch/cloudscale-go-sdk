@@ -89,7 +89,7 @@ func NewClient(httpClient *http.Client) *Client {
 		client: c,
 		path:   floatingIPsBasePath,
 	}
-	c.Volumes = GenericServiceOperations[Volume, VolumeRequest, VolumeRequest]{
+	c.Volumes = GenericServiceOperations[Volume, VolumeCreateRequest, VolumeUpdateRequest]{
 		client: c,
 		path:   volumeBasePath,
 	}

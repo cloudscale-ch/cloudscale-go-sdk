@@ -5,6 +5,7 @@ package integration
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -40,7 +41,7 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:        testRunPrefix,
 		SizeGB:      50,
 		ServerUUIDs: &[]string{server.UUID},
@@ -56,14 +57,14 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	}
 
 	time.Sleep(3 * time.Second)
-	detachVolumeRequest := &cloudscale.VolumeRequest{
+	detachVolumeRequest := &cloudscale.VolumeUpdateRequest{
 		ServerUUIDs: &[]string{},
 	}
 	err = client.Volumes.Update(context.TODO(), volume.UUID, detachVolumeRequest)
 	if err != nil {
 		t.Errorf("Volumes.Update returned error %s\n", err)
 	}
-	attachVolumeRequest := &cloudscale.VolumeRequest{
+	attachVolumeRequest := &cloudscale.VolumeUpdateRequest{
 		ServerUUIDs: &[]string{server.UUID},
 	}
 
@@ -83,8 +84,61 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 	}
 }
 
+func TestIntegrationVolume_CreateFromSnapshot(t *testing.T) {
+	integrationTest(t)
+	ctx := context.Background()
+
+	// volume is need to create a snapshot
+	createVolumeRequest := &cloudscale.VolumeCreateRequest{
+		Name:   fmt.Sprintf("%s-source", testRunPrefix),
+		SizeGB: 10,
+	}
+	volume, err := client.Volumes.Create(ctx, createVolumeRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Create returned error %s\n", err)
+	}
+
+	snapshotCreateRequest := &cloudscale.VolumeSnapshotCreateRequest{
+		Name:         testRunPrefix,
+		SourceVolume: volume.UUID,
+	}
+	snapshot, err := client.VolumeSnapshots.Create(ctx, snapshotCreateRequest)
+	if err != nil {
+		t.Fatalf("VolumeSnapshots.Create: %v", err)
+	}
+
+	createVolumeFromSnapshotRequest := &cloudscale.VolumeCreateRequest{
+		Name:               fmt.Sprintf("%s-from-snapshot", testRunPrefix),
+		VolumeSnapshotUUID: snapshot.UUID,
+	}
+
+	volumeCreatedFromSnapshot, err := client.Volumes.Create(ctx, createVolumeFromSnapshotRequest)
+	if err != nil {
+		t.Fatalf("Volumes.Create: %v", err)
+	}
+
+	if err := client.VolumeSnapshots.Delete(ctx, snapshot.UUID); err != nil {
+		t.Fatalf("Warning: failed to delete snapshot %s: %v", snapshot.UUID, err)
+	}
+
+	// Wait for snapshot to be fully deleted before deleting volume
+	// As a volume has been created, deletion can take a few seconds longer
+	err = waitForSnapshotDeletion(ctx, snapshot.UUID, 30)
+	if err != nil {
+		t.Fatalf("Snapshot deletion timeout: %v", err)
+	}
+
+	if err := client.Volumes.Delete(ctx, volume.UUID); err != nil {
+		t.Fatalf("Warning: failed to delete volume %s: %v", volume.UUID, err)
+	}
+
+	if err := client.Volumes.Delete(ctx, volumeCreatedFromSnapshot.UUID); err != nil {
+		t.Fatalf("Warning: failed to delete volume %s: %v", volume.UUID, err)
+	}
+}
+
 func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
 	}
@@ -109,7 +163,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		t.Errorf("Volume %s not found\n", volume.UUID)
 	}
 
-	multiUpdateVolumeRequest := &cloudscale.VolumeRequest{
+	multiUpdateVolumeRequest := &cloudscale.VolumeUpdateRequest{
 		SizeGB: 50,
 		Name:   testRunPrefix + "Foo",
 	}
@@ -133,7 +187,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 
 	const scaleSize = 200
 	// Try to scale.
-	scaleVolumeRequest := &cloudscale.VolumeRequest{SizeGB: scaleSize}
+	scaleVolumeRequest := &cloudscale.VolumeUpdateRequest{SizeGB: scaleSize}
 	err = client.Volumes.Update(context.TODO(), volume.UUID, scaleVolumeRequest)
 	getVolume, err := client.Volumes.Get(context.TODO(), volume.UUID)
 	if err == nil {
@@ -151,7 +205,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 }
 
 func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
 	}
@@ -184,7 +238,7 @@ func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
-	volumeAttachRequest := &cloudscale.VolumeRequest{
+	volumeAttachRequest := &cloudscale.VolumeUpdateRequest{
 		ServerUUIDs: &[]string{server.UUID},
 	}
 
@@ -205,7 +259,7 @@ func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
 
 func TestIntegrationVolume_ListByName(t *testing.T) {
 	volumeName := testRunPrefix + "-name-test"
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   volumeName,
 		SizeGB: 5,
 	}
@@ -270,7 +324,7 @@ func TestIntegrationVolume_MultiSite(t *testing.T) {
 func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	createVolumeRequest := &cloudscale.VolumeRequest{
+	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
 	}

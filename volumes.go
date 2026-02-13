@@ -22,7 +22,17 @@ type Volume struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-type VolumeRequest struct {
+type VolumeCreateRequest struct {
+	ZonalResourceRequest
+	TaggedResourceRequest
+	Name               string    `json:"name,omitempty"`
+	SizeGB             int       `json:"size_gb,omitempty"`
+	Type               string    `json:"type,omitempty"`
+	ServerUUIDs        *[]string `json:"server_uuids,omitempty"`
+	VolumeSnapshotUUID string    `json:"volume_snapshot_uuid,omitempty"`
+}
+
+type VolumeUpdateRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
 	Name        string    `json:"name,omitempty"`
@@ -32,10 +42,10 @@ type VolumeRequest struct {
 }
 
 type VolumeService interface {
-	GenericCreateService[Volume, VolumeRequest]
+	GenericCreateService[Volume, VolumeCreateRequest]
 	GenericGetService[Volume]
 	GenericListService[Volume]
-	GenericUpdateService[Volume, VolumeRequest]
+	GenericUpdateService[Volume, VolumeUpdateRequest]
 	GenericDeleteService[Volume]
 	GenericWaitForService[Volume]
 }

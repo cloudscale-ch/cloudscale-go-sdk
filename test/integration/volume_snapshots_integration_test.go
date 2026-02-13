@@ -17,7 +17,7 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 	ctx := context.Background()
 
 	// A source volume is needed to create a snapshot.
-	volumeCreateRequest := &cloudscale.VolumeRequest{
+	volumeCreateRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
 		Type:   "ssd",
@@ -88,7 +88,7 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 	ctx := context.Background()
 
 	// A source volume is needed to create a snapshot.
-	volumeCreateRequest := &cloudscale.VolumeRequest{
+	volumeCreateRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
 		Type:   "ssd",
