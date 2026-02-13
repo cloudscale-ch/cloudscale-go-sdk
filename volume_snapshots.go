@@ -5,13 +5,13 @@ const volumeSnapshotsBasePath = "v1/volume-snapshots"
 type VolumeSnapshot struct {
 	ZonalResource
 	TaggedResource
-	HREF      string     `json:"href,omitempty"`
-	UUID      string     `json:"uuid,omitempty"`
-	Name      string     `json:"name,omitempty"`
-	SizeGB    int        `json:"size_gb,omitempty"`
-	CreatedAt string     `json:"created_at,omitempty"`
-	Volume    VolumeStub `json:"source_volume,omitempty"`
-	Status    string     `json:"status,omitempty"`
+	HREF         string     `json:"href,omitempty"`
+	UUID         string     `json:"uuid,omitempty"`
+	Name         string     `json:"name,omitempty"`
+	SizeGB       int        `json:"size_gb,omitempty"`
+	CreatedAt    string     `json:"created_at,omitempty"`
+	SourceVolume VolumeStub `json:"source_volume,omitempty"`
+	Status       string     `json:"status,omitempty"`
 }
 
 type VolumeSnapshotCreateRequest struct {
