@@ -51,6 +51,14 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 		t.Errorf("Expected snapshot name '%s', got '%s'", volumeName, retrieved.Name)
 	}
 
+	// Validate that the Volume field is correctly deserialized from the API response.
+	if retrieved.Volume.UUID == "" {
+		t.Errorf("Expected retrieved snapshot Volume.UUID to be non-empty (source volume: %s)", volume.UUID)
+	}
+	if retrieved.Volume.UUID != volume.UUID {
+		t.Errorf("Expected retrieved snapshot Volume.UUID to be %s, got %q", volume.UUID, retrieved.Volume.UUID)
+	}
+
 	snapshots, err := client.VolumeSnapshots.List(ctx)
 	if err != nil {
 		t.Fatalf("VolumeSnapshots.List: %v", err)
