@@ -49,6 +49,7 @@ func TestMain(m *testing.M) {
 	foundResource := false
 	foundResource = foundResource || DeleteRemainingServer()
 	foundResource = foundResource || DeleteRemainingServerGroups()
+	foundResource = foundResource || DeleteRemainingVolumeSnapshots()
 	foundResource = foundResource || DeleteRemainingVolumes()
 	foundResource = foundResource || DeleteRemainingSubnets()
 	foundResource = foundResource || DeleteRemainingNetworks()
@@ -99,6 +100,28 @@ func DeleteRemainingServerGroups() bool {
 			err = client.ServerGroups.Delete(context.Background(), serverGroup.UUID)
 			if err != nil {
 				log.Fatalf("ServerGroups.Delete returned error %s\n", err)
+			}
+		}
+	}
+
+	return foundResource
+}
+
+func DeleteRemainingVolumeSnapshots() bool {
+	foundResource := false
+
+	snapshots, err := client.VolumeSnapshots.List(context.Background())
+	if err != nil {
+		log.Fatalf("VolumeSnapshots.List returned error %s\n", err)
+	}
+
+	for _, snapshot := range snapshots {
+		if strings.HasPrefix(snapshot.Name, testRunPrefix) {
+			foundResource = true
+			log.Printf("Found not deleted snapshot: %s (%s)\n", snapshot.Name, snapshot.UUID)
+			err = client.VolumeSnapshots.Delete(context.Background(), snapshot.UUID)
+			if err != nil {
+				log.Fatalf("VolumeSnapshots.Delete returned error %s\n", err)
 			}
 		}
 	}
