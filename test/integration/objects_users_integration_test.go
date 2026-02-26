@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v6"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v7"
 )
 
 func TestIntegrationObjectsUser_CRUD(t *testing.T) {
