@@ -39,11 +39,11 @@ func TestRegions_List(t *testing.T) {
 	expected := []Region{
 		{
 			Slug:  "frn",
-			Zones: []Zone{},
+			Zones: []ZoneStub{},
 		},
 		{
 			Slug: "usr",
-			Zones: []Zone{
+			Zones: []ZoneStub{
 				{Slug: "usr1"},
 			},
 		},

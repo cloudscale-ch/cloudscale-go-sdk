@@ -4,7 +4,7 @@
 //
 // Documentation for the API is available at:
 //
-//    https://www.cloudscale.ch/en/api/v1
+//	https://www.cloudscale.ch/en/api/v1
 package cloudscale
 
 import (

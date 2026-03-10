@@ -6,11 +6,12 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v7"
 	"regexp"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v7"
 )
 
 func TestIntegrationNetwork_CRUD(t *testing.T) {
@@ -443,7 +444,7 @@ func TestIntegrationNetwork_MultiSite(t *testing.T) {
 	wg.Wait()
 }
 
-func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -458,7 +459,7 @@ func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.W
 	}
 
 	if network.Zone != zone {
-		t.Errorf("Network in wrong Zone\n got=%#v\nwant=%#v", network.Zone, zone)
+		t.Errorf("Network in wrong ZoneStub\n got=%#v\nwant=%#v", network.Zone, zone)
 	}
 
 	err = client.Networks.Delete(context.Background(), network.UUID)

@@ -388,7 +388,7 @@ func TestIntegrationServer_MultiSite(t *testing.T) {
 	wg.Wait()
 }
 
-func createServerInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+func createServerInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	createRequest := getDefaultServerRequest()
