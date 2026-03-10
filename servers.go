@@ -21,7 +21,7 @@ type Server struct {
 	UUID            string            `json:"uuid"`
 	Name            string            `json:"name"`
 	Status          string            `json:"status"`
-	Flavor          Flavor            `json:"flavor"`
+	Flavor          FlavorStub        `json:"flavor"`
 	Image           Image             `json:"image"`
 	Volumes         []VolumeStub      `json:"volumes"`
 	Interfaces      []Interface       `json:"interfaces"`
@@ -43,7 +43,7 @@ type ServerGroupStub struct {
 	Name string `json:"name"`
 }
 
-type Flavor struct {
+type FlavorStub struct {
 	Slug      string `json:"slug"`
 	Name      string `json:"name"`
 	VCPUCount int    `json:"vcpu_count"`
