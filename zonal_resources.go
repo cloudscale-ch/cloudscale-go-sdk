@@ -1,7 +1,7 @@
 package cloudscale
 
 type ZonalResource struct {
-	Zone Zone `json:"zone"`
+	Zone ZoneStub `json:"zone"`
 }
 
 type ZonalResourceRequest struct {

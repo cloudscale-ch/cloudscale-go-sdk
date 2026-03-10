@@ -321,7 +321,7 @@ func TestIntegrationVolume_MultiSite(t *testing.T) {
 	wg.Wait()
 }
 
-func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.Zone, wg *sync.WaitGroup) {
+func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	createVolumeRequest := &cloudscale.VolumeCreateRequest{

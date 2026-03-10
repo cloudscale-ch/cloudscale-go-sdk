@@ -14,6 +14,7 @@ var toQueryStringTestCases = []struct {
 	{TagMap{"a": ""}, "http://example.com?tag%3Aa="},
 	{TagMap{"a": "b", "c": "d"}, "http://example.com?tag%3Aa=b&tag%3Ac=d"},
 }
+
 func TestTagsToQueryString(t *testing.T) {
 	for _, tt := range toQueryStringTestCases {
 		t.Run(fmt.Sprintf("%#v", tt.tags), func(t *testing.T) {

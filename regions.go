@@ -7,13 +7,17 @@ import (
 
 const regionsBasePath = "v1/regions"
 
-type Zone struct {
+type ZoneStub struct {
+	Slug string `json:"slug"`
+}
+
+type RegionStub struct {
 	Slug string `json:"slug"`
 }
 
 type Region struct {
-	Slug  string `json:"slug"`
-	Zones []Zone `json:"zones"`
+	Slug  string     `json:"slug"`
+	Zones []ZoneStub `json:"zones"`
 }
 
 type RegionService interface {

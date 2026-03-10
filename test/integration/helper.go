@@ -11,12 +11,12 @@ import (
 	"testing"
 )
 
-func getAllZones() ([]cloudscale.Zone, error) {
+func getAllZones() ([]cloudscale.ZoneStub, error) {
 	allRegions, err := getAllRegions()
 	if err != nil {
 		return nil, err
 	}
-	allZones := []cloudscale.Zone{}
+	allZones := []cloudscale.ZoneStub{}
 	for _, region := range allRegions {
 		allZones = append(allZones, region.Zones...)
 	}

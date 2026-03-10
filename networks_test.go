@@ -14,12 +14,12 @@ func TestNetworks_Create(t *testing.T) {
 	defer teardown()
 
 	networkRequest := &NetworkCreateRequest{
-		Name:       "netzli",
+		Name: "netzli",
 	}
 
 	mux.HandleFunc("/v1/networks", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
-			"name":           "netzli",
+			"name": "netzli",
 		}
 
 		var v map[string]interface{}

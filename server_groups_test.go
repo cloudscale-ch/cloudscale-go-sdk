@@ -13,14 +13,14 @@ func TestServersGroups_Create(t *testing.T) {
 	defer teardown()
 
 	serverGroupRequest := &ServerGroupRequest{
-		Name:       "db-servers",
-		Type:       "anti-affinity",
+		Name: "db-servers",
+		Type: "anti-affinity",
 	}
 
 	mux.HandleFunc("/v1/server-groups", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
-			"name":           "db-servers",
-			"type":           "anti-affinity",
+			"name": "db-servers",
+			"type": "anti-affinity",
 		}
 
 		var v map[string]interface{}
