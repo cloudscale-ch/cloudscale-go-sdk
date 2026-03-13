@@ -11,10 +11,10 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
+
+	"golang.org/x/oauth2"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v7"
-	"golang.org/x/oauth2"
 )
 
 var (
@@ -25,7 +25,6 @@ var (
 
 func TestMain(m *testing.M) {
 	// setup tests
-	rand.Seed(time.Now().UnixNano())
 	testRunPrefix = fmt.Sprintf("go-sdk-%d", rand.Intn(100000))
 
 	token := os.Getenv("CLOUDSCALE_API_TOKEN")

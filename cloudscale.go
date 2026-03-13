@@ -35,6 +35,7 @@ type Client struct {
 	UserAgent string
 
 	Regions                    RegionService
+	Flavors                    FlavorService
 	Servers                    ServerService
 	Volumes                    VolumeService
 	VolumeSnapshots            VolumeSnapshotService
@@ -77,6 +78,7 @@ func NewClient(httpClient *http.Client) *Client {
 		},
 		client: c,
 	}
+	c.Flavors = FlavorServiceOperations{client: c}
 	c.Networks = GenericServiceOperations[Network, NetworkCreateRequest, NetworkUpdateRequest]{
 		client: c,
 		path:   networkBasePath,
