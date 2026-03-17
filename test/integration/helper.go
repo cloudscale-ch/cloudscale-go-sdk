@@ -5,7 +5,7 @@ package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v7"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v8"
 	"math/rand"
 	"reflect"
 	"testing"
