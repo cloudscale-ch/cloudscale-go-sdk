@@ -13,21 +13,21 @@ import (
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v8"
 )
 
-func getInitialTags() cloudscale.TagMap {
+func getInitialTags(testName string) cloudscale.TagMap {
 	return cloudscale.TagMap{
-		fmt.Sprintf("yin-%s", testRunPrefix): "yang",
+		fmt.Sprintf("yin-%s-%s", testRunPrefix, testName): "yang",
 	}
 }
 
-func getInitialTagsKeyOnly() cloudscale.TagMap {
+func getInitialTagsKeyOnly(testName string) cloudscale.TagMap {
 	return cloudscale.TagMap{
-		fmt.Sprintf("yin-%s", testRunPrefix): "",
+		fmt.Sprintf("yin-%s-%s", testRunPrefix, testName): "",
 	}
 }
 
-func getNewTags() cloudscale.TagMap {
+func getNewTags(testName string) cloudscale.TagMap {
 	return cloudscale.TagMap{
-		fmt.Sprintf("yab-%s", testRunPrefix): "yum",
+		fmt.Sprintf("yab-%s-%s", testRunPrefix, testName): "yum",
 	}
 }
 
@@ -35,9 +35,9 @@ func getEmptyTags() cloudscale.TagMap {
 	return cloudscale.TagMap{}
 }
 
-func getNewTagsKeyOnly() cloudscale.TagMap {
+func getNewTagsKeyOnly(testName string) cloudscale.TagMap {
 	return cloudscale.TagMap{
-		fmt.Sprintf("yab-%s", testRunPrefix): "",
+		fmt.Sprintf("yab-%s-%s", testRunPrefix, testName): "",
 	}
 }
 
@@ -48,7 +48,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 	t.Parallel()
 
 	createRequest := getDefaultServerRequest()
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	server, err := createServer(t, &createRequest)
@@ -65,7 +65,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.ServerUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.Servers.Update(context.Background(), server.UUID, &updateRequest)
@@ -81,7 +81,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Servers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -92,7 +92,7 @@ func TestIntegrationTags_Server(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Servers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -119,7 +119,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 		Name:   testRunPrefix,
 		SizeGB: 3,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	volume, err := client.Volumes.Create(context.Background(), &createRequest)
@@ -136,7 +136,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.VolumeUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.Volumes.Update(context.Background(), volume.UUID, &updateRequest)
@@ -152,7 +152,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Volumes.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -163,7 +163,7 @@ func TestIntegrationTags_Volume(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Volumes.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -210,7 +210,7 @@ func TestIntegrationTags_VolumeFromSnapshot(t *testing.T) {
 		VolumeSnapshotUUID: snapshot.UUID,
 	}
 
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createVolumeFromSnapshotRequest.Tags = &initialTags
 
 	volume, err := client.Volumes.Create(ctx, createVolumeFromSnapshotRequest)
@@ -227,7 +227,7 @@ func TestIntegrationTags_VolumeFromSnapshot(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.VolumeUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.Volumes.Update(ctx, volume.UUID, &updateRequest)
@@ -243,7 +243,7 @@ func TestIntegrationTags_VolumeFromSnapshot(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Volumes.List(ctx, cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -254,7 +254,7 @@ func TestIntegrationTags_VolumeFromSnapshot(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Volumes.List(ctx, cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -306,7 +306,7 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 		Name:         testRunPrefix,
 		SourceVolume: volume.UUID,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	snapshotCreateRequest.Tags = &initialTags
 
 	snapshot, err := client.VolumeSnapshots.Create(context.Background(), snapshotCreateRequest)
@@ -323,7 +323,7 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.VolumeSnapshotUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.VolumeSnapshots.Update(context.Background(), snapshot.UUID, &updateRequest)
@@ -339,7 +339,7 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.VolumeSnapshots.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -350,7 +350,7 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.VolumeSnapshots.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -397,7 +397,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 			Region: strings.TrimRight(server.Zone.Slug, "0123456789"),
 		},
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	floatingIP, err := client.FloatingIPs.Create(context.Background(), &createRequest)
@@ -414,7 +414,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.FloatingIPUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.FloatingIPs.Update(context.Background(), floatingIP.IP(), &updateRequest)
@@ -430,7 +430,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.FloatingIPs.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -441,7 +441,7 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.FloatingIPs.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -472,7 +472,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	createRequest := cloudscale.ObjectsUserRequest{
 		DisplayName: testRunPrefix,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	objectsUser, err := client.ObjectsUsers.Create(context.Background(), &createRequest)
@@ -489,7 +489,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.ObjectsUserRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.ObjectsUsers.Update(context.Background(), objectsUser.ID, &updateRequest)
@@ -505,7 +505,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.ObjectsUsers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -516,7 +516,7 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.ObjectsUsers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -543,7 +543,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	createRequest := cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	network, err := client.Networks.Create(context.Background(), &createRequest)
@@ -560,7 +560,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.NetworkUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.Networks.Update(context.Background(), network.UUID, &updateRequest)
@@ -576,7 +576,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Networks.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -587,7 +587,7 @@ func TestIntegrationTags_Network(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Networks.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -625,7 +625,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 		CIDR:    "172.16.0.0/14",
 		Network: network.UUID,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 	subnet, err := client.Subnets.Create(context.Background(), &createRequest)
 	if err != nil {
@@ -641,7 +641,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.SubnetUpdateRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.Subnets.Update(context.Background(), subnet.UUID, &updateRequest)
@@ -657,7 +657,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -668,7 +668,7 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.Subnets.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -700,7 +700,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 		Name: testRunPrefix + "-group",
 		Type: "anti-affinity",
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	serverGroup, err := client.ServerGroups.Create(context.Background(), &createRequest)
@@ -733,7 +733,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 
 	// Test update with some tags again
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.ServerGroups.Update(context.Background(), serverGroup.UUID, &updateRequest)
@@ -749,7 +749,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.ServerGroups.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -760,7 +760,7 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.ServerGroups.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -791,7 +791,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 		Zones:            []string{"lpg1"},
 		SourceFormat:     "raw",
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	customImageImport, err := client.CustomImageImports.Create(context.Background(), &createRequest)
@@ -813,7 +813,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.CustomImageRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.CustomImages.Update(context.Background(), imageID, &updateRequest)
@@ -829,7 +829,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.CustomImages.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -840,7 +840,7 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.CustomImages.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -868,7 +868,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 		Flavor: "lb-standard",
 	}
 	createRequest.Zone = testZone
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	loadBalancer, err := client.LoadBalancers.Create(context.Background(), &createRequest)
@@ -887,7 +887,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 	}
 
 	updateRequest := cloudscale.LoadBalancerRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.LoadBalancers.Update(context.Background(), loadBalancer.UUID, &updateRequest)
@@ -903,7 +903,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.LoadBalancers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -914,7 +914,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.LoadBalancers.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -942,7 +942,7 @@ func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalanc
 		Protocol:     "tcp",
 		LoadBalancer: b.UUID,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	pool, err := client.LoadBalancerPools.Create(context.Background(), &createRequest)
@@ -959,7 +959,7 @@ func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalanc
 	}
 
 	updateRequest := cloudscale.LoadBalancerPoolRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.LoadBalancerPools.Update(context.Background(), pool.UUID, &updateRequest)
@@ -975,7 +975,7 @@ func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalanc
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.LoadBalancerPools.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -986,7 +986,7 @@ func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalanc
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.LoadBalancerPools.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -1015,7 +1015,7 @@ func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBal
 		Protocol:     "tcp",
 		ProtocolPort: 8080,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	listener, err := client.LoadBalancerListeners.Create(context.Background(), &createRequest)
@@ -1032,7 +1032,7 @@ func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBal
 	}
 
 	updateRequest := cloudscale.LoadBalancerListenerRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.LoadBalancerListeners.Update(context.Background(), listener.UUID, &updateRequest)
@@ -1048,7 +1048,7 @@ func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBal
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.LoadBalancerListeners.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -1059,7 +1059,7 @@ func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBal
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.LoadBalancerListeners.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -1088,7 +1088,7 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 		Address:      "192.168.42.12",
 		Subnet:       subnet.UUID,
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	member, err := client.LoadBalancerPoolMembers.Create(context.Background(), p.UUID, &createRequest)
@@ -1105,7 +1105,7 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 	}
 
 	updateRequest := cloudscale.LoadBalancerPoolMemberRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.LoadBalancerPoolMembers.Update(context.Background(), p.UUID, member.UUID, &updateRequest)
@@ -1121,7 +1121,7 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.LoadBalancerPoolMembers.List(context.Background(), p.UUID, cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -1132,7 +1132,7 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.LoadBalancerPoolMembers.List(context.Background(), p.UUID, cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -1163,7 +1163,7 @@ func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.L
 		DownThreshold: 10,
 		Type:          "tcp",
 	}
-	initialTags := getInitialTags()
+	initialTags := getInitialTags(t.Name())
 	createRequest.Tags = &initialTags
 
 	healthMonitor, err := client.LoadBalancerHealthMonitors.Create(context.Background(), &createRequest)
@@ -1180,7 +1180,7 @@ func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.L
 	}
 
 	updateRequest := cloudscale.LoadBalancerHealthMonitorRequest{}
-	newTags := getNewTags()
+	newTags := getNewTags(t.Name())
 	updateRequest.Tags = &newTags
 
 	err = client.LoadBalancerHealthMonitors.Update(context.Background(), healthMonitor.UUID, &updateRequest)
@@ -1196,7 +1196,7 @@ func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.L
 	}
 
 	// test querying with tags
-	initialTagsKeyOnly := getInitialTagsKeyOnly()
+	initialTagsKeyOnly := getInitialTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{initialTags, initialTagsKeyOnly} {
 		res, err := client.LoadBalancerHealthMonitors.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
@@ -1207,7 +1207,7 @@ func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.L
 		}
 	}
 
-	newTagsKeyOnly := getNewTagsKeyOnly()
+	newTagsKeyOnly := getNewTagsKeyOnly(t.Name())
 	for _, tags := range []cloudscale.TagMap{newTags, newTagsKeyOnly} {
 		res, err := client.LoadBalancerHealthMonitors.List(context.Background(), cloudscale.WithTagFilter(tags))
 		if err != nil {
