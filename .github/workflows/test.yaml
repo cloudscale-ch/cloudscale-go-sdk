@@ -1,6 +1,7 @@
 name: Go SDK Integration Tests
 on:
   push:
+    branches: [master]
     paths-ignore:
       - 'README.md'
   pull_request:
@@ -8,6 +9,9 @@ on:
       - 'README.md'
   schedule:
     - cron: '14 14 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
 jobs:
   test:
@@ -28,14 +32,14 @@ jobs:
         run: |
           go mod download
 
+      - name: Run go vet
+        run: |
+          make vet
+
       - name: Run unit tests
         timeout-minutes: 5
         run: |
           make test
-
-      - name: Sleep random seconds to ensure test call are not executed at exactly the same time (push and pr runs)
-        run: sleep $(( ( RANDOM % 30 )  + 1 ))
-        shell: bash
 
       - name: Run integration tests
         timeout-minutes: 60
