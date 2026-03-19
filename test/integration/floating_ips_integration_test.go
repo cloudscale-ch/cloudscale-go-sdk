@@ -6,7 +6,6 @@ package integration
 import (
 	"context"
 	"reflect"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,7 +15,7 @@ import (
 const pubKey string = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBFEepRNW5hDct4AdJ8oYsb4lNP5E9XY5fnz3ZvgNCEv7m48+bhUjJXUPuamWix3zigp2lgJHC6SChI/okJ41GUY="
 
 func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -95,7 +94,7 @@ func TestIntegrationFloatingIP_CRUD_Server(t *testing.T) {
 }
 
 func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
@@ -164,7 +163,10 @@ func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
 }
 
 func TestIntegrationFloatingIP_Update(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -258,7 +260,10 @@ func TestIntegrationFloatingIP_Update(t *testing.T) {
 }
 
 func TestIntegrationFloatingIP_MultiSite(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allRegions, err := getAllRegions()
 	if err != nil {
@@ -269,18 +274,15 @@ func TestIntegrationFloatingIP_MultiSite(t *testing.T) {
 		t.Skip("Skipping MultiSite test.")
 	}
 
-	var wg sync.WaitGroup
-
 	for _, region := range allRegions {
-		wg.Add(1)
-		go createFloatingIPInRegionAndAssert(t, region, &wg)
+		t.Run(region.Slug, func(t *testing.T) {
+			t.Parallel()
+			createFloatingIPInRegionAndAssert(t, region)
+		})
 	}
-
-	wg.Wait()
 }
 
-func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, wg *sync.WaitGroup) {
-	defer wg.Done()
+func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region) {
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -335,7 +337,10 @@ func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region, w
 }
 
 func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -385,7 +390,10 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 }
 
 func TestIntegrationFloatingIP_Global(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allRegions, err := getAllRegions()
 	if err != nil {
@@ -482,7 +490,10 @@ func TestIntegrationFloatingIP_Global(t *testing.T) {
 }
 
 func TestIntegrationFloatingIP_WithoutServer(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion: 4,

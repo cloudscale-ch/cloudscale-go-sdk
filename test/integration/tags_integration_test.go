@@ -42,7 +42,10 @@ func getNewTagsKeyOnly() cloudscale.TagMap {
 }
 
 func TestIntegrationTags_Server(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := getDefaultServerRequest()
 	initialTags := getInitialTags()
@@ -107,7 +110,10 @@ func TestIntegrationTags_Server(t *testing.T) {
 }
 
 func TestIntegrationTags_Volume(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
@@ -175,7 +181,10 @@ func TestIntegrationTags_Volume(t *testing.T) {
 }
 
 func TestIntegrationTags_VolumeFromSnapshot(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 	ctx := context.Background()
 
 	// first create a volume and a snapshot
@@ -278,7 +287,10 @@ func TestIntegrationTags_VolumeFromSnapshot(t *testing.T) {
 }
 
 func TestIntegrationTags_Snapshot(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createVolumeRequest := cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
@@ -366,7 +378,10 @@ func TestIntegrationTags_Snapshot(t *testing.T) {
 }
 
 func TestIntegrationTags_FloatingIP(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	serverCreateRequest := getDefaultServerRequest()
 
@@ -449,7 +464,10 @@ func TestIntegrationTags_FloatingIP(t *testing.T) {
 }
 
 func TestIntegrationTags_ObjectsUser(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := cloudscale.ObjectsUserRequest{
 		DisplayName: testRunPrefix,
@@ -517,7 +535,10 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 }
 
 func TestIntegrationTags_Network(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,
@@ -585,7 +606,10 @@ func TestIntegrationTags_Network(t *testing.T) {
 }
 
 func TestIntegrationTags_Subnet(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := cloudscale.NetworkCreateRequest{
@@ -667,7 +691,10 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 }
 
 func TestIntegrationTags_ServerGroup(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := cloudscale.ServerGroupRequest{
 		Name: testRunPrefix + "-group",
@@ -752,7 +779,10 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 }
 
 func TestIntegrationTags_CustomImage(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
@@ -828,7 +858,10 @@ func TestIntegrationTags_CustomImage(t *testing.T) {
 }
 
 func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createRequest := cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,

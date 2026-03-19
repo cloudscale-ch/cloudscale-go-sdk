@@ -9,7 +9,10 @@ import (
 )
 
 func TestListRegions(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allRegions, err := client.Regions.List(context.Background())
 	if err != nil {

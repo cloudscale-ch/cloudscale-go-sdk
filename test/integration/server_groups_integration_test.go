@@ -5,14 +5,13 @@ package integration
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v8"
 )
 
 func TestIntegrationServerGroup_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	expected, err := createServerGroup(t)
 	if err != nil {
@@ -45,7 +44,10 @@ func createServerGroup(t *testing.T) (*cloudscale.ServerGroup, error) {
 }
 
 func TestIntegrationServerGroup_MultiSite(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allZones, err := getAllZones()
 	if err != nil {
@@ -56,18 +58,15 @@ func TestIntegrationServerGroup_MultiSite(t *testing.T) {
 		t.Skip("Skipping MultiSite test.")
 	}
 
-	var wg sync.WaitGroup
-
 	for _, zone := range allZones {
-		wg.Add(1)
-		go createServerGroupInZoneAndAssert(t, zone, &wg)
+		t.Run(zone.Slug, func(t *testing.T) {
+			t.Parallel()
+			createServerGroupInZoneAndAssert(t, zone)
+		})
 	}
-
-	wg.Wait()
 }
 
-func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
-	defer wg.Done()
+func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
 
 	createServerGroupRequest := &cloudscale.ServerGroupRequest{
 		Name: "Yellow Submarine",

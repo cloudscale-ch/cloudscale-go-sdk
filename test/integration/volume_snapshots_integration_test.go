@@ -12,7 +12,7 @@ import (
 )
 
 func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	ctx := context.Background()
 
@@ -78,7 +78,10 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 }
 
 func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	ctx := context.Background()
 

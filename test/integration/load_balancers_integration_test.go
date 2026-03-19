@@ -12,7 +12,7 @@ import (
 )
 
 func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,
@@ -60,7 +60,10 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 }
 
 func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateIPV4Subnet := false
 	networkRequest := &cloudscale.NetworkCreateRequest{
@@ -128,7 +131,10 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 }
 
 func TestIntegrationLoadBalancer_Update(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createLoadBalancerRequest := &cloudscale.LoadBalancerRequest{
 		Name:   testRunPrefix,

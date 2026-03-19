@@ -11,7 +11,10 @@ import (
 )
 
 func TestListFlavors(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allFlavors, err := client.Flavors.List(context.Background())
 	if err != nil {
