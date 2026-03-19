@@ -12,7 +12,7 @@ import (
 )
 
 func TestIntegrationLoadBalancerPool_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	lb, err := createLoadBalancer()
 	if err != nil {
@@ -71,7 +71,10 @@ func TestIntegrationLoadBalancerPool_CRUD(t *testing.T) {
 }
 
 func TestIntegrationLoadBalancerPool_Update(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	lb, err := createLoadBalancer()
 	if err != nil {

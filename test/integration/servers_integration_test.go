@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,12 +15,6 @@ import (
 )
 
 const DefaultImageSlug = "debian-11"
-
-func integrationTest(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping acceptance test")
-	}
-}
 
 func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
 	server, err := client.Servers.Create(context.Background(), createRequest)
@@ -42,7 +35,7 @@ func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloud
 }
 
 func TestIntegrationServer_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	serverRequest := getDefaultServerRequest()
 	serverRequest.SSHKeys = []string{}
@@ -98,7 +91,10 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 }
 
 func TestIntegrationServer_UpdateStatus(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	request := getDefaultServerRequest()
 	server, err := createServer(t, &request)
@@ -173,7 +169,10 @@ func getDefaultServerRequest() cloudscale.ServerRequest {
 }
 
 func TestIntegrationServer_UpdateRest(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	serverRequest := getDefaultServerRequest()
 	server, err := createServer(t, &serverRequest)
@@ -244,7 +243,10 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 }
 
 func TestIntegrationServer_Actions(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	serverRequest := getDefaultServerRequest()
 	server, err := createServer(t, &serverRequest)
@@ -301,7 +303,10 @@ func TestIntegrationServer_Actions(t *testing.T) {
 }
 
 func TestIntegrationServer_MultipleVolumes(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	request := getDefaultServerRequest()
 	request.Volumes = &([]cloudscale.ServerVolumeRequest{
@@ -367,7 +372,10 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 }
 
 func TestIntegrationServer_MultiSite(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allZones, err := getAllZones()
 	if err != nil {
@@ -378,18 +386,15 @@ func TestIntegrationServer_MultiSite(t *testing.T) {
 		t.Skip("Skipping MultiSite test.")
 	}
 
-	var wg sync.WaitGroup
-
 	for _, zone := range allZones {
-		wg.Add(1)
-		go createServerInZoneAndAssert(t, zone, &wg)
+		t.Run(zone.Slug, func(t *testing.T) {
+			t.Parallel()
+			createServerInZoneAndAssert(t, zone)
+		})
 	}
-
-	wg.Wait()
 }
 
-func createServerInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
-	defer wg.Done()
+func createServerInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
 
 	createRequest := getDefaultServerRequest()
 	createRequest.Zone = zone.Slug

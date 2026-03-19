@@ -12,7 +12,7 @@ import (
 )
 
 func TestIntegrationObjectsUser_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	expected, err := createObjectsUser(t)
 	if err != nil {
@@ -42,7 +42,10 @@ func TestIntegrationObjectsUser_CRUD(t *testing.T) {
 }
 
 func TestIntegrationObjectsUser_UpdateRest(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	objectsUser, err := createObjectsUser(t)
 	if err != nil {

@@ -107,10 +107,16 @@ and runs tests against it.
 Since the tests are run against live data, there is a higher chance of false
 positives and test failures due to network issues, data changes, etc.
 
-Run the tests using:
+Run all integration tests using:
 
 ```
 CLOUDSCALE_API_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration
+```
+
+To run only the CRUD tests for a quick smoke test:
+
+```
+CLOUDSCALE_API_TOKEN="HELPIMTRAPPEDINATOKENGENERATOR" make integration-short
 ```
 
 There's a possibility to specify the `CLOUDSCALE_API_URL` environment variable to

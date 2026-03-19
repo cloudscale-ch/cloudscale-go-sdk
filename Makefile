@@ -4,9 +4,18 @@ VERSION ?= $(shell cat VERSION)
 test:
 	go test -v $(TEST) $(TESTARGS) -timeout 30s
 
-integration:
-	go clean -testcache  # Force retesting of code
-	go test -tags=integration -v $(TEST)/test/integration/... $(TESTARGS) -timeout 120m
+clean-testcache:
+	@go clean -testcache  # Force retesting of code
+
+integration: clean-testcache
+	go test -tags=integration -v $(TEST)/test/integration/... $(TESTARGS) -parallel 4 -timeout 120m
+
+integration-short: clean-testcache
+	go test -tags=integration -short -v $(TEST)/test/integration/... $(TESTARGS) -parallel 4 -timeout 120m
+
+vet:
+	go vet ./...
+	go vet -tags=integration ./test/integration/
 
 fmt:
 	go fmt
@@ -20,4 +29,4 @@ bump-version:
 	@sed -i.bak -e 's/${VERSION}/${NEW_VERSION}/g' cloudscale.go
 	@rm cloudscale.go.bak
 
-.PHONY: test integration
+.PHONY: test vet integration integration-short clean-testcache

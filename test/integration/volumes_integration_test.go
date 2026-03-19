@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -15,7 +14,10 @@ import (
 )
 
 func TestIntegrationVolume_CreateAttached(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -85,7 +87,10 @@ func TestIntegrationVolume_CreateAttached(t *testing.T) {
 }
 
 func TestIntegrationVolume_CreateFromSnapshot(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 	ctx := context.Background()
 
 	// volume is need to create a snapshot
@@ -138,6 +143,11 @@ func TestIntegrationVolume_CreateFromSnapshot(t *testing.T) {
 }
 
 func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
+
 	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
@@ -205,6 +215,11 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 }
 
 func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
+
 	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,
 		SizeGB: 50,
@@ -258,6 +273,11 @@ func TestIntegrationVolume_AttachToNewServer(t *testing.T) {
 }
 
 func TestIntegrationVolume_ListByName(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
+
 	volumeName := testRunPrefix + "-name-test"
 	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   volumeName,
@@ -300,7 +320,10 @@ func TestIntegrationVolume_ListByName(t *testing.T) {
 }
 
 func TestIntegrationVolume_MultiSite(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allZones, err := getAllZones()
 	if err != nil {
@@ -311,18 +334,15 @@ func TestIntegrationVolume_MultiSite(t *testing.T) {
 		t.Skip("Skipping MultiSite test.")
 	}
 
-	var wg sync.WaitGroup
-
 	for _, zone := range allZones {
-		wg.Add(1)
-		go createVolumeInZoneAndAssert(t, zone, &wg)
+		t.Run(zone.Slug, func(t *testing.T) {
+			t.Parallel()
+			createVolumeInZoneAndAssert(t, zone)
+		})
 	}
-
-	wg.Wait()
 }
 
-func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
-	defer wg.Done()
+func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
 
 	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,

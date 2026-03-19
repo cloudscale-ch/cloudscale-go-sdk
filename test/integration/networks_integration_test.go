@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"sync"
 	"testing"
 	"time"
 
@@ -15,7 +14,7 @@ import (
 )
 
 func TestIntegrationNetwork_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,
@@ -60,7 +59,10 @@ func TestIntegrationNetwork_CRUD(t *testing.T) {
 }
 
 func TestIntegrationNetwork_CreateWithoutSubnet(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -85,7 +87,10 @@ func TestIntegrationNetwork_CreateWithoutSubnet(t *testing.T) {
 }
 
 func TestIntegrationNetwork_CreateAttached(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -207,7 +212,10 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 }
 
 func TestIntegrationNetwork_Reattach(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -294,7 +302,10 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 }
 
 func TestIntegrationNetwork_Reorder(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -386,6 +397,10 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 }
 
 func TestIntegrationNetwork_Update(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,
@@ -423,7 +438,10 @@ func TestIntegrationNetwork_Update(t *testing.T) {
 }
 
 func TestIntegrationNetwork_MultiSite(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	allZones, err := getAllZones()
 	if err != nil {
@@ -434,18 +452,15 @@ func TestIntegrationNetwork_MultiSite(t *testing.T) {
 		t.Skip("Skipping MultiSite test.")
 	}
 
-	var wg sync.WaitGroup
-
 	for _, zone := range allZones {
-		wg.Add(1)
-		go createNetworkInZoneAndAssert(t, zone, &wg)
+		t.Run(zone.Slug, func(t *testing.T) {
+			t.Parallel()
+			createNetworkInZoneAndAssert(t, zone)
+		})
 	}
-
-	wg.Wait()
 }
 
-func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub, wg *sync.WaitGroup) {
-	defer wg.Done()
+func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,

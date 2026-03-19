@@ -18,7 +18,7 @@ import (
 const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/alpine.raw"
 
 func TestIntegrationCustomImage_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
@@ -116,7 +116,10 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 }
 
 func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
@@ -146,6 +149,10 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 }
 
 func TestIntegrationCustomImage_Update(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createCustomImageImportRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
@@ -191,6 +198,10 @@ func TestIntegrationCustomImage_Update(t *testing.T) {
 }
 
 func TestIntegrationCustomImage_Boot(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createCustomImageImportRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,

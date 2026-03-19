@@ -11,7 +11,10 @@ import (
 )
 
 func TestIntegrationMetrics_GetBucketMetrics(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	objectsUser, err := createObjectsUser(t)
 	if err != nil {

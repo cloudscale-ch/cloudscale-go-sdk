@@ -13,7 +13,10 @@ import (
 const numberOfDefaultEntries = 2
 
 func TestIntegrationSubnet_GetAndList(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,
@@ -62,7 +65,7 @@ func TestIntegrationSubnet_GetAndList(t *testing.T) {
 }
 
 func TestIntegrationSubnet_CRUD(t *testing.T) {
-	integrationTest(t)
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -114,7 +117,10 @@ func TestIntegrationSubnet_CRUD(t *testing.T) {
 }
 
 func TestIntegrationSubnet_Update(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
@@ -252,7 +258,10 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 }
 
 func TestIntegrationSubnet_InitialEmptyDNSServers(t *testing.T) {
-	integrationTest(t)
+	if testing.Short() {
+		t.Skip("skipping: short flag passed")
+	}
+	t.Parallel()
 
 	autoCreateSubnet := false
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
