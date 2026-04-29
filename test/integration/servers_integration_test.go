@@ -352,6 +352,15 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 		t.Errorf("Volumes response\n got=%#v\nwant=%#v", actual, expected)
 	}
 
+	for _, volume := range server.Volumes {
+		if volume.HREF == "" {
+			t.Errorf("Expected volume HREF to be non-empty for UUID %s", volume.UUID)
+		}
+		if volume.Name == "" {
+			t.Errorf("Expected volume Name to be non-empty for UUID %s", volume.UUID)
+		}
+	}
+
 	// delete all volume, except the root volume
 	for _, volume := range server.Volumes[1:] {
 		volumeUUID := volume.UUID
