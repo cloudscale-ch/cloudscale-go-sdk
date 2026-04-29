@@ -53,6 +53,12 @@ func TestIntegrationVolumeSnapshot_CRUD(t *testing.T) {
 	if retrieved.SourceVolume.UUID != volume.UUID {
 		t.Errorf("Expected retrieved snapshot SourceVolume.UUID to be %s, got %q", volume.UUID, retrieved.SourceVolume.UUID)
 	}
+	if retrieved.SourceVolume.Name != volume.Name {
+		t.Errorf("Expected SourceVolume.Name %q, got %q", volume.Name, retrieved.SourceVolume.Name)
+	}
+	if retrieved.SourceVolume.HREF == "" {
+		t.Error("Expected SourceVolume.HREF to be non-empty")
+	}
 
 	snapshots, err := client.VolumeSnapshots.List(ctx)
 	if err != nil {
