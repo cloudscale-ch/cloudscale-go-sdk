@@ -337,19 +337,30 @@ func TestIntegrationServer_MultipleVolumes(t *testing.T) {
 		t.Fatalf("Servers.WaitFor returned error %s\n", err)
 	}
 
-	// Ignore UUIDs in this comparison
+	// Ignore instance-specific fields in this comparison
 	actual := make([]cloudscale.VolumeStub, len(server.Volumes))
 	copy(actual, server.Volumes)
 	for i := range actual {
 		actual[i].UUID = ""
+		actual[i].HREF = ""
+		actual[i].Name = ""
 	}
 	expected := []cloudscale.VolumeStub{
-		{Type: "ssd", DevicePath: "", SizeGB: 10, UUID: ""},
-		{Type: "ssd", DevicePath: "", SizeGB: 3, UUID: ""},
-		{Type: "bulk", DevicePath: "", SizeGB: 100, UUID: ""},
+		{Type: "ssd", SizeGB: 10},
+		{Type: "ssd", SizeGB: 3},
+		{Type: "bulk", SizeGB: 100},
 	}
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("Volumes response\n got=%#v\nwant=%#v", actual, expected)
+	}
+
+	for _, volume := range server.Volumes {
+		if volume.HREF == "" {
+			t.Errorf("Expected volume HREF to be non-empty for UUID %s", volume.UUID)
+		}
+		if volume.Name == "" {
+			t.Errorf("Expected volume Name to be non-empty for UUID %s", volume.UUID)
+		}
 	}
 
 	// delete all volume, except the root volume
