@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v8"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 const DefaultImageSlug = "debian-11"
