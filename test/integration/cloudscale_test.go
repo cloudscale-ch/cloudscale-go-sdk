@@ -14,7 +14,7 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v8"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 var (
