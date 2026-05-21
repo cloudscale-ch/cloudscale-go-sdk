@@ -89,6 +89,8 @@ func encodeGetBucketParameters(request *BucketMetricsRequest) string {
 func (s MetricsServiceOperations) GetBucketMetrics(ctx context.Context, request *BucketMetricsRequest) (*BucketMetrics, error) {
 	path := fmt.Sprintf("%s/buckets%s", metricsBasePath, encodeGetBucketParameters(request))
 
+	ctx = WithOperationPath(ctx, metricsBasePath+"/buckets")
+
 	req, err := s.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err

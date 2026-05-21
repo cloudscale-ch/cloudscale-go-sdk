@@ -29,6 +29,7 @@ type RegionServiceOperations struct {
 }
 
 func (s RegionServiceOperations) List(ctx context.Context) ([]Region, error) {
+	ctx = WithOperationPath(ctx, regionsBasePath)
 	req, err := s.client.NewRequest(ctx, http.MethodGet, regionsBasePath, nil)
 	if err != nil {
 		return nil, err

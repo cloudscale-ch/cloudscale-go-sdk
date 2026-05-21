@@ -93,6 +93,66 @@ To use the `cloudscale-go-sdk` for managing your cloudscale.ch resources, follow
 
 That's it! The code will create a server and leverage the `WaitFor` helper to wait until the server status changes to `running`. For more advanced options, check the [documentation](https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v9).
 
+## Instrumentation
+
+The SDK ships a transport wrapper in
+`github.com/cloudscale-ch/cloudscale-go-sdk/v9/instrumentation` that adds
+Prometheus metrics and/or OpenTelemetry spans to every API call. Both signals
+are independent — set only the fields you need on `Options`, and leaving both
+unset returns the transport unchanged.
+
+Wrap the transport on the client returned by `oauth2.NewClient` before handing
+it to `cloudscale.NewClient`:
+
+```go
+import (
+    "context"
+    "os"
+
+    "github.com/cloudscale-ch/cloudscale-go-sdk/v9"
+    "github.com/cloudscale-ch/cloudscale-go-sdk/v9/instrumentation"
+    "github.com/prometheus/client_golang/prometheus"
+    "go.opentelemetry.io/otel"
+    "golang.org/x/oauth2"
+)
+
+apiToken := os.Getenv("CLOUDSCALE_API_TOKEN")
+
+reg := prometheus.NewRegistry()
+tracer := otel.Tracer("cloudscale-go-sdk")
+
+tc := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
+    &oauth2.Token{AccessToken: apiToken},
+))
+tc.Transport = instrumentation.InstrumentedTransport(tc.Transport, instrumentation.Options{
+    PrometheusRegistry: reg,
+    Tracer:             tracer,
+})
+
+client := cloudscale.NewClient(tc)
+```
+
+For metrics-only, set just `PrometheusRegistry`; for tracing-only, set just
+`Tracer`. The `Subsystem` field overrides the default `cloudscale` metric
+prefix when you need to share a registry across collectors.
+
+What is recorded:
+
+- `cloudscale_requests_total{method, endpoint, status}` — counter of API
+  requests by HTTP method, path template, and status code.
+- `cloudscale_request_duration_seconds{method, endpoint}` — request latency
+  histogram.
+- `cloudscale_in_flight_requests` — gauge of concurrent in-flight requests.
+- Spans named `{METHOD} {endpoint}` (e.g. `GET v1/servers/:id`), or just
+  `{METHOD}` when no path template is set. Attributes follow the OpenTelemetry
+  HTTP semantic conventions (`http.request.method`, `url.full`,
+  `http.response.status_code`) plus a `cloudscale.endpoint` attribute with the
+  path template.
+- W3C trace context is injected into outbound request headers using the
+  globally configured propagator. Call
+  `otel.SetTextMapPropagator(propagation.TraceContext{})` at startup to enable
+  propagation (it is a no-op by default).
+
 ## Testing
 
 The test directory contains integration tests, aside from the unit tests in the

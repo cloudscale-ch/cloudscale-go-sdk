@@ -1,17 +1,17 @@
-TEST?=$$(go list ./... |grep -v 'vendor')
 VERSION ?= $(shell cat VERSION)
+TESTARGS?=
 
 test:
-	go test -v $(TEST) $(TESTARGS) -timeout 30s
+	go test -race -v ./... $(TESTARGS) -timeout 30s
 
 clean-testcache:
 	@go clean -testcache  # Force retesting of code
 
 integration: clean-testcache
-	go test -tags=integration -v $(TEST)/test/integration/... $(TESTARGS) -parallel 4 -timeout 120m
+	go test -tags=integration -v ./test/integration/... $(TESTARGS) -parallel 4 -timeout 120m
 
 integration-short: clean-testcache
-	go test -tags=integration -short -v $(TEST)/test/integration/... $(TESTARGS) -parallel 4 -timeout 120m
+	go test -tags=integration -short -v ./test/integration/... $(TESTARGS) -parallel 4 -timeout 120m
 
 vet:
 	go vet ./...

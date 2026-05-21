@@ -38,6 +38,10 @@ type GenericServiceOperations[TResource any, TCreateRequest any, TUpdateRequest 
 }
 
 func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Create(ctx context.Context, createRequest *TCreateRequest) (*TResource, error) {
+	if OperationPath(ctx) == "" {
+		ctx = WithOperationPath(ctx, g.path)
+	}
+
 	req, err := g.client.NewRequest(ctx, http.MethodPost, g.path, createRequest)
 	if err != nil {
 		return nil, err
@@ -56,6 +60,10 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Cre
 func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Get(ctx context.Context, resourceID string) (*TResource, error) {
 	path := fmt.Sprintf("%s/%s", g.path, resourceID)
 
+	if OperationPath(ctx) == "" {
+		ctx = WithOperationPath(ctx, g.path+"/:id")
+	}
+
 	req, err := g.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
@@ -71,6 +79,10 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Get
 }
 
 func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) List(ctx context.Context, modifiers ...ListRequestModifier) ([]TResource, error) {
+	if OperationPath(ctx) == "" {
+		ctx = WithOperationPath(ctx, g.path)
+	}
+
 	req, err := g.client.NewRequest(ctx, http.MethodGet, g.path, nil)
 	if err != nil {
 		return nil, err
@@ -92,6 +104,10 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Lis
 func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Update(ctx context.Context, resourceID string, updateRequest *TUpdateRequest) error {
 	path := fmt.Sprintf("%s/%s", g.path, resourceID)
 
+	if OperationPath(ctx) == "" {
+		ctx = WithOperationPath(ctx, g.path+"/:id")
+	}
+
 	req, err := g.client.NewRequest(ctx, http.MethodPatch, path, updateRequest)
 	if err != nil {
 		return err
@@ -106,6 +122,10 @@ func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Upd
 
 func (g GenericServiceOperations[TResource, TCreateRequest, TUpdateRequest]) Delete(ctx context.Context, resourceID string) error {
 	path := fmt.Sprintf("%s/%s", g.path, resourceID)
+
+	if OperationPath(ctx) == "" {
+		ctx = WithOperationPath(ctx, g.path+"/:id")
+	}
 
 	req, err := g.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
