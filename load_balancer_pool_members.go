@@ -3,8 +3,9 @@ package cloudscale
 import (
 	"context"
 	"fmt"
-	"github.com/cenkalti/backoff/v5"
 	"time"
+
+	"github.com/cenkalti/backoff/v5"
 )
 
 const loadBalancerPoolMemberBasePath = "v1/load-balancers/pools/%s/members"
@@ -52,26 +53,31 @@ type LoadBalancerPoolMemberServiceOperations struct {
 
 func (l LoadBalancerPoolMemberServiceOperations) Create(ctx context.Context, poolID string, createRequest *LoadBalancerPoolMemberRequest) (*LoadBalancerPoolMember, error) {
 	g := parameterizeGenericInstance(l, poolID)
+	ctx = WithOperationPath(ctx, "v1/load-balancers/pools/:pool_id/members")
 	return g.Create(ctx, createRequest)
 }
 
 func (l LoadBalancerPoolMemberServiceOperations) Get(ctx context.Context, poolID string, resourceID string) (*LoadBalancerPoolMember, error) {
 	g := parameterizeGenericInstance(l, poolID)
+	ctx = WithOperationPath(ctx, "v1/load-balancers/pools/:pool_id/members/:id")
 	return g.Get(ctx, resourceID)
 }
 
 func (l LoadBalancerPoolMemberServiceOperations) List(ctx context.Context, poolID string, modifiers ...ListRequestModifier) ([]LoadBalancerPoolMember, error) {
 	g := parameterizeGenericInstance(l, poolID)
+	ctx = WithOperationPath(ctx, "v1/load-balancers/pools/:pool_id/members")
 	return g.List(ctx, modifiers...)
 }
 
 func (l LoadBalancerPoolMemberServiceOperations) Update(ctx context.Context, poolID string, resourceID string, updateRequest *LoadBalancerPoolMemberRequest) error {
 	g := parameterizeGenericInstance(l, poolID)
+	ctx = WithOperationPath(ctx, "v1/load-balancers/pools/:pool_id/members/:id")
 	return g.Update(ctx, resourceID, updateRequest)
 }
 
 func (l LoadBalancerPoolMemberServiceOperations) Delete(ctx context.Context, poolID string, resourceID string) error {
 	g := parameterizeGenericInstance(l, poolID)
+	ctx = WithOperationPath(ctx, "v1/load-balancers/pools/:pool_id/members/:id")
 	return g.Delete(ctx, resourceID)
 }
 
@@ -83,6 +89,7 @@ func (l LoadBalancerPoolMemberServiceOperations) WaitFor(
 	opts ...backoff.RetryOption,
 ) (*LoadBalancerPoolMember, error) {
 	g := parameterizeGenericInstance(l, poolID)
+	ctx = WithOperationPath(ctx, "v1/load-balancers/pools/:pool_id/members/:id")
 	return g.WaitFor(ctx, resourceID, condition, opts...)
 }
 

@@ -143,6 +143,7 @@ type ServerServiceOperations struct {
 
 func (s ServerServiceOperations) Reboot(ctx context.Context, serverID string) error {
 	path := fmt.Sprintf("%s/%s/reboot", serverBasePath, serverID)
+	ctx = WithOperationPath(ctx, serverBasePath+"/:id/reboot")
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
 		return err
@@ -152,6 +153,7 @@ func (s ServerServiceOperations) Reboot(ctx context.Context, serverID string) er
 
 func (s ServerServiceOperations) Start(ctx context.Context, serverID string) error {
 	path := fmt.Sprintf("%s/%s/start", serverBasePath, serverID)
+	ctx = WithOperationPath(ctx, serverBasePath+"/:id/start")
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
 		return err
@@ -161,6 +163,7 @@ func (s ServerServiceOperations) Start(ctx context.Context, serverID string) err
 
 func (s ServerServiceOperations) Stop(ctx context.Context, serverID string) error {
 	path := fmt.Sprintf("%s/%s/stop", serverBasePath, serverID)
+	ctx = WithOperationPath(ctx, serverBasePath+"/:id/stop")
 	req, err := s.client.NewRequest(ctx, http.MethodPost, path, nil)
 	if err != nil {
 		return err

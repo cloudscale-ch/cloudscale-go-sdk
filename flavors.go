@@ -40,6 +40,7 @@ var _ FlavorService = &FlavorServiceOperations{}
 
 // List returns all available flavors (GET /v1/flavors).
 func (s FlavorServiceOperations) List(ctx context.Context) ([]Flavor, error) {
+	ctx = WithOperationPath(ctx, flavorsBasePath)
 	req, err := s.client.NewRequest(ctx, http.MethodGet, flavorsBasePath, nil)
 	if err != nil {
 		return nil, err
