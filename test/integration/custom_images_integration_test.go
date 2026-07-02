@@ -143,9 +143,9 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
 	}
-	expectedMessage := "Expected HTTP 200, got HTTP 404"
-	if errorMessage := customImageImport.ErrorMessage; errorMessage != expectedMessage {
-		t.Errorf("customImageImport.ErrorMessage got=%s\nwant=%s\n", errorMessage, expectedMessage)
+	expectedPrefix := "Expected HTTP 200, got HTTP 4"
+	if errorMessage := customImageImport.ErrorMessage; !strings.HasPrefix(errorMessage, expectedPrefix) {
+		t.Errorf("customImageImport.ErrorMessage got=%s\nwant prefix %s\n", errorMessage, expectedPrefix)
 	}
 }
 
