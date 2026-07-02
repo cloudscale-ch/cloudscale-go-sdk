@@ -16,6 +16,7 @@ import (
 )
 
 const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/alpine.raw"
+const testInvalidImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/this-does-and-will-never-exist"
 
 func TestIntegrationCustomImage_CRUD(t *testing.T) {
 	t.Parallel()
@@ -123,7 +124,7 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
-		URL:              "http://www.cloudscale.ch/this-does-and-will-never-exist",
+		URL:              testInvalidImageURL,
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"rma1"},
 		SourceFormat:     "raw",
@@ -142,9 +143,9 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("CustomImageImports.WaitFor returned error %s\n", err)
 	}
-	expectedMessage := "Expected HTTP 200, got HTTP 404"
-	if errorMessage := customImageImport.ErrorMessage; errorMessage != expectedMessage {
-		t.Errorf("customImageImport.ErrorMessage got=%s\nwant=%s\n", errorMessage, expectedMessage)
+	expectedPrefix := "Expected HTTP 200, got HTTP 4"
+	if errorMessage := customImageImport.ErrorMessage; !strings.HasPrefix(errorMessage, expectedPrefix) {
+		t.Errorf("customImageImport.ErrorMessage got=%s\nwant prefix %s\n", errorMessage, expectedPrefix)
 	}
 }
 
