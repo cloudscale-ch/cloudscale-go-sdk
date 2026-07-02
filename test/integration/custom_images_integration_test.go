@@ -16,6 +16,7 @@ import (
 )
 
 const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/alpine.raw"
+const testInvalidImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/this-does-and-will-never-exist"
 
 func TestIntegrationCustomImage_CRUD(t *testing.T) {
 	t.Parallel()
@@ -123,7 +124,7 @@ func TestIntegrationCustomImage_InvalidURL(t *testing.T) {
 
 	createCustomImageRequest := &cloudscale.CustomImageImportRequest{
 		Name:             testRunPrefix,
-		URL:              "http://www.cloudscale.ch/this-does-and-will-never-exist",
+		URL:              testInvalidImageURL,
 		UserDataHandling: "extend-cloud-config",
 		Zones:            []string{"rma1"},
 		SourceFormat:     "raw",
