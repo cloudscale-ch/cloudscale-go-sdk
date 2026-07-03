@@ -3,9 +3,10 @@ package cloudscale
 import (
 	"context"
 	"fmt"
-	"github.com/cenkalti/backoff/v5"
 	"net/http"
 	"time"
+
+	"github.com/cenkalti/backoff/v5"
 )
 
 type GenericCreateService[TResource any, TCreateRequest any] interface {

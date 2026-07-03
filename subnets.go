@@ -107,7 +107,3 @@ type SubnetService interface {
 	GenericDeleteService[Subnet]
 	GenericWaitForService[Subnet]
 }
-
-type SubnetServiceOperations struct {
-	client *Client
-}

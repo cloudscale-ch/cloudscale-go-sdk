@@ -25,15 +25,15 @@ func TestObjectsUser_Create(t *testing.T) {
 	}
 
 	mux.HandleFunc("/v1/objects-users", func(w http.ResponseWriter, r *http.Request) {
-		expected := map[string]interface{}{
+		expected := map[string]any{
 			"display_name": "TestBucket",
-			"tags": map[string]interface{}{
+			"tags": map[string]any{
 				"tag":   "one",
 				"other": "tag",
 			},
 		}
 
-		var v map[string]interface{}
+		var v map[string]any
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			t.Fatalf("decode json: %v", err)
@@ -42,6 +42,7 @@ func TestObjectsUser_Create(t *testing.T) {
 		if !reflect.DeepEqual(v, expected) {
 			t.Errorf("Request body\n got=%#v\nwant=%#v", v, expected)
 		}
+		//gosec:disable G101 - not a real credential
 		jsonStr := `{
 						"href": "https://api.cloudscale.ch/v1/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15",
 						"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15",
@@ -55,7 +56,7 @@ func TestObjectsUser_Create(t *testing.T) {
 							"other": "tag"
 						}
 					}`
-		io.WriteString(w, jsonStr)
+		_, _ = io.WriteString(w, jsonStr)
 	})
 
 	objectsUser, err := client.ObjectsUsers.Create(ctx, objectsUserRequest)
@@ -75,7 +76,7 @@ func TestObjectsUser_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/objects-users/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}`)
+		_, _ = fmt.Fprint(w, `{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}`)
 	})
 
 	objectUser, err := client.ObjectsUsers.Get(ctx, "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15")
@@ -109,7 +110,7 @@ func TestObjectsUser_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/objects-users", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `[{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}]`)
+		_, _ = fmt.Fprint(w, `[{"id": "6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15"}]`)
 	})
 
 	objectUsers, err := client.ObjectsUsers.List(ctx)
@@ -121,7 +122,6 @@ func TestObjectsUser_List(t *testing.T) {
 	if !reflect.DeepEqual(objectUsers, expected) {
 		t.Errorf("ObjectsUser.List\n got=%#v\nwant=%#v", objectUsers, expected)
 	}
-
 }
 
 func TestObjectsUser_Update(t *testing.T) {

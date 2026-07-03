@@ -52,7 +52,7 @@ func TestFlavors_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/flavors", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, flavorsResponse)
+		_, _ = fmt.Fprint(w, flavorsResponse)
 	})
 
 	flavors, err := client.Flavors.List(ctx)
@@ -101,5 +101,4 @@ func TestFlavors_List(t *testing.T) {
 		want, _ := json.MarshalIndent(expected, "", "  ")
 		t.Errorf("Flavors.List\n got=%s\nwant=%s", got, want)
 	}
-
 }

@@ -182,7 +182,7 @@ func (s ServerServiceOperations) Update(ctx context.Context, id string, req *Ser
 		case ServerRebooted:
 			err = s.Reboot(ctx, id)
 		default:
-			return fmt.Errorf("Status Not Supported %s", req.Status)
+			return fmt.Errorf("unsupported status %q", req.Status)
 		}
 		if err != nil {
 			return err

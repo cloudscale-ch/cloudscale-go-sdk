@@ -1,7 +1,6 @@
 package cloudscale
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 )
@@ -54,7 +53,7 @@ type VolumeService interface {
 func WithNameFilter(name string) ListRequestModifier {
 	return func(request *http.Request) {
 		query := request.URL.Query()
-		query.Add(fmt.Sprintf("name"), name)
+		query.Add("name", name)
 		request.URL.RawQuery = query.Encode()
 	}
 }

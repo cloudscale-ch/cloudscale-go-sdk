@@ -46,7 +46,7 @@ func newInstrumentedClient(reg prometheus.Registerer, tracer trace.Tracer) *http
 
 func doRequest(t *testing.T, c *http.Client, method, url, opPath string) (*http.Response, error) {
 	t.Helper()
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequestWithContext(t.Context(), method, url, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,13 +94,13 @@ func newRecordingTracer(t *testing.T) (trace.Tracer, *tracetest.SpanRecorder) {
 	return tp.Tracer("test"), sr
 }
 
-func mustDoRequest(t *testing.T, c *http.Client, method, url, opPath string) {
+func mustDoRequest(t *testing.T, c *http.Client, url, opPath string) {
 	t.Helper()
-	resp, err := doRequest(t, c, method, url, opPath)
+	resp, err := doRequest(t, c, http.MethodGet, url, opPath)
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp.Body.Close()
+	_ = resp.Body.Close()
 }
 
 func singleSpan(t *testing.T, sr *tracetest.SpanRecorder) sdktrace.ReadOnlySpan {
@@ -174,7 +174,7 @@ func TestInstrumentedTransport_StatusLabels(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				resp.Body.Close()
+				_ = resp.Body.Close()
 			}
 
 			wantEndpoint := tc.opPath
@@ -235,7 +235,7 @@ func TestInstrumentedTransport_Concurrent(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(n)
-	for i := 0; i < n; i++ {
+	for range n {
 		go func() {
 			defer wg.Done()
 			resp, err := doRequest(t, client, http.MethodGet, server.URL+"/v1/servers", "v1/servers")
@@ -243,11 +243,11 @@ func TestInstrumentedTransport_Concurrent(t *testing.T) {
 				t.Errorf("request failed: %v", err)
 				return
 			}
-			resp.Body.Close()
+			_ = resp.Body.Close()
 		}()
 	}
 
-	for i := 0; i < n; i++ {
+	for range n {
 		<-arrived
 	}
 
@@ -288,7 +288,7 @@ func TestInstrumentedTransport_MetricsOnly(t *testing.T) {
 	server := newTestServer(t, statusHandler(http.StatusTeapot))
 	client := newInstrumentedClient(reg, nil)
 
-	mustDoRequest(t, client, http.MethodGet, server.URL+"/v1/flavors", "v1/flavors")
+	mustDoRequest(t, client, server.URL+"/v1/flavors", "v1/flavors")
 
 	for _, name := range []string{
 		"cloudscale_requests_total",
@@ -310,7 +310,7 @@ func TestInstrumentedTransport_DefaultSubsystem(t *testing.T) {
 		}),
 	}
 
-	mustDoRequest(t, client, http.MethodGet, server.URL+"/v1/flavors", "v1/flavors")
+	mustDoRequest(t, client, server.URL+"/v1/flavors", "v1/flavors")
 
 	metricFamily(t, reg, "cloudscale_requests_total")
 }
@@ -322,7 +322,7 @@ func TestInstrumentedTransport_SharedRegistry(t *testing.T) {
 	// Two independent transports sharing the same registry must reuse the same
 	// underlying collectors — both increments should land on a single series.
 	for _, c := range []*http.Client{newInstrumentedClient(reg, nil), newInstrumentedClient(reg, nil)} {
-		mustDoRequest(t, c, http.MethodGet, server.URL+"/v1/servers", "v1/servers")
+		mustDoRequest(t, c, server.URL+"/v1/servers", "v1/servers")
 	}
 
 	total := metricFamily(t, reg, "cloudscale_requests_total")
@@ -341,7 +341,7 @@ func TestInstrumentedTransport_CombinedMetricsAndTracing(t *testing.T) {
 	server := newTestServer(t, statusHandler(http.StatusOK))
 	client := newInstrumentedClient(reg, tracer)
 
-	mustDoRequest(t, client, http.MethodGet, server.URL+"/v1/servers/123", "v1/servers/:id")
+	mustDoRequest(t, client, server.URL+"/v1/servers/123", "v1/servers/:id")
 
 	total := metricFamily(t, reg, "cloudscale_requests_total")
 	labels := labelsOf(total.Metric[0])
@@ -379,7 +379,7 @@ func TestInstrumentedTransport_SpanAttributes(t *testing.T) {
 			client := newInstrumentedClient(nil, tracer)
 
 			reqURL := server.URL + "/some/path?bucket_name=secret&objects_user_id=user-uuid"
-			mustDoRequest(t, client, http.MethodGet, reqURL, tc.opPath)
+			mustDoRequest(t, client, reqURL, tc.opPath)
 
 			span := singleSpan(t, sr)
 
@@ -425,7 +425,7 @@ func TestInstrumentedTransport_URLFullRedactsQuery(t *testing.T) {
 	client := newInstrumentedClient(nil, tracer)
 
 	reqURL := server.URL + "/v1/metrics/buckets?start=2026-01-01&end=2026-01-02&bucket_name=secret&objects_user_id=user-uuid"
-	mustDoRequest(t, client, http.MethodGet, reqURL, "v1/metrics/buckets")
+	mustDoRequest(t, client, reqURL, "v1/metrics/buckets")
 
 	got := attrsOf(singleSpan(t, sr))["url.full"].AsString()
 	want := server.URL + "/v1/metrics/buckets"
@@ -449,7 +449,7 @@ func TestInstrumentedTransport_Propagation(t *testing.T) {
 
 	client := newInstrumentedClient(nil, tracer)
 
-	mustDoRequest(t, client, http.MethodGet, server.URL+"/v1/servers", "v1/servers")
+	mustDoRequest(t, client, server.URL+"/v1/servers", "v1/servers")
 
 	if got == "" {
 		t.Fatal("expected traceparent header to be injected")

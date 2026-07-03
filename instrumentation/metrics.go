@@ -61,7 +61,7 @@ func registerOrReuseGauge(reg prometheus.Registerer, opts prometheus.GaugeOpts) 
 }
 
 // NewMetricsCollector creates a metricsCollector backed by the given registry.
-func NewMetricsCollector(reg prometheus.Registerer, subsystem string) *metricsCollector {
+func NewMetricsCollector(reg prometheus.Registerer, subsystem string) *metricsCollector { //revive:disable:unexported-return
 	return &metricsCollector{
 		requestsTotal: registerOrReuseCounterVec(reg, prometheus.CounterOpts{
 			Subsystem: subsystem,

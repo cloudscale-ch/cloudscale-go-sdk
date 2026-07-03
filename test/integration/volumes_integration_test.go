@@ -1,11 +1,11 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 	"testing"
 	"time"
@@ -187,7 +187,7 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 		if !ok {
 			t.Errorf("Couldn't cast %s\n", err)
 		}
-		if err.StatusCode != 400 {
+		if err.StatusCode != http.StatusBadRequest {
 			t.Errorf("Expected bad request and not %d\n", err.StatusCode)
 		}
 		if !strings.Contains(err.Error(), expected) {
@@ -199,6 +199,9 @@ func TestIntegrationVolume_CreateWithoutServer(t *testing.T) {
 	// Try to scale.
 	scaleVolumeRequest := &cloudscale.VolumeUpdateRequest{SizeGB: scaleSize}
 	err = client.Volumes.Update(context.TODO(), volume.UUID, scaleVolumeRequest)
+	if err != nil {
+		t.Errorf("Volumes.Update returned error %s\n", err)
+	}
 	getVolume, err := client.Volumes.Get(context.TODO(), volume.UUID)
 	if err == nil {
 		if getVolume.SizeGB != scaleSize {
@@ -343,6 +346,7 @@ func TestIntegrationVolume_MultiSite(t *testing.T) {
 }
 
 func createVolumeInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
+	t.Helper()
 
 	createVolumeRequest := &cloudscale.VolumeCreateRequest{
 		Name:   testRunPrefix,

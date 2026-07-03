@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -19,7 +18,7 @@ func TestListRegions(t *testing.T) {
 		t.Fatalf("Regions.List returned error %s\n", err)
 	}
 
-	if len(allRegions) <= 0 {
+	if len(allRegions) == 0 {
 		t.Fatal("Regions.List returned empty slice\n", err)
 	}
 

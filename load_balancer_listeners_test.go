@@ -14,7 +14,7 @@ func TestIntegrationLoadBalancerListener_GetWithPool(t *testing.T) {
 
 	mux.HandleFunc("/v1/load-balancers/listeners/754c3797-57de-4fd2-a5c9-97efa2a0c466", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{
+		_, _ = fmt.Fprint(w, `{
             "href": "https://lab-api.cloudscale.ch/v1/load-balancers/listeners/754c3797-57de-4fd2-a5c9-97efa2a0c466",
             "uuid": "754c3797-57de-4fd2-a5c9-97efa2a0c466",
             "name": "web-lb1-listener",
@@ -82,7 +82,7 @@ func TestIntegrationLoadBalancerListener_GetWithoutPool(t *testing.T) {
 
 	mux.HandleFunc("/v1/load-balancers/listeners/3d6ca1f4-5aea-41f5-b724-0f3054b60e85", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{
+		_, _ = fmt.Fprint(w, `{
             "href": "https://lab-api.cloudscale.ch/v1/load-balancers/listeners/3d6ca1f4-5aea-41f5-b724-0f3054b60e85",
             "uuid": "3d6ca1f4-5aea-41f5-b724-0f3054b60e85",
             "name": "web-lb1-listener-without-pool",

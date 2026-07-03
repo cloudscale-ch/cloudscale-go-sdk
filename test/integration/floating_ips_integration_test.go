@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -107,7 +106,7 @@ func TestIntegrationFloatingIP_CRUD_LoadBalancer(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(loadBalancer.UUID, t)
+	waitUntilLB(t, loadBalancer.UUID)
 
 	createFloatingIPRequest := &cloudscale.FloatingIPCreateRequest{
 		IPVersion:    4,
@@ -283,6 +282,7 @@ func TestIntegrationFloatingIP_MultiSite(t *testing.T) {
 }
 
 func createFloatingIPInRegionAndAssert(t *testing.T, region cloudscale.Region) {
+	t.Helper()
 
 	createServerRequest := &cloudscale.ServerRequest{
 		Name:         testRunPrefix,
@@ -386,7 +386,6 @@ func TestIntegrationFloatingIP_PrefixLength(t *testing.T) {
 	if err != nil {
 		t.Fatalf("FloatingIPs.Delete returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationFloatingIP_Global(t *testing.T) {

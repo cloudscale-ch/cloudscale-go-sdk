@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -531,7 +530,6 @@ func TestIntegrationTags_ObjectsUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ObjectsUsers.Delete returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationTags_Network(t *testing.T) {
@@ -602,7 +600,6 @@ func TestIntegrationTags_Network(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationTags_Subnet(t *testing.T) {
@@ -687,7 +684,6 @@ func TestIntegrationTags_Subnet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Networks.Delete returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationTags_ServerGroup(t *testing.T) {
@@ -775,7 +771,6 @@ func TestIntegrationTags_ServerGroup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ServerGroups.Delete returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationTags_CustomImage(t *testing.T) {
@@ -876,7 +871,7 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(loadBalancer.UUID, t)
+	waitUntilLB(t, loadBalancer.UUID)
 
 	getResult, err := client.LoadBalancers.Get(context.Background(), loadBalancer.UUID)
 	if err != nil {
@@ -926,16 +921,17 @@ func TestIntegrationTags_LoadBalancerAndRelatedResources(t *testing.T) {
 	}
 
 	// call these test cases inline to avoid recreating the load balancer
-	testIntegrationTags_LoadBalancerPool(t, loadBalancer)
+	testIntegrationTagsLoadBalancerPool(t, loadBalancer)
 
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
 		t.Fatalf("LoadBalancers.Delete returned error %s\n", err)
 	}
-
 }
 
-func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalancer) {
+func testIntegrationTagsLoadBalancerPool(t *testing.T, b *cloudscale.LoadBalancer) {
+	t.Helper()
+
 	createRequest := cloudscale.LoadBalancerPoolRequest{
 		Name:         testRunPrefix,
 		Algorithm:    "round_robin",
@@ -998,9 +994,9 @@ func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalanc
 	}
 
 	// call these test cases inline to avoid recreating the load balancer
-	testIntegrationTags_LoadBalancerListner(t, pool)
-	testIntegrationTags_LoadBalancerPoolMember(t, pool)
-	testIntegrationTags_LoadBalancerHealthMonitor(t, pool)
+	testIntegrationTagsLoadBalancerListner(t, pool)
+	testIntegrationTagsLoadBalancerPoolMember(t, pool)
+	testIntegrationTagsLoadBalancerHealthMonitor(t, pool)
 
 	err = client.LoadBalancerPools.Delete(context.Background(), pool.UUID)
 	if err != nil {
@@ -1008,7 +1004,9 @@ func testIntegrationTags_LoadBalancerPool(t *testing.T, b *cloudscale.LoadBalanc
 	}
 }
 
-func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBalancerPool) {
+func testIntegrationTagsLoadBalancerListner(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	t.Helper()
+
 	createRequest := cloudscale.LoadBalancerListenerRequest{
 		Name:         testRunPrefix,
 		Pool:         p.UUID,
@@ -1076,7 +1074,9 @@ func testIntegrationTags_LoadBalancerListner(t *testing.T, p *cloudscale.LoadBal
 	}
 }
 
-func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.LoadBalancerPool) {
+func testIntegrationTagsLoadBalancerPoolMember(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	t.Helper()
+
 	network, subnet, err := createNetworkAndSubnet()
 	if err != nil {
 		t.Fatalf("error while creating network and subnet: %s\n", err)
@@ -1154,7 +1154,9 @@ func testIntegrationTags_LoadBalancerPoolMember(t *testing.T, p *cloudscale.Load
 	}
 }
 
-func testIntegrationTags_LoadBalancerHealthMonitor(t *testing.T, p *cloudscale.LoadBalancerPool) {
+func testIntegrationTagsLoadBalancerHealthMonitor(t *testing.T, p *cloudscale.LoadBalancerPool) {
+	t.Helper()
+
 	createRequest := cloudscale.LoadBalancerHealthMonitorRequest{
 		Pool:          p.UUID,
 		DelayS:        10,

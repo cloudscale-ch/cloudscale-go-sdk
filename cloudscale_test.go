@@ -3,7 +3,7 @@ package cloudscale
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -40,6 +40,7 @@ func teardown() {
 }
 
 func testHTTPMethod(t *testing.T, r *http.Request, expected string) {
+	t.Helper()
 	if expected != r.Method {
 		t.Errorf("Request method = %v, expected %v", r.Method, expected)
 	}
@@ -55,7 +56,6 @@ func TestNewClient(t *testing.T) {
 	if c.UserAgent != userAgent {
 		t.Errorf("NewClient UserAgent = %v, expected %v", c.UserAgent, userAgent)
 	}
-
 }
 
 func TestNewRequest(t *testing.T) {
@@ -73,7 +73,7 @@ func TestNewRequest(t *testing.T) {
 	}
 
 	// test body was JSON encoded
-	body, _ := ioutil.ReadAll(req.Body)
+	body, _ := io.ReadAll(req.Body)
 	if string(body) != outBody {
 		t.Errorf("NewRequest(%v)Body = %v, expected %v", inBody, string(body), outBody)
 	}
@@ -115,7 +115,7 @@ func TestCheckResponse(t *testing.T) {
 	res := &http.Response{
 		Request:    &http.Request{},
 		StatusCode: http.StatusBadRequest,
-		Body:       ioutil.NopCloser(strings.NewReader(`{"name": "This field may not be blank."}`)),
+		Body:       io.NopCloser(strings.NewReader(`{"name": "This field may not be blank."}`)),
 	}
 	err := CheckResponse(res).(*ErrorResponse)
 
@@ -146,7 +146,7 @@ func TestDo(t *testing.T) {
 		if m := http.MethodGet; m != r.Method {
 			t.Errorf("Request method = %v, expected %v", r.Method, m)
 		}
-		fmt.Fprint(w, `{"A":"a"}`)
+		_, _ = fmt.Fprint(w, `{"A":"a"}`)
 	})
 
 	req, _ := client.NewRequest(ctx, http.MethodGet, "/", nil)
@@ -167,7 +167,7 @@ func TestDo_httpError(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "Bad Request", 400)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 	})
 
 	req, _ := client.NewRequest(ctx, http.MethodGet, "/", nil)
@@ -200,7 +200,7 @@ func TestDo_redirectLoop(t *testing.T) {
 }
 
 // TODO: Maybe add an argument with a description for the assertion.
-func assertEqual(t *testing.T, expected interface{}, actual interface{}) {
+func assertEqual(t *testing.T, expected any, actual any) {
 	t.Helper()
 
 	if !reflect.DeepEqual(expected, actual) {

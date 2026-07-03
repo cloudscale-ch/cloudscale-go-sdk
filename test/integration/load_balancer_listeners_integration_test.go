@@ -1,15 +1,15 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
 	"fmt"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 func TestIntegrationLoadBalancerListener_CRUD(t *testing.T) {
@@ -20,7 +20,7 @@ func TestIntegrationLoadBalancerListener_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(lb.UUID, t)
+	waitUntilLB(t, lb.UUID)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {

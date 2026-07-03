@@ -1,13 +1,13 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 	"testing"
 	"time"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 func TestIntegrationMetrics_GetBucketMetrics(t *testing.T) {

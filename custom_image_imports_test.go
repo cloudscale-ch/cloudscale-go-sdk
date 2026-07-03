@@ -24,15 +24,15 @@ func TestCustomImageImport_Create(t *testing.T) {
 	}
 
 	mux.HandleFunc("/v1/custom-images/import", func(w http.ResponseWriter, r *http.Request) {
-		expected := map[string]interface{}{
+		expected := map[string]any{
 			"name": "Test Image",
-			"tags": map[string]interface{}{
+			"tags": map[string]any{
 				"tag":   "one",
 				"other": "tag",
 			},
 		}
 
-		var v map[string]interface{}
+		var v map[string]any
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			t.Fatalf("decode json: %v", err)
@@ -54,7 +54,7 @@ func TestCustomImageImport_Create(t *testing.T) {
   						"error_message": "",
   						"tags": {}
 					}`
-		io.WriteString(w, jsonStr)
+		_, _ = io.WriteString(w, jsonStr)
 	})
 
 	customImageImport, err := client.CustomImageImports.Create(ctx, customImageImportRequest)
@@ -75,7 +75,7 @@ func TestCustomImageImport_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/custom-images/import/6fe39134bf4178747eebc429f82cfafdd08891d4279d0d899bc4012db1db6a15", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{
+		_, _ = fmt.Fprint(w, `{
 			"href": "https://api.cloudscale.ch/v1/custom-images/import/11111111-1864-4608-853a-0771b6885a3a",
 			"uuid": "11111111-1864-4608-853a-0771b6885a3a",
 			"custom_image": {
@@ -120,7 +120,7 @@ func TestCustomImageImport_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/custom-images/import", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `[{
+		_, _ = fmt.Fprint(w, `[{
 			"href": "https://api.cloudscale.ch/v1/custom-images/import/11111111-1864-4608-853a-0771b6885a3a",
 			"uuid": "11111111-1864-4608-853a-0771b6885a3a",
 			"custom_image": {
@@ -159,5 +159,4 @@ func TestCustomImageImport_List(t *testing.T) {
 	if !reflect.DeepEqual(objectUsers, expected) {
 		t.Errorf("CustomImageImport.List\n got=%#v\nwant=%#v", objectUsers, expected)
 	}
-
 }

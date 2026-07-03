@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -27,18 +26,17 @@ func TestIntegrationObjectsUser_CRUD(t *testing.T) {
 	if id := objectsUser.ID; id != expected.ID {
 		t.Errorf("ObjectsUser.ID got=%s\nwant=%s", id, expected.ID)
 	}
-	if access_key := objectsUser.Keys[0]["access_key"]; access_key != expected.Keys[0]["access_key"] {
-		t.Errorf("ObjectsUser.Keys[0][\"access_key\"] got=%s\nwant=%s", access_key, expected.Keys[0]["access_key"])
+	if accessKey := objectsUser.Keys[0]["access_key"]; accessKey != expected.Keys[0]["access_key"] {
+		t.Errorf("ObjectsUser.Keys[0][\"access_key\"] got=%s\nwant=%s", accessKey, expected.Keys[0]["access_key"])
 	}
-	if secret_key := objectsUser.Keys[0]["secret_key"]; secret_key != expected.Keys[0]["secret_key"] {
-		t.Errorf("ObjectsUser.Keys[0][\"secret_key\"] got=%s\nwant=%s", secret_key, expected.Keys[0]["secret_key"])
+	if secretKey := objectsUser.Keys[0]["secret_key"]; secretKey != expected.Keys[0]["secret_key"] {
+		t.Errorf("ObjectsUser.Keys[0][\"secret_key\"] got=%s\nwant=%s", secretKey, expected.Keys[0]["secret_key"])
 	}
 
 	err = client.ObjectsUsers.Delete(context.Background(), objectsUser.ID)
 	if err != nil {
 		t.Fatalf("ObjectsUsers.Get returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationObjectsUser_UpdateRest(t *testing.T) {
@@ -73,10 +71,11 @@ func TestIntegrationObjectsUser_UpdateRest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ObjectsUsers.Get returned error %s\n", err)
 	}
-
 }
 
 func createObjectsUser(t *testing.T) (*cloudscale.ObjectsUser, error) {
+	t.Helper()
+
 	createRequest := &cloudscale.ObjectsUserRequest{
 		DisplayName: testRunPrefix,
 	}

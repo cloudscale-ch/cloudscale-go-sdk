@@ -43,10 +43,6 @@ type CustomImageService interface {
 	GenericWaitForService[CustomImage]
 }
 
-type CustomImageServiceOperations struct {
-	client *Client
-}
-
 var ImportIsSuccessful = func(importInfo *CustomImageImport) (bool, error) {
 	if importInfo.Status == "success" {
 		return true, nil

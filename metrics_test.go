@@ -55,7 +55,7 @@ func TestMetrics_GetBucketMetrics(t *testing.T) {
 					}
 				]
 			}`
-		io.WriteString(w, jsonStr)
+		_, _ = io.WriteString(w, jsonStr)
 	})
 
 	metrics, err := client.Metrics.GetBucketMetrics(ctx, metricsRequest)
@@ -118,7 +118,7 @@ func TestMetrics_GetBucketMetricsAdditionalArgs(t *testing.T) {
 		assertEqual(t, url.Values(expected), r.URL.Query())
 
 		// Dummy response.
-		fmt.Fprintf(w, "{}")
+		_, _ = fmt.Fprintf(w, "{}")
 	})
 
 	_, err := client.Metrics.GetBucketMetrics(ctx, metricsRequest)

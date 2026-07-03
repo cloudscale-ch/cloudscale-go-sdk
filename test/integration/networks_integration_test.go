@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -190,10 +189,8 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 				if !re.Match([]byte(lastNetworkInterface.Addresses[0].Address)) {
 					t.Errorf("Expected IP regex does not match\ngot=%#v\nwant=%#v", lastNetworkInterface.Addresses[0].Address, tt.expectedIP)
 				}
-			} else {
-				if len(lastNetworkInterface.Addresses) != 0 {
-					t.Errorf("Expected no IP addresses\ngot=%#v", len(lastNetworkInterface.Addresses))
-				}
+			} else if len(lastNetworkInterface.Addresses) != 0 {
+				t.Errorf("Expected no IP addresses\ngot=%#v", len(lastNetworkInterface.Addresses))
 			}
 
 			// this is required especially for the 'without IP' case.
@@ -461,6 +458,7 @@ func TestIntegrationNetwork_MultiSite(t *testing.T) {
 }
 
 func createNetworkInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
+	t.Helper()
 
 	createNetworkRequest := &cloudscale.NetworkCreateRequest{
 		Name: testRunPrefix,

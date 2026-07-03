@@ -1,11 +1,11 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"reflect"
 	"strings"
 	"testing"
@@ -17,6 +17,8 @@ import (
 const DefaultImageSlug = "debian-11"
 
 func createServer(t *testing.T, createRequest *cloudscale.ServerRequest) (*cloudscale.Server, error) {
+	t.Helper()
+
 	server, err := client.Servers.Create(context.Background(), createRequest)
 	if err != nil {
 		return nil, err
@@ -87,7 +89,6 @@ func TestIntegrationServer_CRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Servers.Delete returned error %s\n", err)
 	}
-
 }
 
 func TestIntegrationServer_UpdateStatus(t *testing.T) {
@@ -207,7 +208,7 @@ func TestIntegrationServer_UpdateRest(t *testing.T) {
 		if !ok {
 			t.Errorf("Couldn't cast %s\n", err)
 		}
-		if err.StatusCode != 400 {
+		if err.StatusCode != http.StatusBadRequest {
 			t.Errorf("Expected bad request and not %d\n", err.StatusCode)
 		}
 		if !strings.Contains(err.Error(), expected) {
@@ -406,6 +407,7 @@ func TestIntegrationServer_MultiSite(t *testing.T) {
 }
 
 func createServerInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
+	t.Helper()
 
 	createRequest := getDefaultServerRequest()
 	createRequest.Zone = zone.Slug

@@ -23,15 +23,15 @@ func TestServers_Create(t *testing.T) {
 	}
 
 	mux.HandleFunc("/v1/servers", func(w http.ResponseWriter, r *http.Request) {
-		expected := map[string]interface{}{
+		expected := map[string]any{
 			"name":           "mysql",
 			"flavor":         "flex-4",
 			"image":          "debian",
 			"volume_size_gb": float64(50),
-			"ssh_keys":       []interface{}{"key"},
+			"ssh_keys":       []any{"key"},
 		}
 
-		var v map[string]interface{}
+		var v map[string]any
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			t.Fatalf("decode json: %v", err)
@@ -41,7 +41,7 @@ func TestServers_Create(t *testing.T) {
 			t.Errorf("Request body\n got=%#v\nwant=%#v", v, expected)
 		}
 
-		fmt.Fprintf(w, `{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}`)
+		_, _ = fmt.Fprintf(w, `{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}`)
 	})
 
 	server, err := client.Servers.Create(ctx, serverRequest)
@@ -52,7 +52,6 @@ func TestServers_Create(t *testing.T) {
 	if id := server.UUID; id != "47cec963-fcd2-482f-bdb6-24461b2d47b1" {
 		t.Errorf("expected id '%s', received '%s'", server.UUID, id)
 	}
-
 }
 
 func TestServers_Get(t *testing.T) {
@@ -61,7 +60,7 @@ func TestServers_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/servers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc", "created_at": "2019-05-27T16:45:32.241824Z"}`)
+		_, _ = fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
 
 	server, err := client.Servers.Get(ctx, "cfde831a-4e87-4a75-960f-89b0148aa2cc")
@@ -95,7 +94,7 @@ func TestServers_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/servers", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
+		_, _ = fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
 	})
 
 	servers, err := client.Servers.List(ctx)
@@ -107,7 +106,6 @@ func TestServers_List(t *testing.T) {
 	if !reflect.DeepEqual(servers, expected) {
 		t.Errorf("Servers.List\n got=%#v\nwant=%#v", servers, expected)
 	}
-
 }
 
 func TestServers_Reboot(t *testing.T) {
@@ -199,5 +197,4 @@ func TestServers_Update(t *testing.T) {
 	if err == nil {
 		t.Errorf("Servers.Update returned error: %v", err)
 	}
-
 }

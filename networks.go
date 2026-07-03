@@ -48,7 +48,3 @@ type NetworkService interface {
 	GenericDeleteService[Network]
 	GenericWaitForService[Network]
 }
-
-type NetworkServiceOperations struct {
-	client *Client
-}

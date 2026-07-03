@@ -17,7 +17,6 @@ func TestFloatingIPs_IP(t *testing.T) {
 	}
 	if ip := floatingIP.IP(); ip != expected {
 		t.Errorf("FloatingIP.IP got=%s\nwant=%s", ip, expected)
-
 	}
 }
 
@@ -31,12 +30,12 @@ func TestFloatingIPs_Create(t *testing.T) {
 	}
 
 	mux.HandleFunc("/v1/floating-ips", func(w http.ResponseWriter, r *http.Request) {
-		expected := map[string]interface{}{
+		expected := map[string]any{
 			"ip_version": float64(6),
 			"server":     "47cec963-fcd2-482f-bdb6-24461b2d47b1",
 		}
 
-		var v map[string]interface{}
+		var v map[string]any
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			t.Fatalf("decode json: %v", err)
@@ -46,7 +45,7 @@ func TestFloatingIPs_Create(t *testing.T) {
 			t.Errorf("Request body\n got=%#v\nwant=%#v", v, expected)
 		}
 
-		fmt.Fprintf(w, `{"network": "2001:db8::cafe/128"}`)
+		_, _ = fmt.Fprintf(w, `{"network": "2001:db8::cafe/128"}`)
 	})
 
 	floatingIP, err := client.FloatingIPs.Create(ctx, floatingIPrequest)
@@ -57,7 +56,6 @@ func TestFloatingIPs_Create(t *testing.T) {
 	if network := floatingIP.Network; network != "2001:db8::cafe/128" {
 		t.Errorf("expected network '%s', received '%s'", floatingIP.Network, network)
 	}
-
 }
 
 func TestFloatingIPs_Get(t *testing.T) {
@@ -66,7 +64,7 @@ func TestFloatingIPs_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"network": "192.0.2.123/32", "created_at": "2019-05-27T16:45:32.241824Z"}`)
+		_, _ = fmt.Fprint(w, `{"network": "192.0.2.123/32", "created_at": "2019-05-27T16:45:32.241824Z"}`)
 	})
 
 	floatingIP, err := client.FloatingIPs.Get(ctx, "192.0.2.123")
@@ -89,11 +87,11 @@ func TestFloatingIPs_Update(t *testing.T) {
 	}
 
 	mux.HandleFunc("/v1/floating-ips/192.0.2.123", func(w http.ResponseWriter, r *http.Request) {
-		expected := map[string]interface{}{
+		expected := map[string]any{
 			"server": "47777777-fcd2-482f-bdb6-24461b2d47b1",
 		}
 
-		var v map[string]interface{}
+		var v map[string]any
 		err := json.NewDecoder(r.Body).Decode(&v)
 		if err != nil {
 			t.Fatalf("decode json: %v", err)
@@ -130,7 +128,7 @@ func TestFloatingIPs_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/floating-ips", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `[{"network": "192.0.2.123/32"}]`)
+		_, _ = fmt.Fprint(w, `[{"network": "192.0.2.123/32"}]`)
 	})
 
 	servers, err := client.FloatingIPs.List(ctx)
@@ -142,5 +140,4 @@ func TestFloatingIPs_List(t *testing.T) {
 	if !reflect.DeepEqual(servers, expected) {
 		t.Errorf("FloatingIPs.List\n got=%#v\nwant=%#v", servers, expected)
 	}
-
 }
