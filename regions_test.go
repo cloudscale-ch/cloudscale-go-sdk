@@ -28,7 +28,7 @@ func TestRegions_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/regions", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, regionsResponse)
+		_, _ = fmt.Fprint(w, regionsResponse)
 	})
 
 	regions, err := client.Regions.List(ctx)
@@ -51,5 +51,4 @@ func TestRegions_List(t *testing.T) {
 	if !reflect.DeepEqual(regions, expected) {
 		t.Errorf("Regions.List\n got=%#v\nwant=%#v", regions, expected)
 	}
-
 }

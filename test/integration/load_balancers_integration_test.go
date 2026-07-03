@@ -1,14 +1,14 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
@@ -30,7 +30,7 @@ func TestIntegrationLoadBalancer_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Get returned error %s\n", err)
 	}
 
-	waitUntilLB(expected.UUID, t)
+	waitUntilLB(t, expected.UUID)
 
 	if h := time.Since(loadBalancer.CreatedAt).Hours(); !(-1 < h && h < 1) {
 		t.Errorf("loadBalancer.CreatedAt ourside of expected range. got=%v", loadBalancer.CreatedAt)
@@ -117,7 +117,7 @@ func TestIntegrationLoadBalancer_PrivateNetwork(t *testing.T) {
 		t.Errorf("loadBalancerSubnetUUID \n got=%s\nwant=%s", loadBalancerSubnetUUID, subnet.UUID)
 	}
 
-	waitUntilLB(loadBalancer.UUID, t)
+	waitUntilLB(t, loadBalancer.UUID)
 
 	err = client.LoadBalancers.Delete(context.Background(), loadBalancer.UUID)
 	if err != nil {
@@ -147,7 +147,7 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 		t.Fatalf("loadBalancer.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(lb.UUID, t)
+	waitUntilLB(t, lb.UUID)
 
 	newName := testRunPrefix + "-renamed"
 	updateRequest := &cloudscale.LoadBalancerRequest{
@@ -175,7 +175,9 @@ func TestIntegrationLoadBalancer_Update(t *testing.T) {
 	}
 }
 
-func waitUntilLB(uuid string, t *testing.T) *cloudscale.LoadBalancer {
+func waitUntilLB(t *testing.T, uuid string) *cloudscale.LoadBalancer {
+	t.Helper()
+
 	lb, err := client.LoadBalancers.WaitFor(context.Background(), uuid, cloudscale.LoadBalancerIsRunning)
 	if err != nil {
 		t.Fatalf("client.LoadBalancers.WaitFor returned error %s\n", err)

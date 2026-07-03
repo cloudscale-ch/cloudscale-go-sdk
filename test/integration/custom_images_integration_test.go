@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -90,22 +89,26 @@ func TestIntegrationCustomImage_CRUD(t *testing.T) {
 
 	for _, algo := range []string{"md5", "sha256"} {
 		checksumURL := fmt.Sprintf("%s.%s", testImageURL, algo)
-		resp, err := http.Get(checksumURL)
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, checksumURL, nil)
+		if err != nil {
+			t.Fatalf("NewRequestWithContext returned error %s\n", err)
+		}
+		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			t.Fatal(err)
 		}
 		if resp.StatusCode != http.StatusOK {
-			t.Fatal(fmt.Sprintf("Wrong http status code\n got=%#v\nwant=%#v", resp.Status, http.StatusOK))
+			t.Fatalf("Wrong http status code\n got=%#v\nwant=%#v", resp.Status, http.StatusOK)
 		}
-		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		checksum := strings.TrimSpace(string(body))
 		if checksum != customImage.Checksums[algo] {
-			t.Error(fmt.Sprintf("Checksum does not match\n got=%#v\nwant=%#v", customImage.Checksums[algo], checksum))
+			t.Errorf("Checksum does not match\n got=%#v\nwant=%#v", customImage.Checksums[algo], checksum)
 		}
 	}
 

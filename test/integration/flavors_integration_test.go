@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -21,7 +20,7 @@ func TestListFlavors(t *testing.T) {
 		t.Fatalf("Flavors.List returned error %s\n", err)
 	}
 
-	if len(allFlavors) <= 0 {
+	if len(allFlavors) == 0 {
 		t.Fatal("Flavors.List returned empty slice\n", err)
 	}
 

@@ -5,6 +5,7 @@ package integration
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -150,12 +151,11 @@ func TestIntegrationVolumeSnapshot_Update(t *testing.T) {
 
 // waitForSnapshotDeletion polls the API until the snapshot no longer exists
 func waitForSnapshotDeletion(ctx context.Context, snapshotUUID string, maxWaitSeconds int) error {
-	for i := 0; i < maxWaitSeconds; i++ {
+	for range maxWaitSeconds {
 		snapshot, err := client.VolumeSnapshots.Get(ctx, snapshotUUID)
 		if err != nil {
-
 			if apiErr, ok := err.(*cloudscale.ErrorResponse); ok {
-				if apiErr.StatusCode == 404 {
+				if apiErr.StatusCode == http.StatusNotFound {
 					// if we get a 404 error, snapshot is gone, deletion completed
 					return nil
 				}

@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -31,10 +30,11 @@ func TestIntegrationServerGroup_CRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ServerGroups.Get returned error %s\n", err)
 	}
-
 }
 
 func createServerGroup(t *testing.T) (*cloudscale.ServerGroup, error) {
+	t.Helper()
+
 	createRequest := &cloudscale.ServerGroupRequest{
 		Name: testRunPrefix + "-group",
 		Type: "anti-affinity",
@@ -67,6 +67,7 @@ func TestIntegrationServerGroup_MultiSite(t *testing.T) {
 }
 
 func createServerGroupInZoneAndAssert(t *testing.T, zone cloudscale.ZoneStub) {
+	t.Helper()
 
 	createServerGroupRequest := &cloudscale.ServerGroupRequest{
 		Name: "Yellow Submarine",

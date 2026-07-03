@@ -19,7 +19,7 @@ func TestTagsToQueryString(t *testing.T) {
 	for _, tt := range toQueryStringTestCases {
 		t.Run(fmt.Sprintf("%#v", tt.tags), func(t *testing.T) {
 			// arrange
-			req, _ := http.NewRequest("GET", "http://example.com", nil)
+			req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://example.com", nil)
 
 			// act
 			requestModifier := WithTagFilter(tt.tags)

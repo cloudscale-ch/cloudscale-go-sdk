@@ -1,13 +1,13 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 	"reflect"
 	"testing"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 const numberOfDefaultEntries = 2
@@ -143,7 +143,7 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 	}
 
 	// assert initial DNSServers, no option was passed, hence defaults should be used
-	if actualDNSServers := subnet.DNSServers; !(len(actualDNSServers) == 2) {
+	if actualDNSServers := subnet.DNSServers; len(actualDNSServers) != 2 {
 		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", len(actualDNSServers), 2)
 	}
 
@@ -222,7 +222,7 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 	}
 
 	// assert default servers
-	if actualNumberOfEntries := len(updatedSubnet.DNSServers); !(actualNumberOfEntries == numberOfDefaultEntries) {
+	if actualNumberOfEntries := len(updatedSubnet.DNSServers); actualNumberOfEntries != numberOfDefaultEntries {
 		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
 	}
 
@@ -242,7 +242,7 @@ func TestIntegrationSubnet_Update(t *testing.T) {
 	}
 
 	// assert default servers are still set
-	if actualNumberOfEntries := len(updatedSubnet.DNSServers); !(actualNumberOfEntries == numberOfDefaultEntries) {
+	if actualNumberOfEntries := len(updatedSubnet.DNSServers); actualNumberOfEntries != numberOfDefaultEntries {
 		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
 	}
 
@@ -305,7 +305,7 @@ func TestIntegrationSubnet_InitialEmptyDNSServers(t *testing.T) {
 	}
 
 	// assert default servers
-	if actualNumberOfEntries := len(updatedSubnet.DNSServers); !(actualNumberOfEntries == numberOfDefaultEntries) {
+	if actualNumberOfEntries := len(updatedSubnet.DNSServers); actualNumberOfEntries != numberOfDefaultEntries {
 		t.Errorf("Subnet DNSServers length\ngot=%#v\nwant=%#v", actualNumberOfEntries, numberOfDefaultEntries)
 	}
 

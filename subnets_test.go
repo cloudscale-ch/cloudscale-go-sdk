@@ -14,7 +14,7 @@ func TestSubnets_Get(t *testing.T) {
 
 	mux.HandleFunc("/v1/subnets/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc"}`)
+		_, _ = fmt.Fprint(w, `{"uuid": "cfde831a-4e87-4a75-960f-89b0148aa2cc"}`)
 	})
 
 	subnet, err := client.Subnets.Get(ctx, "cfde831a-4e87-4a75-960f-89b0148aa2cc")
@@ -34,7 +34,7 @@ func TestSubnets_List(t *testing.T) {
 
 	mux.HandleFunc("/v1/subnets", func(w http.ResponseWriter, r *http.Request) {
 		testHTTPMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
+		_, _ = fmt.Fprint(w, `[{"uuid": "47cec963-fcd2-482f-bdb6-24461b2d47b1"}]`)
 	})
 
 	subnets, err := client.Subnets.List(ctx)
@@ -46,7 +46,6 @@ func TestSubnets_List(t *testing.T) {
 	if !reflect.DeepEqual(subnets, expected) {
 		t.Errorf("Subnets.List\n got=%#v\nwant=%#v", subnets, expected)
 	}
-
 }
 
 func TestMarshalingOfDNSServersInSubnetUpdateRequest(t *testing.T) {

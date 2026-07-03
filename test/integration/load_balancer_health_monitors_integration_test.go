@@ -1,14 +1,14 @@
 //go:build integration
-// +build integration
 
 package integration
 
 import (
 	"context"
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
 
 func TestIntegrationLoadBalancerHealthMonitor_CRUD(t *testing.T) {
@@ -19,7 +19,7 @@ func TestIntegrationLoadBalancerHealthMonitor_CRUD(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(lb.UUID, t)
+	waitUntilLB(t, lb.UUID)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {
@@ -95,7 +95,7 @@ func TestIntegrationLoadBalancerHealthMonitor_Update(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(lb.UUID, t)
+	waitUntilLB(t, lb.UUID)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {
@@ -162,7 +162,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 		t.Fatalf("LoadBalancers.Create returned error %s\n", err)
 	}
 
-	waitUntilLB(lb.UUID, t)
+	waitUntilLB(t, lb.UUID)
 
 	pool, err := createPoolOnLB(lb)
 	if err != nil {
@@ -190,7 +190,7 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 	expectedHTTP := cloudscale.LoadBalancerHealthMonitorHTTP{
 		ExpectedCodes: []string{"200"},
 		Method:        "GET",
-		UrlPath:       "/",
+		URLPath:       "/",
 		Version:       "1.1",
 		Host:          &hostName,
 	}
@@ -220,13 +220,13 @@ func TestIntegrationLoadBalancerHealthMonitor_HTTP_Update(t *testing.T) {
 	expectedUpdatedHTTP := cloudscale.LoadBalancerHealthMonitorHTTP{
 		ExpectedCodes: []string{"201", "200"},
 		Method:        "GET",
-		UrlPath:       "/",
+		URLPath:       "/",
 		Version:       "1.1",
 		Host:          &hostName,
 	}
-	updatedHttp := updated.HTTP
-	if !reflect.DeepEqual(updatedHttp, &expectedUpdatedHTTP) {
-		t.Errorf("updated.HTTP \n got=%#v\nwant=%#v", updatedHttp, &expectedUpdatedHTTP)
+	updatedHTTP := updated.HTTP
+	if !reflect.DeepEqual(updatedHTTP, &expectedUpdatedHTTP) {
+		t.Errorf("updated.HTTP \n got=%#v\nwant=%#v", updatedHTTP, &expectedUpdatedHTTP)
 	}
 
 	err = client.LoadBalancerHealthMonitors.Delete(context.Background(), updated.UUID)

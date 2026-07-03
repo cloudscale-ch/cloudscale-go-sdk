@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package integration
 
@@ -25,7 +24,7 @@ var (
 
 func TestMain(m *testing.M) {
 	// setup tests
-	testRunPrefix = fmt.Sprintf("go-sdk-%d", rand.Intn(100000))
+	testRunPrefix = fmt.Sprintf("go-sdk-%d", rand.Intn(100000)) //gosec:disable G404 - random number not cryptographically relevant
 
 	token := os.Getenv("CLOUDSCALE_API_TOKEN")
 	if token == "" {

@@ -26,7 +26,7 @@ type LoadBalancerHealthMonitor struct {
 type LoadBalancerHealthMonitorHTTP struct {
 	ExpectedCodes []string `json:"expected_codes,omitempty"`
 	Method        string   `json:"method,omitempty"`
-	UrlPath       string   `json:"url_path,omitempty"`
+	URLPath       string   `json:"url_path,omitempty"`
 	Version       string   `json:"version,omitempty"`
 	Host          *string  `json:"host,omitempty"`
 }
@@ -45,7 +45,7 @@ type LoadBalancerHealthMonitorRequest struct {
 type LoadBalancerHealthMonitorHTTPRequest struct {
 	ExpectedCodes []string `json:"expected_codes,omitempty"`
 	Method        string   `json:"method,omitempty"`
-	UrlPath       string   `json:"url_path,omitempty"`
+	URLPath       string   `json:"url_path,omitempty"`
 	Version       string   `json:"version,omitempty"`
 	Host          *string  `json:"host,omitempty"`
 }

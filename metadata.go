@@ -1,23 +1,24 @@
-// Package metadata implements a client for the cloudscale.ch's OpenStack
+package cloudscale
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"path"
+	"time"
+)
+
+// metadata implements a client for the cloudscale.ch's OpenStack
 // metadata API. This API allows a server to inspect information about itself,
 // like its server ID.
 //
 // Documentation for the API is available at:
 //
 //	https://www.cloudscale.ch/en/api/v1
-package cloudscale
-
-import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"path"
-	"time"
-)
 
 const (
 	maxErrMsgLen = 128 // arbitrary max length for error messages
@@ -36,70 +37,76 @@ var (
 	}()
 )
 
-// Client to interact with cloudscale.ch's OpenStack metadata API, from inside
+// MetadataClient to interact with cloudscale.ch's OpenStack metadata API, from inside
 // a server.
 type MetadataClient struct {
 	client  *http.Client
 	BaseURL *url.URL
 }
 
-// NewClient creates a client for the metadata API.
+// NewMetadataClient creates a client for the metadata API.
 func NewMetadataClient(httpClient *http.Client) *MetadataClient {
 	if httpClient == nil {
-		httpClient = http.DefaultClient
+		httpClient = &http.Client{Timeout: defaultTimeout}
 	}
 
 	client := &MetadataClient{
-		client:  &http.Client{Timeout: defaultTimeout},
+		client:  httpClient,
 		BaseURL: defaultMetadataBaseURL,
 	}
 	return client
 }
 
-// Metadata contains the entire contents of a OpenStack's metadata.
+// GetMetadata contains the entire contents of a OpenStack's metadata.
 // This method is unique because it returns all of the
 // metadata at once, instead of individual metadata items.
-func (c *MetadataClient) GetMetadata() (*Metadata, error) {
+func (c *MetadataClient) GetMetadata(ctx context.Context) (*Metadata, error) {
 	metadata := new(Metadata)
-	err := c.getResource("meta_data.json", func(r io.Reader) error {
+	err := c.getResource(ctx, "meta_data.json", func(r io.Reader) error {
 		return json.NewDecoder(r).Decode(metadata)
 	})
 	return metadata, err
 }
 
-// ServerID returns the Server's unique identifier. This is
+// GetServerID returns the Server's unique identifier. This is
 // automatically generated upon Server creation.
-func (c *MetadataClient) GetServerID() (string, error) {
-	metadata, err := c.GetMetadata()
+func (c *MetadataClient) GetServerID(ctx context.Context) (string, error) {
+	metadata, err := c.GetMetadata(ctx)
 	if err != nil {
 		return "", err
 	}
 	if metadata.Meta.CloudscaleUUID == "" {
-		return "", errors.New("The CloudscaleUUID was not defined in metadata")
+		return "", errors.New("CloudscaleUUID not defined in metadata")
 	}
 	return metadata.Meta.CloudscaleUUID, nil
 }
 
-// RawUserData returns the user data that was provided by the user
+// GetRawUserData returns the user data that was provided by the user
 // during Server creation. User data for cloudscale.ch is a YAML
 // Script that is used for cloud-init.
-func (c *MetadataClient) GetRawUserData() (string, error) {
+func (c *MetadataClient) GetRawUserData(ctx context.Context) (string, error) {
 	var userdata string
-	err := c.getResource("user_data", func(r io.Reader) error {
-		userdataraw, err := ioutil.ReadAll(r)
+	err := c.getResource(ctx, "user_data", func(r io.Reader) error {
+		userdataraw, err := io.ReadAll(r)
 		userdata = string(userdataraw)
 		return err
 	})
 	return userdata, err
 }
 
-func (c *MetadataClient) getResource(resource string, decoder func(r io.Reader) error) error {
+func (c *MetadataClient) getResource(ctx context.Context, resource string, decoder func(r io.Reader) error) error {
 	url := c.resolve(defaultPath, resource)
-	resp, err := c.client.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 	if resp.StatusCode != http.StatusOK {
 		return c.makeError(resp)
 	}
@@ -107,7 +114,7 @@ func (c *MetadataClient) getResource(resource string, decoder func(r io.Reader) 
 }
 
 func (c *MetadataClient) makeError(resp *http.Response) error {
-	body, _ := ioutil.ReadAll(io.LimitReader(resp.Body, maxErrMsgLen))
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, maxErrMsgLen))
 	if len(body) >= maxErrMsgLen {
 		body = append(body[:maxErrMsgLen], []byte("... (elided)")...)
 	} else if len(body) == 0 {

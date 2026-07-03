@@ -18,8 +18,11 @@ func TestOperationPath(t *testing.T) {
 		t.Fatalf("expected %q, got %q", "v1/servers/:id", got)
 	}
 
+	type nestedKey struct{}
+	nested := nestedKey{}
+
 	// Nested context should inherit.
-	child := context.WithValue(ctx, struct{}{}, "other")
+	child := context.WithValue(ctx, nested, "other")
 	if got := OperationPath(child); got != "v1/servers/:id" {
 		t.Fatalf("expected %q, got %q", "v1/servers/:id", got)
 	}
