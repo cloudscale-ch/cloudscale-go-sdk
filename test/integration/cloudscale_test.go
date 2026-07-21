@@ -49,6 +49,7 @@ func TestMain(m *testing.M) {
 	foundResource = foundResource || DeleteRemainingServerGroups()
 	foundResource = foundResource || DeleteRemainingVolumeSnapshots()
 	foundResource = foundResource || DeleteRemainingVolumes()
+	foundResource = foundResource || DeleteRemainingRouters()
 	foundResource = foundResource || DeleteRemainingSubnets()
 	foundResource = foundResource || DeleteRemainingNetworks()
 	foundResource = foundResource || DeleteRemainingObjectsUsers()
@@ -230,6 +231,36 @@ func DeleteRemainingCustomImages() bool {
 			err = client.CustomImages.Delete(context.Background(), customImage.UUID)
 			if err != nil {
 				log.Fatalf("CustomImages.Delete returned error %s\n", err)
+			}
+		}
+	}
+
+	return foundResource
+}
+
+func DeleteRemainingRouters() bool {
+	foundResource := false
+
+	routers, err := client.Routers.List(context.Background())
+	if err != nil {
+		log.Fatalf("Routers.List returned error %s\n", err)
+	}
+
+	for _, router := range routers {
+		if strings.HasPrefix(router.Name, testRunPrefix) {
+			foundResource = true
+			log.Printf("Found not deleted router: %s (%s)\n", router.Name, router.UUID)
+			// Interfaces must be removed before the router can be deleted.
+			for _, iface := range router.Interfaces {
+				log.Printf("Found not deleted router interface: %s on router %s\n", iface.UUID, router.UUID)
+				err = client.Routers.DeleteInterface(context.Background(), router.UUID, iface.UUID)
+				if err != nil {
+					log.Fatalf("Routers.DeleteInterface returned error %s\n", err)
+				}
+			}
+			err = client.Routers.Delete(context.Background(), router.UUID)
+			if err != nil {
+				log.Fatalf("Routers.Delete returned error %s\n", err)
 			}
 		}
 	}

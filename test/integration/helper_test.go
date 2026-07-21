@@ -4,9 +4,13 @@ package integration
 
 import (
 	"context"
+	"errors"
 	"math/rand"
 	"reflect"
 	"testing"
+	"time"
+
+	"github.com/cenkalti/backoff/v5"
 
 	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
 )
@@ -45,4 +49,24 @@ func assertEqual(t *testing.T, expected any, actual any) {
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("Assertion failed:\nexpected: %#v\n  actual: %#v", expected, actual)
 	}
+}
+
+// waitForDeleted calls existsFunc in a backoff loop until exists is false.
+func waitForDeleted(ctx context.Context, existsFunc func() (exists bool, err error)) error {
+	options := []backoff.RetryOption{
+		backoff.WithBackOff(backoff.NewConstantBackOff(2 * time.Second)),
+		backoff.WithMaxElapsedTime(5 * time.Minute),
+	}
+
+	_, err := backoff.Retry(ctx, func() (struct{}, error) {
+		exists, err := existsFunc()
+		if !exists {
+			return struct{}{}, nil
+		}
+		if err == nil {
+			return struct{}{}, errors.New("resource not deleted yet")
+		}
+		return struct{}{}, err
+	}, options...)
+	return err
 }
