@@ -214,7 +214,7 @@ func TestIntegrationLoadBalancerPoolMember_MonitorStatus(t *testing.T) {
 
 	// Step 2: Create a server on the private network
 	serverRequest := getDefaultServerRequest()
-	serverRequest.Interfaces = &[]cloudscale.InterfaceRequest{{Network: network.UUID}}
+	serverRequest.Interfaces = &[]cloudscale.ServerInterfaceRequest{{Network: network.UUID}}
 	serverRequest.SSHKeys = []string{}
 	serverRequest.Password = randomNotVerySecurePassword(10)
 

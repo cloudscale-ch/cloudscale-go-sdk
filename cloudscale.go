@@ -40,6 +40,7 @@ type Client struct {
 	VolumeSnapshots            VolumeSnapshotService
 	Networks                   NetworkService
 	Subnets                    SubnetService
+	Routers                    RouterService
 	FloatingIPs                FloatingIPsService
 	ServerGroups               ServerGroupService
 	ObjectsUsers               ObjectsUsersService
@@ -85,6 +86,13 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Subnets = GenericServiceOperations[Subnet, SubnetCreateRequest, SubnetUpdateRequest]{
 		client: c,
 		path:   subnetBasePath,
+	}
+	c.Routers = RouterServiceOperations{
+		GenericServiceOperations: GenericServiceOperations[Router, RouterCreateRequest, RouterUpdateRequest]{
+			client: c,
+			path:   routerBasePath,
+		},
+		client: c,
 	}
 	c.FloatingIPs = GenericServiceOperations[FloatingIP, FloatingIPCreateRequest, FloatingIPUpdateRequest]{
 		client: c,

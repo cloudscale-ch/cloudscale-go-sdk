@@ -24,7 +24,7 @@ type Server struct {
 	Flavor          FlavorStub        `json:"flavor"`
 	Image           ImageServerStub   `json:"image"`
 	Volumes         []VolumeStub      `json:"volumes"`
-	Interfaces      []Interface       `json:"interfaces"`
+	Interfaces      []ServerInterface `json:"interfaces"`
 	SSHFingerprints []string          `json:"ssh_fingerprints"`
 	SSHHostKeys     []string          `json:"ssh_host_keys"`
 	AntiAfinityWith []ServerStub      `json:"anti_affinity_with"`
@@ -65,13 +65,13 @@ type VolumeStub struct {
 	SizeGB int    `json:"size_gb"`
 }
 
-type Interface struct {
-	Type      string      `json:"type,omitempty"`
-	Network   NetworkStub `json:"network,omitempty"`
-	Addresses []Address   `json:"addresses,omitempty"`
+type ServerInterface struct {
+	Type      string          `json:"type,omitempty"`
+	Network   NetworkStub     `json:"network,omitempty"`
+	Addresses []ServerAddress `json:"addresses,omitempty"`
 }
 
-type Address struct {
+type ServerAddress struct {
 	Version      int        `json:"version"`
 	Address      string     `json:"address"`
 	PrefixLength int        `json:"prefix_length"`
@@ -83,30 +83,30 @@ type Address struct {
 type ServerRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
-	Name              string                 `json:"name"`
-	Flavor            string                 `json:"flavor"`
-	Image             string                 `json:"image"`
-	Zone              string                 `json:"zone,omitempty"`
-	VolumeSizeGB      int                    `json:"volume_size_gb,omitempty"`
-	Volumes           *[]ServerVolumeRequest `json:"volumes,omitempty"`
-	Interfaces        *[]InterfaceRequest    `json:"interfaces,omitempty"`
-	BulkVolumeSizeGB  int                    `json:"bulk_volume_size_gb,omitempty"`
-	SSHKeys           []string               `json:"ssh_keys"`
-	Password          string                 `json:"password,omitempty"`
-	UsePublicNetwork  *bool                  `json:"use_public_network,omitempty"`
-	UsePrivateNetwork *bool                  `json:"use_private_network,omitempty"`
-	UseIPV6           *bool                  `json:"use_ipv6,omitempty"`
-	AntiAffinityWith  string                 `json:"anti_affinity_with,omitempty"`
-	ServerGroups      []string               `json:"server_groups,omitempty"`
-	UserData          string                 `json:"user_data,omitempty"`
+	Name              string                    `json:"name"`
+	Flavor            string                    `json:"flavor"`
+	Image             string                    `json:"image"`
+	Zone              string                    `json:"zone,omitempty"`
+	VolumeSizeGB      int                       `json:"volume_size_gb,omitempty"`
+	Volumes           *[]ServerVolumeRequest    `json:"volumes,omitempty"`
+	Interfaces        *[]ServerInterfaceRequest `json:"interfaces,omitempty"`
+	BulkVolumeSizeGB  int                       `json:"bulk_volume_size_gb,omitempty"`
+	SSHKeys           []string                  `json:"ssh_keys"`
+	Password          string                    `json:"password,omitempty"`
+	UsePublicNetwork  *bool                     `json:"use_public_network,omitempty"`
+	UsePrivateNetwork *bool                     `json:"use_private_network,omitempty"`
+	UseIPV6           *bool                     `json:"use_ipv6,omitempty"`
+	AntiAffinityWith  string                    `json:"anti_affinity_with,omitempty"`
+	ServerGroups      []string                  `json:"server_groups,omitempty"`
+	UserData          string                    `json:"user_data,omitempty"`
 }
 
 type ServerUpdateRequest struct {
 	TaggedResourceRequest
-	Name       string              `json:"name,omitempty"`
-	Status     string              `json:"status,omitempty"`
-	Flavor     string              `json:"flavor,omitempty"`
-	Interfaces *[]InterfaceRequest `json:"interfaces,omitempty"`
+	Name       string                    `json:"name,omitempty"`
+	Status     string                    `json:"status,omitempty"`
+	Flavor     string                    `json:"flavor,omitempty"`
+	Interfaces *[]ServerInterfaceRequest `json:"interfaces,omitempty"`
 }
 
 type ServerVolumeRequest struct {
@@ -114,7 +114,7 @@ type ServerVolumeRequest struct {
 	Type   string `json:"type,omitempty"`
 }
 
-type InterfaceRequest struct {
+type ServerInterfaceRequest struct {
 	Network   string            `json:"network,omitempty"`
 	Addresses *[]AddressRequest `json:"addresses,omitempty"`
 }
