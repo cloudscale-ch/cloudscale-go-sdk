@@ -1,13 +1,26 @@
 version: 2
 updates:
-  # Check for major GitHub Actions updates
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+    groups:
+      actions:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7
 
-  # Check for Go module updates
   - package-ecosystem: "gomod"
-    directory: "/"  # adjust this if your go.mod file is in a subdirectory
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+    groups:
+      all-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    cooldown:
+      default-days: 7
