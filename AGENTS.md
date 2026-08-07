@@ -64,20 +64,11 @@ generic ones. The usual steps:
 ## Integration tests
 
 These run against a real cloudscale account, so they cost money and create real resources. Resources are named
-`go-sdk-<random>` and cleaned up automatically after each test.
-
-- `CLOUDSCALE_API_TOKEN` — required, the API token to test against.
-- `CLOUDSCALE_API_URL` — optional, defaults to `https://api.cloudscale.ch`.
-- `INTEGRATION_TEST_ZONE` — optional, defaults to `rma1`.
-
-To run a subset, pass `go test` arguments through `TESTARGS`, e.g.
-`TESTARGS='-run FloatingIP' make integration`.
+`go-sdk-<random>` and cleaned up automatically after each test. The README's "Testing" section documents how to run them.
 
 ## Releasing
 
-Releases are automated: bump the version with `make NEW_VERSION=vX.Y.Z bump-version`, merge, then push a signed tag. The
-`Release` workflow in `.github/workflows/release.yml` verifies the tag and publishes the GitHub release. The README's
-"Releasing" section has the full procedure.
+Releasing is a manual process. Consult the README's "Releasing" section for instructions on how to release.
 
 ## References
 
