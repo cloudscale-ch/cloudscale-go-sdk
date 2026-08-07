@@ -1,13 +1,6 @@
 VERSION ?= $(shell cat VERSION)
 TESTARGS?=
 
-# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
-else
-GOBIN=$(shell go env GOBIN)
-endif
-
 ##@ Dependencies
 
 ## Location to install dependencies to
@@ -20,7 +13,6 @@ HOST_PLATFORM := $(shell go env GOOS)-$(shell go env GOARCH)
 
 ## Tool Binaries
 GOLANGCI_LINT = $(LOCALBIN)/golangci-lint
-GOVULNCHECK ?= $(LOCALBIN)/govulncheck
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # Options are set to exit when a recipe line exits non-zero or a piped command fails.
@@ -39,6 +31,7 @@ SHELL = /usr/bin/env bash -o pipefail
 # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
 # More info on the awk command:
 # http://linuxcommand.org/lc3_adv_awk.php
+# Based on Kubebuilders help target: https://github.com/kubernetes-sigs/kubebuilder/blob/f98c0ef7f0df9f83a3044d829effc336b126aaf6/pkg/plugins/golang/v4/scaffolds/internal/templates/makefile.go#L102-L117
 
 .PHONY: help
 help: ## Display this help.
@@ -93,12 +86,7 @@ lint-fix: golangci-lint ## Run golangci-lint linter and perform fixes
 lint-config: golangci-lint ## Verify golangci-lint linter configuration
 	"$(GOLANGCI_LINT)" config verify
 
-.PHONY: govulncheck
-govulncheck: govulncheck-tool ## Run govulncheck to scan for known, reachable vulnerabilities (incl. stdlib/toolchain).
-	"$(GOVULNCHECK)" ./...
-
 GOLANGCI_LINT_VERSION ?= v2.12.2
-GOVULNCHECK_VERSION ?= v1.5.0
 
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
@@ -109,11 +97,6 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 		$(GOLANGCI_LINT) custom --destination $(LOCALBIN) --name golangci-lint-custom && \
 		mv -f $(LOCALBIN)/golangci-lint-custom $(GOLANGCI_LINT); \
 	} || true
-
-.PHONY: govulncheck-tool
-govulncheck-tool: $(GOVULNCHECK) ## Download govulncheck locally if necessary.
-$(GOVULNCHECK): $(LOCALBIN)
-	$(call go-install-tool,$(GOVULNCHECK),golang.org/x/vuln/cmd/govulncheck,$(GOVULNCHECK_VERSION))
 
 # go-install-tool will 'go install' any package with custom target and name of binary, if it doesn't exist
 # $1 - target path with name of binary
@@ -129,8 +112,4 @@ GOBIN="$(LOCALBIN)" go install $${package} ;\
 mv "$(LOCALBIN)/$$(basename "$(1)")" "$(1)-$(3)-$(HOST_PLATFORM)" ;\
 } ;\
 ln -sf "$$(realpath "$(1)-$(3)-$(HOST_PLATFORM)")" "$(1)"
-endef
-
-define gomodver
-$(shell go list -m -f '{{if .Replace}}{{.Replace.Version}}{{else}}{{.Version}}{{end}}' $(1) 2>/dev/null)
 endef

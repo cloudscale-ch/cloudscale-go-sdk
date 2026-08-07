@@ -197,10 +197,6 @@ INTEGRATION_TEST_ZONE="lpg1"  make integration
 
 ## Releasing
 
-Releases are automated: pushing a signed `vX.Y.Z` tag runs the
-[`Release` workflow](.github/workflows/release.yml), which verifies the tag, runs the checks, and
-creates the GitHub Release with generated notes.
-
 To create a new release, please do the following:
 
 - Merge all feature branches into `main`/`master` branch
@@ -210,14 +206,4 @@ To create a new release, please do the following:
   - For a new major release: update the `pkg.go.dev` references in this file (multiple!).
 - Commit changes
 - Open a merge request for the release branch and after code review merge the release branch into master
-- Create and push a **signed** tag from the merged commit:
-
-  ```bash
-  git checkout master && git pull
-  git tag -s vX.Y.Z -m vX.Y.Z
-  git push origin vX.Y.Z
-  ```
-
-  The `Release` workflow then verifies that the tag matches `VERSION`/`cloudscale.go`, that it is
-  signed, runs `govulncheck`/`go vet`/unit tests, and publishes the GitHub Release automatically. A
-  tag with a hyphen (e.g. `vX.Y.Z-rc1`) is published as a prerelease.
+- Create a [new release](https://github.com/cloudscale-ch/cloudscale-go-sdk/releases/new) on GitHub.
