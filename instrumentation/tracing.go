@@ -10,7 +10,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v10"
 )
 
 // tracingTransport wraps an http.RoundTripper with OpenTelemetry spans.

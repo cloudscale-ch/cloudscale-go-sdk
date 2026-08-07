@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v10"
 )
 
 func TestIntegrationVolume_CreateAttached(t *testing.T) {
