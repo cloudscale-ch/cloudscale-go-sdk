@@ -5,7 +5,7 @@ This file is a supplement for AI agents working on the cloudscale SDK (cloudscal
 ## What this is
 
 A Go client library for the cloudscale.ch API, imported as
-`github.com/cloudscale-ch/cloudscale-go-sdk/v9`. It is source-only: there is no `main` package and nothing to build or
+`github.com/cloudscale-ch/cloudscale-go-sdk/v10`. It is source-only: there is no `main` package and nothing to build or
 ship, so consumers just `go get` it.
 
 ## What to run after a change
@@ -73,4 +73,4 @@ Releasing is a manual process. Consult the README's "Releasing" section for inst
 ## References
 
 - `README.md` — usage, instrumentation, testing, and release steps.
-- API docs: <https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v9>
+- API docs: <https://pkg.go.dev/github.com/cloudscale-ch/cloudscale-go-sdk/v10>

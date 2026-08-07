@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v10"
 )
 
 const testImageURL = "https://at-images.objects.lpg.cloudscale.ch/prod/alpine.raw"

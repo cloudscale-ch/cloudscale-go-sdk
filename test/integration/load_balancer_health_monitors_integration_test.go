@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cloudscale-ch/cloudscale-go-sdk/v9"
+	"github.com/cloudscale-ch/cloudscale-go-sdk/v10"
 )
 
 func TestIntegrationLoadBalancerHealthMonitor_CRUD(t *testing.T) {
