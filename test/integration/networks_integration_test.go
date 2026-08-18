@@ -112,16 +112,16 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 
 	cases := []struct {
 		name                string
-		in                  *[]cloudscale.InterfaceRequest
+		in                  *[]cloudscale.ServerInterfaceRequest
 		expectedNumNetworks int
 		expectedIP          string
 	}{
-		{"Attach by network UUID", &[]cloudscale.InterfaceRequest{
+		{"Attach by network UUID", &[]cloudscale.ServerInterfaceRequest{
 			{
 				Network: network.UUID,
 			},
 		}, 1, `192\.168\.42\.[0-9]*`},
-		{"Attach by subnet UUID", &[]cloudscale.InterfaceRequest{
+		{"Attach by subnet UUID", &[]cloudscale.ServerInterfaceRequest{
 			{
 				Addresses: &[]cloudscale.AddressRequest{
 					{
@@ -130,7 +130,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 				},
 			},
 		}, 1, `192\.168\.42\.[0-9]*`},
-		{"Attach by subnet UUID with predefined IP", &[]cloudscale.InterfaceRequest{
+		{"Attach by subnet UUID with predefined IP", &[]cloudscale.ServerInterfaceRequest{
 			{
 				Addresses: &[]cloudscale.AddressRequest{
 					{
@@ -140,7 +140,7 @@ func TestIntegrationNetwork_CreateAttached(t *testing.T) {
 				},
 			},
 		}, 1, `192\.168\.42\.242`},
-		{"Attach by network UUID without IP (Layer 2)", &[]cloudscale.InterfaceRequest{
+		{"Attach by network UUID without IP (Layer 2)", &[]cloudscale.ServerInterfaceRequest{
 			{
 				Network: "public",
 			},
@@ -233,7 +233,7 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 		t.Fatalf("Subnets.Create returned error %s\n", err)
 	}
 
-	interfaces := []cloudscale.InterfaceRequest{
+	interfaces := []cloudscale.ServerInterfaceRequest{
 		{Network: "public"},
 	}
 	createServerRequest := &cloudscale.ServerRequest{
@@ -268,7 +268,7 @@ func TestIntegrationNetwork_Reattach(t *testing.T) {
 		Subnet:  subnet.UUID,
 		Address: "192.168.77.77",
 	}}
-	interfaces = append(interfaces, cloudscale.InterfaceRequest{
+	interfaces = append(interfaces, cloudscale.ServerInterfaceRequest{
 		Addresses: &addresses,
 	})
 	updateRequest := cloudscale.ServerUpdateRequest{
@@ -323,7 +323,7 @@ func TestIntegrationNetwork_Reorder(t *testing.T) {
 		t.Fatalf("Subnets.Create returned error %s\n", err)
 	}
 
-	interfaces := []cloudscale.InterfaceRequest{
+	interfaces := []cloudscale.ServerInterfaceRequest{
 		{Network: "public"},
 		{Network: network.UUID},
 	}
