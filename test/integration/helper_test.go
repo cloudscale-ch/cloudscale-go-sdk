@@ -52,6 +52,8 @@ func assertEqual(t *testing.T, expected any, actual any) {
 }
 
 // waitForDeleted calls existsFunc in a backoff loop until exists is false.
+//
+//lint:ignore U1000 - Ignore unused function, since it might become handy again
 func waitForDeleted(ctx context.Context, existsFunc func() (exists bool, err error)) error {
 	options := []backoff.RetryOption{
 		backoff.WithBackOff(backoff.NewConstantBackOff(2 * time.Second)),

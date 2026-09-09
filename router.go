@@ -43,14 +43,18 @@ type RouterCreateRequest struct {
 	InternetGateway bool   `json:"internet_gateway"`
 }
 
-// RouterUpdateRequest is not implemented yet because the API is not implemented yet
-type RouterUpdateRequest struct{}
+type RouterUpdateRequest struct {
+	ZonalResourceRequest
+	TaggedResourceRequest
+	Name            string `json:"name,omitempty"`
+	InternetGateway bool   `json:"internet_gateway,omitempty"`
+}
 
 type RouterService interface {
 	GenericCreateService[Router, RouterCreateRequest]
 	GenericGetService[Router]
 	GenericListService[Router]
-	// GenericUpdateService[Router, RouterUpdateRequest]
+	GenericUpdateService[Router, RouterUpdateRequest]
 	GenericDeleteService[Router]
 	GenericWaitForService[Router]
 	// CreateInterface creates a new interface attached to this router
