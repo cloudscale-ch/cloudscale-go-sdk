@@ -1,6 +1,7 @@
 package cloudscale
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -45,6 +46,40 @@ func TestRouters_Create(t *testing.T) {
 
 	if id := router.UUID; id != "42cec963-fcd2-482f-bdb6-24461b2d47b1" {
 		t.Errorf("expected id '42cec963-fcd2-482f-bdb6-24461b2d47b1', received '%s'", id)
+	}
+}
+
+func TestRouters_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	routerID := "cfde831a-4e87-4a75-960f-89b0148aa2cc"
+	newRouterName := "new-router-name"
+	updateRouterRequest := &RouterUpdateRequest{
+		Name: newRouterName,
+	}
+
+	mux.HandleFunc("/v1/routers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
+		testHTTPMethod(t, r, http.MethodPatch)
+
+		expected := map[string]any{
+			"name": newRouterName,
+		}
+
+		var v map[string]any
+		err := json.NewDecoder(r.Body).Decode(&v)
+		if err != nil {
+			t.Fatalf("decode json: %v", err)
+		}
+
+		if !reflect.DeepEqual(v, expected) {
+			t.Errorf("Request body = %#v, expected %#v", v, expected)
+		}
+	})
+
+	err := client.Routers.Update(context.TODO(), routerID, updateRouterRequest)
+	if err != nil {
+		t.Errorf("ObjectsUser.Update returned error: %v", err)
 	}
 }
 
