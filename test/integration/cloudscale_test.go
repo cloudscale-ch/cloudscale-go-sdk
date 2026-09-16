@@ -260,7 +260,7 @@ func DeleteRemainingRouters() bool {
 			}
 			err = client.Routers.Delete(context.Background(), router.UUID)
 			if err != nil {
-				log.Fatalf("Routers.Delete returned error %s\n", err)
+				log.Fatalf("Routers.Delete returned error: %s\n", err)
 			}
 		}
 	}

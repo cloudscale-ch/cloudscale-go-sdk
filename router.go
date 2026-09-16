@@ -43,14 +43,20 @@ type RouterCreateRequest struct {
 	InternetGateway bool   `json:"internet_gateway"`
 }
 
-// RouterUpdateRequest is not implemented yet because the API is not implemented yet
-type RouterUpdateRequest struct{}
+type RouterUpdateRequest struct {
+	ZonalResourceRequest
+	TaggedResourceRequest
+	Name string `json:"name,omitempty"`
+	// bool + omitempty: If we don't use a pointer to bool here, the value `false` causes the attribute to be omitted.
+	// This means setting the `internet_gateway` to false would cause an empty request body and thus a 400 Bad Request.
+	InternetGateway *bool `json:"internet_gateway,omitempty"`
+}
 
 type RouterService interface {
 	GenericCreateService[Router, RouterCreateRequest]
 	GenericGetService[Router]
 	GenericListService[Router]
-	// GenericUpdateService[Router, RouterUpdateRequest]
+	GenericUpdateService[Router, RouterUpdateRequest]
 	GenericDeleteService[Router]
 	GenericWaitForService[Router]
 	// CreateInterface creates a new interface attached to this router
