@@ -14,8 +14,8 @@ func testCreateRouter(t *testing.T) cloudscale.Router {
 	t.Helper()
 
 	createRouterRequest := &cloudscale.RouterCreateRequest{
-		Name:                 fmt.Sprintf("%s-%s", testRunPrefix, "offline-router"),
-		InternetGateway:      false,
+		Name:                 fmt.Sprintf("%s-%s", testRunPrefix, "router.example.com"),
+		InternetGateway:      true,
 		ZonalResourceRequest: cloudscale.ZonalResourceRequest{Zone: testZone},
 	}
 
@@ -32,17 +32,30 @@ func testCreateRouter(t *testing.T) cloudscale.Router {
 		t.Errorf("Router.InternetGateway got=%t\nwant=%t", initialRouter.InternetGateway, createRouterRequest.InternetGateway)
 	}
 
-	// The number of InternetGatewayAddresses should be 0, since InternetGateway is initially set to false
-	if numInternetGatewayAddresses := len(initialRouter.InternetGatewayAddresses); numInternetGatewayAddresses != 0 {
-		t.Errorf("Number of InternetGatewayAddresses got=%d\nwant=%d", numInternetGatewayAddresses, 0)
-	}
-
 	if _, err := client.Routers.WaitFor(t.Context(), initialRouter.UUID, cloudscale.RouterIsActive); err != nil {
 		t.Errorf("router not in active state: %s", err)
 	}
 
 	if h := time.Since(initialRouter.CreatedAt).Hours(); !(-1 < h && h < 1) {
 		t.Errorf("router.CreatedAt outside of expected range. got=%s", initialRouter.CreatedAt)
+	}
+
+	// The number of InternetGatewayAddresses should be 1, since InternetGateway was updated to true.
+	// This assertion must be updated after the API supports IPv6 for private networks.
+	if numInternetGatewayAddresses := len(initialRouter.InternetGatewayAddresses); numInternetGatewayAddresses != 1 {
+		t.Errorf("Number of InternetGatewayAddresses got=%d\nwant=%d", numInternetGatewayAddresses, 1)
+	}
+
+	// If InternetGateway is true and the Name is a valid FQDN, all InternetGatewayAddresses should have this FQDN as a reverse pointer.
+	for index, address := range initialRouter.InternetGatewayAddresses {
+		reversePTR := ""
+		if address.ReversePTR != nil {
+			reversePTR = *address.ReversePTR
+		}
+
+		if reversePTR != initialRouter.Name {
+			t.Errorf("Router.InternetGatewayAddresses[%d].ReversePTR got=%s\nwant=%s", index, reversePTR, initialRouter.Name)
+		}
 	}
 
 	return *initialRouter
@@ -52,7 +65,7 @@ func testUpdateRouter(t *testing.T, initialRouter cloudscale.Router) cloudscale.
 	t.Helper()
 
 	updateNameRouterRequest := &cloudscale.RouterUpdateRequest{
-		Name: fmt.Sprintf("%s.%s", testRunPrefix, "router.example.com"),
+		Name: fmt.Sprintf("%s.%s", testRunPrefix, "offline-router"),
 	}
 
 	err := client.Routers.Update(t.Context(), initialRouter.UUID, updateNameRouterRequest)
@@ -61,7 +74,7 @@ func testUpdateRouter(t *testing.T, initialRouter cloudscale.Router) cloudscale.
 	}
 
 	updateInternetGatewayRouterRequest := &cloudscale.RouterUpdateRequest{
-		InternetGateway: true,
+		InternetGateway: new(false),
 	}
 
 	err = client.Routers.Update(t.Context(), initialRouter.UUID, updateInternetGatewayRouterRequest)
@@ -77,28 +90,15 @@ func testUpdateRouter(t *testing.T, initialRouter cloudscale.Router) cloudscale.
 	if updatedRouter.Name != updateNameRouterRequest.Name {
 		t.Errorf("router.Name got=%s\nwant=%s", updatedRouter.Name, updateNameRouterRequest.Name)
 	}
-	if updatedRouter.InternetGateway != updateInternetGatewayRouterRequest.InternetGateway {
-		t.Errorf("router.InternetGateway got=%t\nwant=%t", updatedRouter.InternetGateway, updateInternetGatewayRouterRequest.InternetGateway)
+	if updatedRouter.InternetGateway != *updateInternetGatewayRouterRequest.InternetGateway {
+		t.Errorf("router.InternetGateway got=%t\nwant=%t", updatedRouter.InternetGateway, *updateInternetGatewayRouterRequest.InternetGateway)
 	}
 	if uuid := updatedRouter.UUID; uuid != initialRouter.UUID {
 		t.Errorf("Router.UUID got=%s\nwant=%s", uuid, initialRouter.UUID)
 	}
-	// The number of InternetGatewayAddresses should be 1, since InternetGateway was updated to true.
-	// This assertion must be updated after the API supports IPv6 for private networks.
-	if numInternetGatewayAddresses := len(updatedRouter.InternetGatewayAddresses); numInternetGatewayAddresses != 1 {
-		t.Errorf("Number of InternetGatewayAddresses got=%d\nwant=%d", numInternetGatewayAddresses, 1)
-	}
-
-	// If InternetGateway is true and the Name is a valid FQDN, all InternetGatewayAddresses should have this FQDN as a reverse pointer.
-	for index, address := range updatedRouter.InternetGatewayAddresses {
-		reversePTR := ""
-		if address.ReversePTR != nil {
-			reversePTR = *address.ReversePTR
-		}
-
-		if reversePTR != updateNameRouterRequest.Name {
-			t.Errorf("Router.InternetGatewayAddresses[%d].ReversePTR got=%s\nwant=%s", index, reversePTR, updateNameRouterRequest.Name)
-		}
+	// The number of InternetGatewayAddresses should be 0, since InternetGateway is set to false
+	if numInternetGatewayAddresses := len(updatedRouter.InternetGatewayAddresses); numInternetGatewayAddresses != 0 {
+		t.Errorf("Number of InternetGatewayAddresses got=%d\nwant=%d", numInternetGatewayAddresses, 0)
 	}
 
 	return *updatedRouter

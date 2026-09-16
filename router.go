@@ -46,8 +46,10 @@ type RouterCreateRequest struct {
 type RouterUpdateRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
-	Name            string `json:"name,omitempty"`
-	InternetGateway bool   `json:"internet_gateway,omitempty"`
+	Name string `json:"name,omitempty"`
+	// bool + omitempty: If we don't use a pointer to bool here, the value `false` causes the attribute to be omitted.
+	// This means setting the `internet_gateway` to false would cause an empty request body and thus a 400 Bad Request.
+	InternetGateway *bool `json:"internet_gateway,omitempty"`
 }
 
 type RouterService interface {
