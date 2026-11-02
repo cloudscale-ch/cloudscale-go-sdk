@@ -47,6 +47,9 @@ func testHTTPMethod(t *testing.T, r *http.Request, expected string) {
 }
 
 func TestNewClient(t *testing.T) {
+	// Causes the API URL to fallback on defaultBaseURL, which avoids test failures if CLOUDSCALE_API_URL is set to
+	// a different value.
+	t.Setenv("CLOUDSCALE_API_URL", "")
 	c := NewClient(nil)
 
 	if c.BaseURL == nil || c.BaseURL.String() != defaultBaseURL {
@@ -59,6 +62,9 @@ func TestNewClient(t *testing.T) {
 }
 
 func TestNewRequest(t *testing.T) {
+	// Causes the API URL to fallback on defaultBaseURL, which avoids test failures if CLOUDSCALE_API_URL is set to
+	// a different value.
+	t.Setenv("CLOUDSCALE_API_URL", "")
 	c := NewClient(nil)
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
