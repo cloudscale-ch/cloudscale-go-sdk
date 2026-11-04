@@ -4,6 +4,7 @@ package integration
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -185,6 +186,51 @@ func testCreateRouterInterface(t *testing.T, router cloudscale.Router, subnet cl
 	return *routerInterface
 }
 
+func testUpdateRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
+	t.Helper()
+
+	updateRouterAddExtraRoutesRequest := &cloudscale.RouterUpdateRequest{
+		ExtraRoutes: &[]cloudscale.RouterExtraRoute{
+			{
+				Destination: "10.10.20.0/24",
+				NextHop:     "192.168.99.100",
+			},
+		},
+	}
+
+	err := client.Routers.Update(t.Context(), initialRouter.UUID, updateRouterAddExtraRoutesRequest)
+	if err != nil {
+		t.Fatalf("Routers.Update returned error %s", err)
+	}
+
+	updatedRouterWithExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
+	if err != nil {
+		t.Fatalf("Routers.Get returned error %s", err)
+	}
+
+	if !reflect.DeepEqual(updatedRouterWithExtraRoutes.ExtraRoutes, *updateRouterAddExtraRoutesRequest.ExtraRoutes) {
+		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithExtraRoutes.ExtraRoutes, *updateRouterAddExtraRoutesRequest.ExtraRoutes)
+	}
+
+	updateRouterRemoveExtraRoutesRequest := &cloudscale.RouterUpdateRequest{
+		ExtraRoutes: &[]cloudscale.RouterExtraRoute{},
+	}
+
+	err = client.Routers.Update(t.Context(), initialRouter.UUID, updateRouterRemoveExtraRoutesRequest)
+	if err != nil {
+		t.Fatalf("Routers.Update returned error %s", err)
+	}
+
+	updatedRouterWithoutExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
+	if err != nil {
+		t.Fatalf("Routers.Get returned error %s", err)
+	}
+
+	if !reflect.DeepEqual(updatedRouterWithoutExtraRoutes.ExtraRoutes, *updateRouterRemoveExtraRoutesRequest.ExtraRoutes) {
+		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithoutExtraRoutes.ExtraRoutes, *updateRouterRemoveExtraRoutesRequest.ExtraRoutes)
+	}
+}
+
 func testDeleteRouterInterface(t *testing.T, router cloudscale.Router, routerInterface cloudscale.RouterInterface) {
 	t.Helper()
 
@@ -225,10 +271,13 @@ func TestIntegrationRouter_CRUD(t *testing.T) {
 
 	routerInterface := testCreateRouterInterface(t, router, subnet)
 
-	// Clean up and test router interface deletion
+	// Test router extra_routes
+	testUpdateRouterExtraRoutes(t, router)
+
+	// Test router interface deletion
 	testDeleteRouterInterface(t, router, routerInterface)
 
-	// Clean up and test router deletion
+	// Test router deletion
 	testDeleteRouter(t, router)
 
 	// Clean up: delete network (automatically deletes the subnet too)
