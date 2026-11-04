@@ -55,8 +55,15 @@ func TestRouters_Update(t *testing.T) {
 
 	routerID := "cfde831a-4e87-4a75-960f-89b0148aa2cc"
 	newRouterName := "new-router-name"
+	newExtraRoutes := []RouterExtraRoute{
+		{
+			Destination: "10.10.20.0/24",
+			NextHop:     "10.10.10.1",
+		},
+	}
 	updateRouterRequest := &RouterUpdateRequest{
-		Name: newRouterName,
+		Name:        newRouterName,
+		ExtraRoutes: &newExtraRoutes,
 	}
 
 	mux.HandleFunc("/v1/routers/cfde831a-4e87-4a75-960f-89b0148aa2cc", func(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +71,12 @@ func TestRouters_Update(t *testing.T) {
 
 		expected := map[string]any{
 			"name": newRouterName,
+			"extra_routes": []any{
+				map[string]any{
+					"next_hop":    newExtraRoutes[0].NextHop,
+					"destination": newExtraRoutes[0].Destination,
+				},
+			},
 		}
 
 		var v map[string]any
@@ -142,7 +155,13 @@ func TestRouters_Get(t *testing.T) {
                 "type": "private",
                 "mac_address": "00:00:5e:00:53:ab"
               }
-            ]
+            ],
+			"extra_routes": [
+			  {
+				"destination": "10.10.20.0/24",
+				"next_hop": "10.10.10.1"
+			  }
+			]
           }`)
 	})
 
@@ -205,6 +224,12 @@ func TestRouters_Get(t *testing.T) {
 				},
 				Type:       "private",
 				MACAddress: "00:00:5e:00:53:ab",
+			},
+		},
+		ExtraRoutes: []RouterExtraRoute{
+			{
+				Destination: "10.10.20.0/24",
+				NextHop:     "10.10.10.1",
 			},
 		},
 	}
