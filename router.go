@@ -12,14 +12,15 @@ const routerBasePath = "v1/routers"
 type Router struct {
 	ZonalResource
 	TaggedResource
-	HREF                     string            `json:"href"`
-	UUID                     string            `json:"uuid"`
-	Name                     string            `json:"name"`
-	CreatedAt                time.Time         `json:"created_at"`
-	Status                   string            `json:"status"`
-	InternetGateway          bool              `json:"internet_gateway"`
-	InternetGatewayAddresses []IPAddress       `json:"internet_gateway_addresses,omitempty"`
-	Interfaces               []RouterInterface `json:"interfaces,omitempty"`
+	HREF                     string             `json:"href"`
+	UUID                     string             `json:"uuid"`
+	Name                     string             `json:"name"`
+	CreatedAt                time.Time          `json:"created_at"`
+	Status                   string             `json:"status"`
+	InternetGateway          bool               `json:"internet_gateway"`
+	InternetGatewayAddresses []IPAddress        `json:"internet_gateway_addresses,omitempty"`
+	Interfaces               []RouterInterface  `json:"interfaces,omitempty"`
+	ExtraRoutes              []RouterExtraRoute `json:"extra_routes,omitempty"`
 }
 
 type IPAddress struct {
@@ -36,6 +37,11 @@ type RouterInterface struct {
 	MACAddress string      `json:"mac_address"`
 }
 
+type RouterExtraRoute struct {
+	Destination string `json:"destination"`
+	NextHop     string `json:"next_hop"`
+}
+
 type RouterCreateRequest struct {
 	ZonalResourceRequest
 	TaggedResourceRequest
@@ -49,7 +55,8 @@ type RouterUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 	// bool + omitempty: If we don't use a pointer to bool here, the value `false` causes the attribute to be omitted.
 	// This means setting the `internet_gateway` to false would cause an empty request body and thus a 400 Bad Request.
-	InternetGateway *bool `json:"internet_gateway,omitempty"`
+	InternetGateway *bool               `json:"internet_gateway,omitempty"`
+	ExtraRoutes     *[]RouterExtraRoute `json:"extra_routes,omitempty"`
 }
 
 type RouterService interface {
