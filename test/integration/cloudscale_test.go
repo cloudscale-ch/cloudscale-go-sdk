@@ -241,9 +241,6 @@ func DeleteRemainingCustomImages() bool {
 func DeleteRemainingRouters() bool {
 	foundResource := false
 
-	updateRouterRequest := &cloudscale.RouterUpdateRequest{
-		ExtraRoutes: &[]cloudscale.RouterExtraRoute{},
-	}
 	routers, err := client.Routers.List(context.Background())
 	if err != nil {
 		log.Fatalf("Routers.List returned error %s\n", err)
@@ -254,9 +251,12 @@ func DeleteRemainingRouters() bool {
 			foundResource = true
 			log.Printf("Found not deleted router: %s (%s)\n", router.Name, router.UUID)
 			// Extra routes must be removed before the router interfaces can be removed.
-			err = client.Routers.Update(context.Background(), router.UUID, updateRouterRequest)
-			if err != nil {
-				log.Fatalf("Routers.Update returned error %s", err)
+			for _, extraRoute := range router.ExtraRoutes {
+				log.Printf("Found not deleted router extra route: %s on router %s\n", extraRoute.UUID, router.UUID)
+				err = client.Routers.RemoveRouterExtraRoute(context.Background(), router.UUID, extraRoute.UUID)
+				if err != nil {
+					log.Fatalf("Routers.RemoveRouterExtraRoute returned error %s\n", err)
+				}
 			}
 			// Interfaces must be removed before the router can be deleted.
 			for _, iface := range router.Interfaces {

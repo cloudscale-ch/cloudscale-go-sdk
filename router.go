@@ -38,6 +38,8 @@ type RouterInterface struct {
 }
 
 type RouterExtraRoute struct {
+	HREF        string `json:"href"`
+	UUID        string `json:"uuid"`
 	Destination string `json:"destination"`
 	NextHop     string `json:"next_hop"`
 }
@@ -55,8 +57,7 @@ type RouterUpdateRequest struct {
 	Name string `json:"name,omitempty"`
 	// bool + omitempty: If we don't use a pointer to bool here, the value `false` causes the attribute to be omitted.
 	// This means setting the `internet_gateway` to false would cause an empty request body and thus a 400 Bad Request.
-	InternetGateway *bool               `json:"internet_gateway,omitempty"`
-	ExtraRoutes     *[]RouterExtraRoute `json:"extra_routes,omitempty"`
+	InternetGateway *bool `json:"internet_gateway,omitempty"`
 }
 
 type RouterService interface {
@@ -70,6 +71,8 @@ type RouterService interface {
 	CreateInterface(ctx context.Context, routerUUID string, createReq CreateInterfaceRequest) (*RouterInterface, error)
 	// DeleteInterface removes an interface attached to this router
 	DeleteInterface(ctx context.Context, routerUUID, interfaceUUID string) error
+	AddRouterExtraRoute(ctx context.Context, routerUUID string, createReq AddRouterExtraRouteRequest) (*RouterExtraRoute, error)
+	RemoveRouterExtraRoute(ctx context.Context, routerUUID string, routerExtraRouteUUID string) error
 }
 
 type CreateInterfaceRequest struct {
@@ -79,6 +82,11 @@ type CreateInterfaceRequest struct {
 type CreateAddressRequest struct {
 	Subnet  string `json:"subnet"`
 	Address string `json:"address"`
+}
+
+type AddRouterExtraRouteRequest struct {
+	Destination string `json:"destination"`
+	NextHop     string `json:"next_hop"`
 }
 
 type RouterServiceOperations struct {
@@ -103,6 +111,32 @@ func (r RouterServiceOperations) CreateInterface(ctx context.Context, routerUUID
 func (r RouterServiceOperations) DeleteInterface(ctx context.Context, routerUUID, interfaceUUID string) error {
 	path := fmt.Sprintf("%s/%s/interfaces/%s", routerBasePath, routerUUID, interfaceUUID)
 	ctx = WithOperationPath(ctx, routerBasePath+"/:id/interfaces/:interface_id")
+
+	req, err := r.client.NewRequest(ctx, http.MethodDelete, path, nil)
+	if err != nil {
+		return err
+	}
+	return r.client.Do(ctx, req, nil)
+}
+
+func (r RouterServiceOperations) AddRouterExtraRoute(ctx context.Context, routerUUID string, createReq AddRouterExtraRouteRequest) (*RouterExtraRoute, error) {
+	path := fmt.Sprintf("%s/%s/extra-routes", routerBasePath, routerUUID)
+	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes")
+
+	req, err := r.client.NewRequest(ctx, http.MethodPost, path, createReq)
+	if err != nil {
+		return nil, err
+	}
+	res := &RouterExtraRoute{}
+	if err := r.client.Do(ctx, req, res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (r RouterServiceOperations) RemoveRouterExtraRoute(ctx context.Context, routerUUID, routerExtraRouteUUID string) error {
+	path := fmt.Sprintf("%s/%s/extra-routes/%s", routerBasePath, routerUUID, routerExtraRouteUUID)
+	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes/:router_extra_route_uuid")
 
 	req, err := r.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {

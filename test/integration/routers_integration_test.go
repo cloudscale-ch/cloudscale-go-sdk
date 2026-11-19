@@ -186,21 +186,17 @@ func testCreateRouterInterface(t *testing.T, router cloudscale.Router, subnet cl
 	return *routerInterface
 }
 
-func testUpdateRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
+func testAddAndRemoveRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
 	t.Helper()
 
-	updateRouterAddExtraRoutesRequest := &cloudscale.RouterUpdateRequest{
-		ExtraRoutes: &[]cloudscale.RouterExtraRoute{
-			{
-				Destination: "10.10.20.0/24",
-				NextHop:     "192.168.99.100",
-			},
-		},
+	addRouterExtraRouterRequest := cloudscale.AddRouterExtraRouteRequest{
+		Destination: "10.10.10.0/24",
+		NextHop:     "192.168.99.1",
 	}
 
-	err := client.Routers.Update(t.Context(), initialRouter.UUID, updateRouterAddExtraRoutesRequest)
+	addedRouterExtraRoute, err := client.Routers.AddRouterExtraRoute(t.Context(), initialRouter.UUID, addRouterExtraRouterRequest)
 	if err != nil {
-		t.Fatalf("Routers.Update returned error %s", err)
+		t.Fatalf("Routers.AddRouterExtraRouteRequest returned error %s", err)
 	}
 
 	updatedRouterWithExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
@@ -208,17 +204,14 @@ func testUpdateRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) 
 		t.Fatalf("Routers.Get returned error %s", err)
 	}
 
-	if !reflect.DeepEqual(updatedRouterWithExtraRoutes.ExtraRoutes, *updateRouterAddExtraRoutesRequest.ExtraRoutes) {
-		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithExtraRoutes.ExtraRoutes, *updateRouterAddExtraRoutesRequest.ExtraRoutes)
+	expectedRouterExtraRoutes := []cloudscale.RouterExtraRoute{*addedRouterExtraRoute}
+	if !reflect.DeepEqual(updatedRouterWithExtraRoutes.ExtraRoutes, expectedRouterExtraRoutes) {
+		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithExtraRoutes.ExtraRoutes, expectedRouterExtraRoutes)
 	}
 
-	updateRouterRemoveExtraRoutesRequest := &cloudscale.RouterUpdateRequest{
-		ExtraRoutes: &[]cloudscale.RouterExtraRoute{},
-	}
-
-	err = client.Routers.Update(t.Context(), initialRouter.UUID, updateRouterRemoveExtraRoutesRequest)
+	err = client.Routers.RemoveRouterExtraRoute(t.Context(), initialRouter.UUID, addedRouterExtraRoute.UUID)
 	if err != nil {
-		t.Fatalf("Routers.Update returned error %s", err)
+		t.Fatalf("Routers.RemoveRouterExtraRoute returned error %s", err)
 	}
 
 	updatedRouterWithoutExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
@@ -226,8 +219,9 @@ func testUpdateRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) 
 		t.Fatalf("Routers.Get returned error %s", err)
 	}
 
-	if !reflect.DeepEqual(updatedRouterWithoutExtraRoutes.ExtraRoutes, *updateRouterRemoveExtraRoutesRequest.ExtraRoutes) {
-		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithoutExtraRoutes.ExtraRoutes, *updateRouterRemoveExtraRoutesRequest.ExtraRoutes)
+	expectedLeftOverRouterExtraRoutes := []cloudscale.RouterExtraRoute{}
+	if !reflect.DeepEqual(updatedRouterWithoutExtraRoutes.ExtraRoutes, expectedLeftOverRouterExtraRoutes) {
+		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithoutExtraRoutes.ExtraRoutes, expectedLeftOverRouterExtraRoutes)
 	}
 }
 
@@ -272,7 +266,7 @@ func TestIntegrationRouter_CRUD(t *testing.T) {
 	routerInterface := testCreateRouterInterface(t, router, subnet)
 
 	// Test router extra_routes
-	testUpdateRouterExtraRoutes(t, router)
+	testAddAndRemoveRouterExtraRoutes(t, router)
 
 	// Test router interface deletion
 	testDeleteRouterInterface(t, router, routerInterface)
