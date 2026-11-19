@@ -4,6 +4,7 @@ package integration
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -185,6 +186,45 @@ func testCreateRouterInterface(t *testing.T, router cloudscale.Router, subnet cl
 	return *routerInterface
 }
 
+func testAddAndRemoveRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
+	t.Helper()
+
+	addRouterExtraRouterRequest := cloudscale.AddRouterExtraRouteRequest{
+		Destination: "10.10.10.0/24",
+		NextHop:     "192.168.99.1",
+	}
+
+	addedRouterExtraRoute, err := client.Routers.AddRouterExtraRoute(t.Context(), initialRouter.UUID, addRouterExtraRouterRequest)
+	if err != nil {
+		t.Fatalf("Routers.AddRouterExtraRouteRequest returned error %s", err)
+	}
+
+	updatedRouterWithExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
+	if err != nil {
+		t.Fatalf("Routers.Get returned error %s", err)
+	}
+
+	expectedRouterExtraRoutes := []cloudscale.RouterExtraRoute{*addedRouterExtraRoute}
+	if !reflect.DeepEqual(updatedRouterWithExtraRoutes.ExtraRoutes, expectedRouterExtraRoutes) {
+		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithExtraRoutes.ExtraRoutes, expectedRouterExtraRoutes)
+	}
+
+	err = client.Routers.RemoveRouterExtraRoute(t.Context(), initialRouter.UUID, addedRouterExtraRoute.UUID)
+	if err != nil {
+		t.Fatalf("Routers.RemoveRouterExtraRoute returned error %s", err)
+	}
+
+	updatedRouterWithoutExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
+	if err != nil {
+		t.Fatalf("Routers.Get returned error %s", err)
+	}
+
+	expectedLeftOverRouterExtraRoutes := []cloudscale.RouterExtraRoute{}
+	if !reflect.DeepEqual(updatedRouterWithoutExtraRoutes.ExtraRoutes, expectedLeftOverRouterExtraRoutes) {
+		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithoutExtraRoutes.ExtraRoutes, expectedLeftOverRouterExtraRoutes)
+	}
+}
+
 func testDeleteRouterInterface(t *testing.T, router cloudscale.Router, routerInterface cloudscale.RouterInterface) {
 	t.Helper()
 
@@ -225,10 +265,13 @@ func TestIntegrationRouter_CRUD(t *testing.T) {
 
 	routerInterface := testCreateRouterInterface(t, router, subnet)
 
-	// Clean up and test router interface deletion
+	// Test router extra_routes
+	testAddAndRemoveRouterExtraRoutes(t, router)
+
+	// Test router interface deletion
 	testDeleteRouterInterface(t, router, routerInterface)
 
-	// Clean up and test router deletion
+	// Test router deletion
 	testDeleteRouter(t, router)
 
 	// Clean up: delete network (automatically deletes the subnet too)

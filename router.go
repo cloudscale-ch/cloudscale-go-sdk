@@ -12,14 +12,15 @@ const routerBasePath = "v1/routers"
 type Router struct {
 	ZonalResource
 	TaggedResource
-	HREF                     string            `json:"href"`
-	UUID                     string            `json:"uuid"`
-	Name                     string            `json:"name"`
-	CreatedAt                time.Time         `json:"created_at"`
-	Status                   string            `json:"status"`
-	InternetGateway          bool              `json:"internet_gateway"`
-	InternetGatewayAddresses []IPAddress       `json:"internet_gateway_addresses,omitempty"`
-	Interfaces               []RouterInterface `json:"interfaces,omitempty"`
+	HREF                     string             `json:"href"`
+	UUID                     string             `json:"uuid"`
+	Name                     string             `json:"name"`
+	CreatedAt                time.Time          `json:"created_at"`
+	Status                   string             `json:"status"`
+	InternetGateway          bool               `json:"internet_gateway"`
+	InternetGatewayAddresses []IPAddress        `json:"internet_gateway_addresses,omitempty"`
+	Interfaces               []RouterInterface  `json:"interfaces,omitempty"`
+	ExtraRoutes              []RouterExtraRoute `json:"extra_routes,omitempty"`
 }
 
 type IPAddress struct {
@@ -34,6 +35,13 @@ type RouterInterface struct {
 	Addresses  []IPAddress `json:"addresses"`
 	Type       string      `json:"type"`
 	MACAddress string      `json:"mac_address"`
+}
+
+type RouterExtraRoute struct {
+	HREF        string `json:"href"`
+	UUID        string `json:"uuid"`
+	Destination string `json:"destination"`
+	NextHop     string `json:"next_hop"`
 }
 
 type RouterCreateRequest struct {
@@ -63,6 +71,8 @@ type RouterService interface {
 	CreateInterface(ctx context.Context, routerUUID string, createReq CreateInterfaceRequest) (*RouterInterface, error)
 	// DeleteInterface removes an interface attached to this router
 	DeleteInterface(ctx context.Context, routerUUID, interfaceUUID string) error
+	AddRouterExtraRoute(ctx context.Context, routerUUID string, createReq AddRouterExtraRouteRequest) (*RouterExtraRoute, error)
+	RemoveRouterExtraRoute(ctx context.Context, routerUUID string, routerExtraRouteUUID string) error
 }
 
 type CreateInterfaceRequest struct {
@@ -72,6 +82,11 @@ type CreateInterfaceRequest struct {
 type CreateAddressRequest struct {
 	Subnet  string `json:"subnet"`
 	Address string `json:"address"`
+}
+
+type AddRouterExtraRouteRequest struct {
+	Destination string `json:"destination"`
+	NextHop     string `json:"next_hop"`
 }
 
 type RouterServiceOperations struct {
@@ -96,6 +111,32 @@ func (r RouterServiceOperations) CreateInterface(ctx context.Context, routerUUID
 func (r RouterServiceOperations) DeleteInterface(ctx context.Context, routerUUID, interfaceUUID string) error {
 	path := fmt.Sprintf("%s/%s/interfaces/%s", routerBasePath, routerUUID, interfaceUUID)
 	ctx = WithOperationPath(ctx, routerBasePath+"/:id/interfaces/:interface_id")
+
+	req, err := r.client.NewRequest(ctx, http.MethodDelete, path, nil)
+	if err != nil {
+		return err
+	}
+	return r.client.Do(ctx, req, nil)
+}
+
+func (r RouterServiceOperations) AddRouterExtraRoute(ctx context.Context, routerUUID string, createReq AddRouterExtraRouteRequest) (*RouterExtraRoute, error) {
+	path := fmt.Sprintf("%s/%s/extra-routes", routerBasePath, routerUUID)
+	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes")
+
+	req, err := r.client.NewRequest(ctx, http.MethodPost, path, createReq)
+	if err != nil {
+		return nil, err
+	}
+	res := &RouterExtraRoute{}
+	if err := r.client.Do(ctx, req, res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (r RouterServiceOperations) RemoveRouterExtraRoute(ctx context.Context, routerUUID, routerExtraRouteUUID string) error {
+	path := fmt.Sprintf("%s/%s/extra-routes/%s", routerBasePath, routerUUID, routerExtraRouteUUID)
+	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes/:router_extra_route_uuid")
 
 	req, err := r.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
