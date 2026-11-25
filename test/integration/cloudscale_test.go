@@ -253,9 +253,9 @@ func DeleteRemainingRouters() bool {
 			// Extra routes must be removed before the router interfaces can be removed.
 			for _, extraRoute := range router.ExtraRoutes {
 				log.Printf("Found not deleted router extra route: %s on router %s\n", extraRoute.UUID, router.UUID)
-				err = client.Routers.RemoveRouterExtraRoute(context.Background(), router.UUID, extraRoute.UUID)
+				err = client.Routers.DeleteExtraRoute(context.Background(), router.UUID, extraRoute.UUID)
 				if err != nil {
-					log.Fatalf("Routers.RemoveRouterExtraRoute returned error %s\n", err)
+					log.Fatalf("Routers.DeleteExtraRoute returned error %s\n", err)
 				}
 			}
 			// Interfaces must be removed before the router can be deleted.

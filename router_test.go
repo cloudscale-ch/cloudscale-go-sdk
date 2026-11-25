@@ -360,12 +360,12 @@ func TestRouters_DeleteInterface(t *testing.T) {
 	}
 }
 
-func TestRouters_AddRouterExtraRoute(t *testing.T) {
+func TestRouters_CreateExtraRoute(t *testing.T) {
 	setup()
 	defer teardown()
 
 	routerUUID := "cfde831a-4e87-4a75-960f-89b0148aa2cc"
-	addRouterExtraRouterRequest := AddRouterExtraRouteRequest{
+	createExtraRouterRequest := CreateExtraRouteRequest{
 		Destination: "10.10.20.0/24",
 		NextHop:     "10.10.10.1",
 	}
@@ -374,8 +374,8 @@ func TestRouters_AddRouterExtraRoute(t *testing.T) {
 		testHTTPMethod(t, r, http.MethodPost)
 
 		expected := map[string]any{
-			"destination": addRouterExtraRouterRequest.Destination,
-			"next_hop":    addRouterExtraRouterRequest.NextHop,
+			"destination": createExtraRouterRequest.Destination,
+			"next_hop":    createExtraRouterRequest.NextHop,
 		}
 
 		var v map[string]any
@@ -389,24 +389,30 @@ func TestRouters_AddRouterExtraRoute(t *testing.T) {
 		}
 
 		_, _ = fmt.Fprint(w, `{
-			"extra_routes": [
-			  {
-				"href": "https://api.cloudscale.ch/v1/routers/cfde831a-4e87-4a75-960f-89b0148aa2cc/extra-routes/b70e92cb-e8c2-4455-bfae-d1365fa75c08",
-				"uuid": "b70e92cb-e8c2-4455-bfae-d1365fa75c08",
-				"destination": "10.10.20.0/24",
-				"next_hop": "10.10.10.1"
-			  }
-			]
+			"href": "https://api.cloudscale.ch/v1/routers/cfde831a-4e87-4a75-960f-89b0148aa2cc/extra-routes/b70e92cb-e8c2-4455-bfae-d1365fa75c08",
+			"uuid": "b70e92cb-e8c2-4455-bfae-d1365fa75c08",
+			"destination": "10.10.20.0/24",
+			"next_hop": "10.10.10.1"
 		}`)
 	})
 
-	_, err := client.Routers.AddRouterExtraRoute(context.TODO(), routerUUID, addRouterExtraRouterRequest)
+	extraRoute, err := client.Routers.CreateExtraRoute(context.TODO(), routerUUID, createExtraRouterRequest)
 	if err != nil {
-		t.Errorf("Routers.AddRouterExtraRoute returned error: %v", err)
+		t.Errorf("Routers.CreateExtraRoute returned error: %v", err)
+	}
+
+	expected := &RouterExtraRoute{
+		HREF:        "https://api.cloudscale.ch/v1/routers/cfde831a-4e87-4a75-960f-89b0148aa2cc/extra-routes/b70e92cb-e8c2-4455-bfae-d1365fa75c08",
+		UUID:        "b70e92cb-e8c2-4455-bfae-d1365fa75c08",
+		Destination: "10.10.20.0/24",
+		NextHop:     "10.10.10.1",
+	}
+	if !reflect.DeepEqual(extraRoute, expected) {
+		t.Errorf("Routers.CreateExtraRoute returned %+v, expected %+v", extraRoute, expected)
 	}
 }
 
-func TestRouters_RemoveRouterExtraRoute(t *testing.T) {
+func TestRouters_DeleteExtraRoute(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -417,12 +423,12 @@ func TestRouters_RemoveRouterExtraRoute(t *testing.T) {
 		called = true
 	})
 
-	err := client.Routers.RemoveRouterExtraRoute(ctx, "cfde831a-4e87-4a75-960f-89b0148aa2cc", "b70e92cb-e8c2-4455-bfae-d1365fa75c08")
+	err := client.Routers.DeleteExtraRoute(ctx, "cfde831a-4e87-4a75-960f-89b0148aa2cc", "b70e92cb-e8c2-4455-bfae-d1365fa75c08")
 	if err != nil {
-		t.Errorf("Routers.DeleteInterface returned error: %v", err)
+		t.Errorf("Routers.DeleteExtraRoute returned error: %v", err)
 	}
 
 	if !called {
-		t.Error("expected remove_router_extra_route endpoint to be called")
+		t.Error("expected remove_extra_route endpoint to be called")
 	}
 }

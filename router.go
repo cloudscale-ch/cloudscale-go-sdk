@@ -71,8 +71,8 @@ type RouterService interface {
 	CreateInterface(ctx context.Context, routerUUID string, createReq CreateInterfaceRequest) (*RouterInterface, error)
 	// DeleteInterface removes an interface attached to this router
 	DeleteInterface(ctx context.Context, routerUUID, interfaceUUID string) error
-	AddRouterExtraRoute(ctx context.Context, routerUUID string, createReq AddRouterExtraRouteRequest) (*RouterExtraRoute, error)
-	RemoveRouterExtraRoute(ctx context.Context, routerUUID string, routerExtraRouteUUID string) error
+	CreateExtraRoute(ctx context.Context, routerUUID string, createReq CreateExtraRouteRequest) (*RouterExtraRoute, error)
+	DeleteExtraRoute(ctx context.Context, routerUUID string, routerExtraRouteUUID string) error
 }
 
 type CreateInterfaceRequest struct {
@@ -84,7 +84,7 @@ type CreateAddressRequest struct {
 	Address string `json:"address"`
 }
 
-type AddRouterExtraRouteRequest struct {
+type CreateExtraRouteRequest struct {
 	Destination string `json:"destination"`
 	NextHop     string `json:"next_hop"`
 }
@@ -119,7 +119,7 @@ func (r RouterServiceOperations) DeleteInterface(ctx context.Context, routerUUID
 	return r.client.Do(ctx, req, nil)
 }
 
-func (r RouterServiceOperations) AddRouterExtraRoute(ctx context.Context, routerUUID string, createReq AddRouterExtraRouteRequest) (*RouterExtraRoute, error) {
+func (r RouterServiceOperations) CreateExtraRoute(ctx context.Context, routerUUID string, createReq CreateExtraRouteRequest) (*RouterExtraRoute, error) {
 	path := fmt.Sprintf("%s/%s/extra-routes", routerBasePath, routerUUID)
 	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes")
 
@@ -134,9 +134,9 @@ func (r RouterServiceOperations) AddRouterExtraRoute(ctx context.Context, router
 	return res, nil
 }
 
-func (r RouterServiceOperations) RemoveRouterExtraRoute(ctx context.Context, routerUUID, routerExtraRouteUUID string) error {
+func (r RouterServiceOperations) DeleteExtraRoute(ctx context.Context, routerUUID, routerExtraRouteUUID string) error {
 	path := fmt.Sprintf("%s/%s/extra-routes/%s", routerBasePath, routerUUID, routerExtraRouteUUID)
-	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes/:router_extra_route_uuid")
+	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes/:extra_route_id")
 
 	req, err := r.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {

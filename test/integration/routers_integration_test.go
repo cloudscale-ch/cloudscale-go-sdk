@@ -186,17 +186,17 @@ func testCreateRouterInterface(t *testing.T, router cloudscale.Router, subnet cl
 	return *routerInterface
 }
 
-func testAddAndRemoveRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
+func testAddAndDeleteExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
 	t.Helper()
 
-	addRouterExtraRouterRequest := cloudscale.AddRouterExtraRouteRequest{
+	createExtraRouterRequest := cloudscale.CreateExtraRouteRequest{
 		Destination: "10.10.10.0/24",
 		NextHop:     "192.168.99.1",
 	}
 
-	addedRouterExtraRoute, err := client.Routers.AddRouterExtraRoute(t.Context(), initialRouter.UUID, addRouterExtraRouterRequest)
+	addedRouterExtraRoute, err := client.Routers.CreateExtraRoute(t.Context(), initialRouter.UUID, createExtraRouterRequest)
 	if err != nil {
-		t.Fatalf("Routers.AddRouterExtraRouteRequest returned error %s", err)
+		t.Fatalf("Routers.CreateExtraRouteRequest returned error %s", err)
 	}
 
 	updatedRouterWithExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
@@ -209,9 +209,9 @@ func testAddAndRemoveRouterExtraRoutes(t *testing.T, initialRouter cloudscale.Ro
 		t.Errorf("router.ExtraRoutes got=%+v\nwant=%+v", updatedRouterWithExtraRoutes.ExtraRoutes, expectedRouterExtraRoutes)
 	}
 
-	err = client.Routers.RemoveRouterExtraRoute(t.Context(), initialRouter.UUID, addedRouterExtraRoute.UUID)
+	err = client.Routers.DeleteExtraRoute(t.Context(), initialRouter.UUID, addedRouterExtraRoute.UUID)
 	if err != nil {
-		t.Fatalf("Routers.RemoveRouterExtraRoute returned error %s", err)
+		t.Fatalf("Routers.DeleteExtraRoute returned error %s", err)
 	}
 
 	updatedRouterWithoutExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
@@ -266,7 +266,7 @@ func TestIntegrationRouter_CRUD(t *testing.T) {
 	routerInterface := testCreateRouterInterface(t, router, subnet)
 
 	// Test router extra_routes
-	testAddAndRemoveRouterExtraRoutes(t, router)
+	testAddAndDeleteExtraRoutes(t, router)
 
 	// Test router interface deletion
 	testDeleteRouterInterface(t, router, routerInterface)
