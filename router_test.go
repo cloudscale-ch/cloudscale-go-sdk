@@ -365,7 +365,7 @@ func TestRouters_CreateExtraRoute(t *testing.T) {
 	defer teardown()
 
 	routerUUID := "cfde831a-4e87-4a75-960f-89b0148aa2cc"
-	createExtraRouterRequest := CreateExtraRouteRequest{
+	createExtraRouteRequest := CreateExtraRouteRequest{
 		Destination: "10.10.20.0/24",
 		NextHop:     "10.10.10.1",
 	}
@@ -374,8 +374,8 @@ func TestRouters_CreateExtraRoute(t *testing.T) {
 		testHTTPMethod(t, r, http.MethodPost)
 
 		expected := map[string]any{
-			"destination": createExtraRouterRequest.Destination,
-			"next_hop":    createExtraRouterRequest.NextHop,
+			"destination": createExtraRouteRequest.Destination,
+			"next_hop":    createExtraRouteRequest.NextHop,
 		}
 
 		var v map[string]any
@@ -396,7 +396,7 @@ func TestRouters_CreateExtraRoute(t *testing.T) {
 		}`)
 	})
 
-	extraRoute, err := client.Routers.CreateExtraRoute(context.TODO(), routerUUID, createExtraRouterRequest)
+	extraRoute, err := client.Routers.CreateExtraRoute(context.TODO(), routerUUID, createExtraRouteRequest)
 	if err != nil {
 		t.Errorf("Routers.CreateExtraRoute returned error: %v", err)
 	}
@@ -429,6 +429,6 @@ func TestRouters_DeleteExtraRoute(t *testing.T) {
 	}
 
 	if !called {
-		t.Error("expected remove_extra_route endpoint to be called")
+		t.Error("expected delete_extra_route endpoint to be called")
 	}
 }

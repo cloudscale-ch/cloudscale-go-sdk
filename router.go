@@ -72,7 +72,7 @@ type RouterService interface {
 	// DeleteInterface removes an interface attached to this router
 	DeleteInterface(ctx context.Context, routerUUID, interfaceUUID string) error
 	CreateExtraRoute(ctx context.Context, routerUUID string, createReq CreateExtraRouteRequest) (*RouterExtraRoute, error)
-	DeleteExtraRoute(ctx context.Context, routerUUID string, routerExtraRouteUUID string) error
+	DeleteExtraRoute(ctx context.Context, routerUUID string, extraRouteUUID string) error
 }
 
 type CreateInterfaceRequest struct {
@@ -134,8 +134,8 @@ func (r RouterServiceOperations) CreateExtraRoute(ctx context.Context, routerUUI
 	return res, nil
 }
 
-func (r RouterServiceOperations) DeleteExtraRoute(ctx context.Context, routerUUID, routerExtraRouteUUID string) error {
-	path := fmt.Sprintf("%s/%s/extra-routes/%s", routerBasePath, routerUUID, routerExtraRouteUUID)
+func (r RouterServiceOperations) DeleteExtraRoute(ctx context.Context, routerUUID, extraRouteUUID string) error {
+	path := fmt.Sprintf("%s/%s/extra-routes/%s", routerBasePath, routerUUID, extraRouteUUID)
 	ctx = WithOperationPath(ctx, routerBasePath+"/:id/extra-routes/:extra_route_id")
 
 	req, err := r.client.NewRequest(ctx, http.MethodDelete, path, nil)

@@ -189,14 +189,14 @@ func testCreateRouterInterface(t *testing.T, router cloudscale.Router, subnet cl
 func testAddAndDeleteExtraRoutes(t *testing.T, initialRouter cloudscale.Router) {
 	t.Helper()
 
-	createExtraRouterRequest := cloudscale.CreateExtraRouteRequest{
+	createExtraRouteRequest := cloudscale.CreateExtraRouteRequest{
 		Destination: "10.10.10.0/24",
 		NextHop:     "192.168.99.1",
 	}
 
-	addedRouterExtraRoute, err := client.Routers.CreateExtraRoute(t.Context(), initialRouter.UUID, createExtraRouterRequest)
+	addedRouterExtraRoute, err := client.Routers.CreateExtraRoute(t.Context(), initialRouter.UUID, createExtraRouteRequest)
 	if err != nil {
-		t.Fatalf("Routers.CreateExtraRouteRequest returned error %s", err)
+		t.Fatalf("Routers.CreateExtraRoute returned error %s", err)
 	}
 
 	updatedRouterWithExtraRoutes, err := client.Routers.Get(t.Context(), initialRouter.UUID)
